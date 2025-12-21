@@ -11,6 +11,9 @@ import {
   SignedContractRowData,
   signedContractsColumns,
 } from "@/modules/sales/components/columns";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
+import ExportButton from "@/components/shared/export-button";
 
 // Sample data based on the image
 const tableData: SignedContractRowData[] = [
@@ -128,10 +131,17 @@ export default function SignedContractsPage() {
   const [appliedFilters, setAppliedFilters] = useState<Record<string, string>>(
     {}
   );
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleApplyFilters = (filters: Record<string, string>) => {
     setAppliedFilters(filters);
     console.log("Applied Filters:", filters);
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    // Apply search logic here
+    console.log("Search Query:", e.target.value);
   };
 
   // Define filter fields for signed contracts
@@ -169,13 +179,36 @@ export default function SignedContractsPage() {
   return (
     <div className="space-y-2">
       {/* Filter Section */}
-      <FilterSheet
-        fields={filterFields}
-        initialFilters={appliedFilters}
-        onApplyFilters={handleApplyFilters}
-        title="فلترة العقود الموقعة"
-        description="استخدم الحقول التالية لفلترة العقود الموقعة"
-      />
+      <div className="flex items-center justify-between gap-3">
+        <div className="w-[250px]">
+          <Input
+            type="text"
+            placeholder="Search"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            icon={Search}
+            className="max-w-md"
+          />
+        </div>
+        <div className="flex items-center gap-3">
+          <ExportButton
+            data={tableData}
+            filename="signed-contracts"
+            columns={signedContractsColumns.map((col) => ({
+              key: col.key,
+              header: col.header,
+            }))}
+          />
+          <FilterSheet
+            fields={filterFields}
+            initialFilters={appliedFilters}
+            onApplyFilters={handleApplyFilters}
+            title="فلترة العقود الموقعة"
+            description="استخدم الحقول التالية لفلترة العقود الموقعة"
+          />
+        </div>
+      </div>
+
       {/* Summary Statistics */}
       <div className="bg-white rounded-xl p-3 shadow-sm">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -188,9 +221,7 @@ export default function SignedContractsPage() {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-gray-700">
-              المساحة الاجمالية:
-            </h3>
+            <h3 className="font-semibold text-gray-700">المساحة الاجمالية:</h3>
             <p className="text-lg font-bold text-primary">{totalArea}</p>
           </div>
         </div>

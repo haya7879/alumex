@@ -48,7 +48,7 @@ export function DataTable<T extends Record<string, any>>({
   };
 
   return (
-    <div className={cn("bg-white rounded-xl overflow-hidden", className)}>
+    <div className={cn("bg-white rounded-lg overflow-hidden", className)}>
       <Table>
         {showHeader && (
           <TableHeader>

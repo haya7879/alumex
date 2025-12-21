@@ -181,8 +181,8 @@ export default function StepThree({
   ];
 
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm space-y-6">
-      <h2 className="text-2xl font-semibold mb-6">جدول القياس</h2>
+    <div className="bg-white rounded-xl p-4 border">
+      <h2 className="text-xl font-semibold mb-6">جدول القياس</h2>
 
       {/* Section Tabs */}
       <div className="flex items-center gap-2 mb-4">
@@ -238,10 +238,10 @@ export default function StepThree({
       </div>
 
       <div className="flex justify-between gap-4 pt-4">
-        <Button onClick={onPrev} variant="outline">
+        <Button onClick={onPrev} variant="outline" className="min-w-[100px]">
           <ChevronLeft className="size-4 ml-2" /> السابق
         </Button>
-        <Button onClick={onSubmit} className="bg-primary hover:bg-primary/80">
+        <Button onClick={onSubmit} className="bg-primary hover:bg-primary/80 min-w-[100px]">
           حفظ
         </Button>
       </div>

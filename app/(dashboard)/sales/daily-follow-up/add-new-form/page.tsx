@@ -4,6 +4,7 @@ import { useState } from "react";
 import StepOne, { BasicInfoFormData } from "./(steps)/step-one";
 import StepTwo from "./(steps)/step-two";
 import StepThree, { MeasurementRow } from "./(steps)/step-three";
+import StepsIndicator from "@/components/shared/steps-indicator";
 
 export default function AddNewFormPage() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -89,63 +90,15 @@ export default function AddNewFormPage() {
     console.log("Measurements:", measurementRows);
   };
 
+  const steps = [
+    { label: "المعلومات" },
+    { label: "الملاحظات" },
+    { label: "جدول القياس" },
+  ];
+
   return (
-    <div className="space-y-4">
-      {/* Steps Indicator */}
-      <div className="bg-white rounded-xl p-3">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-4">
-            <div
-              className={`flex items-center justify-center w-8 h-8 rounded-full ${
-                currentStep >= 1 ? "bg-primary text-white" : "bg-gray-200 text-gray-600"
-              }`}
-            >
-              1
-            </div>
-            <div className="h-1 w-20 bg-gray-200">
-              <div
-                className={`h-full transition-all ${
-                  currentStep >= 2 ? "bg-primary" : "bg-gray-200"
-                }`}
-                style={{ width: currentStep >= 2 ? "100%" : "0%" }}
-              />
-            </div>
-            <div
-              className={`flex items-center justify-center w-8 h-8 rounded-full ${
-                currentStep >= 2 ? "bg-primary text-white" : "bg-gray-200 text-gray-600"
-              }`}
-            >
-              2
-            </div>
-            <div className="h-1 w-20 bg-gray-200">
-              <div
-                className={`h-full transition-all ${
-                  currentStep >= 3 ? "bg-primary" : "bg-gray-200"
-                }`}
-                style={{ width: currentStep >= 3 ? "100%" : "0%" }}
-              />
-            </div>
-            <div
-              className={`flex items-center justify-center w-8 h-8 rounded-full ${
-                currentStep >= 3 ? "bg-primary text-white" : "bg-gray-200 text-gray-600"
-              }`}
-            >
-              3
-            </div>
-          </div>
-        </div>
-        <div className="flex items-center gap-8 text-sm">
-          <span className={currentStep === 1 ? "font-semibold text-primary" : "text-gray-600"}>
-            المعلومات الاساسية
-          </span>
-          <span className={currentStep === 2 ? "font-semibold text-primary" : "text-gray-600"}>
-            الملاحظات
-          </span>
-          <span className={currentStep === 3 ? "font-semibold text-primary" : "text-gray-600"}>
-            جدول القياس
-          </span>
-        </div>
-      </div>
+    <div className="space-y-2">
+      <StepsIndicator steps={steps} currentStep={currentStep} />
 
       {/* Step 1: Basic Information */}
       {currentStep === 1 && (

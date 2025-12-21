@@ -14,8 +14,8 @@ interface StepTwoProps {
 
 export default function StepTwo({ notes, onNotesChange, onNext, onPrev }: StepTwoProps) {
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm space-y-6">
-      <h2 className="text-2xl font-semibold mb-6">الملاحظات</h2>
+    <div className="bg-white rounded-xl p-4 border">
+      <h2 className="text-xl font-semibold mb-6">الملاحظات</h2>
 
       <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
         <p className="text-sm text-yellow-800">
@@ -36,10 +36,10 @@ export default function StepTwo({ notes, onNotesChange, onNext, onPrev }: StepTw
       </div>
 
       <div className="flex justify-between gap-4 pt-4">
-        <Button onClick={onPrev} variant="outline">
+        <Button onClick={onPrev} variant="outline" className="min-w-[100px]">
           <ChevronLeft className="size-4 ml-2" /> السابق
         </Button>
-        <Button onClick={onNext} className="bg-primary hover:bg-primary/80">
+        <Button onClick={onNext} className="bg-primary hover:bg-primary/80 min-w-[100px]">
           التالي <ChevronRight className="size-4 mr-2" />
         </Button>
       </div>

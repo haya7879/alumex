@@ -3,10 +3,10 @@
 export const Logo = () => {
   return (
     <div className="flex items-center gap-2">
-      <div className="size-8 bg-primary rounded flex items-center justify-center">
-        <span className="text-primary-foreground text-xs font-bold">A</span>
+      <div>
+        <img src="/logo.svg" alt="" className="w-[70px]" />
       </div>
-      <span className="font-semibold text-lg">Alumex</span>
+      <span className="font-bold text-[#2D3748] text-xl">ALUMEX</span>
     </div>
   );
 };

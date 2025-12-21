@@ -145,9 +145,9 @@ export function TablePagination({
           size="icon"
           onClick={handlePrevious}
           disabled={currentPage === 1}
-          className="h-9 w-9"
+          className="h-8 w-8"
         >
-          <ChevronLeft className="size-4" />
+          <ChevronRight className="size-4" />
         </Button>
 
         {/* Page Numbers */}
@@ -174,7 +174,7 @@ export function TablePagination({
                 size="icon"
                 onClick={() => handlePageClick(pageNumber)}
                 className={cn(
-                  "h-9 w-9",
+                  "h-8 w-8",
                   isActive && "bg-primary hover:bg-primary/80 text-white"
                 )}
               >
@@ -190,9 +190,9 @@ export function TablePagination({
           size="icon"
           onClick={handleNext}
           disabled={currentPage === totalPages}
-          className="h-9 w-9"
+          className="h-8 w-8"
         >
-          <ChevronRight className="size-4" />
+          <ChevronLeft className="size-4" />
         </Button>
       </div>
     </div>

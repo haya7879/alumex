@@ -539,7 +539,7 @@ function ContainerHeaderContent({
     <div
       className={cn(
         "relative bg-background flex-1 flex items-center px-6 rounded-tr-2xl h-full transition-all",
-        "after:absolute after:bottom-0 after:-right-4 after:h-6 after:w-4 after:bg-[url('/carved-right.svg')] after:bg-contain after:bg-bottom after:bg-no-repeat after:content-['']",
+        "after:absolute after:bottom-0 after:-left-4 after:h-6 after:w-4 after:bg-[url('/carved-right.svg')] after:bg-contain after:bg-bottom after:bg-no-repeat after:content-['']",
         fullSize && "after:hidden",
         !hasHeaderList && "rounded-tl-2xl"
       )}

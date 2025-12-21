@@ -34,8 +34,8 @@ interface StepOneProps {
 
 export default function StepOne({ formData, onInputChange, onNext }: StepOneProps) {
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm space-y-4">
-      <h2 className="text-2xl font-semibold mb-6">المعلومات الاساسية</h2>
+    <div className="bg-white rounded-lg p-4 border">
+      <h2 className="text-xl font-semibold mb-6">المعلومات الاساسية</h2>
 
       <div className="grid grid-cols-3 gap-6">
         <div className="space-y-2">
@@ -172,7 +172,7 @@ export default function StepOne({ formData, onInputChange, onNext }: StepOneProp
       </div>
 
       <div className="flex justify-end gap-4 pt-4">
-        <Button onClick={onNext} className="bg-primary hover:bg-primary/80">
+        <Button onClick={onNext} className="bg-primary hover:bg-primary/80 min-w-[100px]">
           التالي <ChevronRight className="size-4 mr-2" />
         </Button>
       </div>

@@ -2,9 +2,17 @@
 
 import { useState } from "react";
 import { DataTable } from "@/components/table/data-table";
-import { columns, TableRowData } from "../../../../modules/sales/components/columns";
-import FilterSheet, { FilterField } from "../../../../modules/sales/components/filter-sheet";
+import {
+  columns,
+  TableRowData,
+} from "../../../../modules/sales/components/columns";
+import FilterSheet, {
+  FilterField,
+} from "../../../../modules/sales/components/filter-sheet";
 import { TablePagination } from "@/components/table";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
+import ExportButton from "@/components/shared/export-button";
 
 // Sample data based on the image
 const tableData: TableRowData[] = [
@@ -110,12 +118,21 @@ const tableData: TableRowData[] = [
 ];
 
 export default function DailyFollowUpPage() {
-  const [appliedFilters, setAppliedFilters] = useState<Record<string, string>>({});
+  const [appliedFilters, setAppliedFilters] = useState<Record<string, string>>(
+    {}
+  );
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleApplyFilters = (filters: Record<string, string>) => {
     setAppliedFilters(filters);
     console.log("Applied Filters:", filters);
     // Apply filters logic here
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    // Apply search logic here
+    console.log("Search Query:", e.target.value);
   };
 
   // Define filter fields for daily follow-up
@@ -175,18 +192,46 @@ export default function DailyFollowUpPage() {
   ];
 
   return (
-    <div className="space-y-3">
-      <FilterSheet
-        fields={filterFields}
-        initialFilters={appliedFilters}
-        onApplyFilters={handleApplyFilters}
-      />
+    <div className="space-y-6">
+      <div className="flex items-center justify-between gap-3">
+        <div className="w-[250px]">
+          <Input
+            type="text"
+            placeholder="Search"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            icon={Search}
+            className="max-w-md"
+          />
+        </div>
+        <div className="flex items-center gap-3">
+          <ExportButton
+            data={tableData}
+            filename="daily-follow-up"
+            columns={columns.map((col) => ({
+              key: col.key,
+              header: col.header,
+            }))}
+          />
+          <FilterSheet
+            fields={filterFields}
+            initialFilters={appliedFilters}
+            onApplyFilters={handleApplyFilters}
+          />
+        </div>
+      </div>
       <DataTable
         data={tableData}
         columns={columns}
         emptyMessage="لا توجد بيانات للعرض"
       />
-      <TablePagination currentPage={1} totalPages={1} pageSize={10} totalItems={10} onPageChange={() => {}} />
+      <TablePagination
+        currentPage={1}
+        totalPages={1}
+        pageSize={10}
+        totalItems={10}
+        onPageChange={() => {}}
+      />
     </div>
   );
 }

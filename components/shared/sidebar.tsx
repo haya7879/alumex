@@ -1,106 +1,234 @@
 "use client";
 import * as React from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ShoppingCart, FolderKanban, Ruler, DollarSign, ClipboardList, LogOut, Moon, Sun } from "lucide-react";
+import {
+  ShoppingCart,
+  FolderKanban,
+  Ruler,
+  DollarSign,
+  ClipboardList,
+  LogOut,
+  Moon,
+  Sun,
+  Home,
+} from "lucide-react";
 import { useModalStore, EModalType } from "@/store/use-modal-store";
 import { LogoutModal } from "./logout-modal";
-import { StorageService } from "@/lib/storage-service";
 import { useTheme } from "next-themes";
-import { useRouter } from "next/navigation";
-const UserAvatar = () => {
-  const user = StorageService.getUser();
+import { cn } from "@/lib/utils";
+import { useSidebarStore } from "@/store/use-sidebar-store";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
-  return (
-    <div className="flex items-center w-full">
-      <Avatar className="size-13">
-        <AvatarImage src="" />
-        <AvatarFallback className="bg-slate-600 text-white">
-          {user?.full_name
-            ?.split(" ")
-            .map((name: string) => name.charAt(0))
-            .slice(0, 2)
-            .join("")
-            .toUpperCase()}
-        </AvatarFallback>
-      </Avatar>
-      <p className="text-xs font-medium text-[#7B8495] sr-only">
-        {user?.full_name}
-      </p>
-    </div>
-  );
-};
+interface MenuItem {
+  label: string;
+  href: string;
+  icon?: React.ElementType;
+}
+
+interface MenuSection {
+  title: string;
+  items: MenuItem[];
+}
 
 export const Sidebar = () => {
   const { onOpen } = useModalStore();
-  const [open, setOpen] = React.useState(false);
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
-  const router = useRouter();
+  const pathname = usePathname();
+  const { isOpen } = useSidebarStore();
 
   React.useEffect(() => {
     setMounted(true);
   }, []);
 
-  const buttons = [
+  // Menu sections
+  const menuSections: MenuSection[] = [
     {
-      icon: <ShoppingCart className="size-5" />,
-      href: "/sales/daily-follow-up"
+      title: "قسم المبيعات",
+      items: [
+        {
+          label: "المتابعة اليومية",
+          href: "/sales/daily-follow-up",
+          icon: ShoppingCart,
+        },
+        {
+          label: "الزيارات اليومية",
+          href: "/sales/daily-visits",
+          icon: ShoppingCart,
+        },
+        {
+          label: "خيارات المقاطع",
+          href: "/sales/section-options",
+          icon: ShoppingCart,
+        },
+        {
+          label: "الشركات المعتمدة",
+          href: "/sales/companies",
+          icon: ShoppingCart,
+        },
+      ],
     },
     {
-      icon: <FolderKanban className="size-5" />,
-      href: "/projects"
+      title: "القسم المالي",
+      items: [
+        {
+          label: "المستحقات",
+          href: "/financial/debts",
+          icon: DollarSign,
+        },
+      ],
     },
     {
-      icon: <Ruler className="size-5" />,
-      href: "/measurements"
+      title: "قسم المشاريع",
+      items: [
+        {
+          label: "قائمة العقود",
+          href: "/projects/contracts",
+          icon: FolderKanban,
+        },
+        {
+          label: "الوصوف",
+          href: "/projects/descriptions",
+          icon: FolderKanban,
+        },
+        {
+          label: "طلبات الانتاج",
+          href: "/projects/production-orders",
+          icon: FolderKanban,
+        },
+      ],
     },
     {
-      icon: <DollarSign className="size-5" />,
-      href: "/financial"
+      title: "قسم القياسات",
+      items: [
+        {
+          label: "عرض الطلبات",
+          href: "/measurements",
+          icon: Ruler,
+        },
+      ],
     },
     {
-      icon: <ClipboardList className="size-5" />,
-      href: "/tasks-management"
-    },
-    {
-      icon: <LogOut className="size-5" />,
-      onClick: () => onOpen(EModalType.LOGOUT),
-    },
-    {
-      icon: mounted && theme === "dark" ? (
-        <Sun className="size-5" />
-      ) : (
-        <Moon className="size-5" />
-      ),
-      className: "size-13 rounded-full bg-white/40",
-      onClick: () => setTheme(theme === "dark" ? "light" : "dark"),
+      title: "إدارة المهام",
+      items: [
+        {
+          label: "عرض جميع المهام",
+          href: "/tasks-manager/all-tasks",
+          icon: ClipboardList,
+        },
+      ],
     },
   ];
 
+  const isActive = (href: string) => {
+    const normalizedPath = pathname.replace(/^\/(en|ar)/, "");
+    const normalizedHref = href.replace(/^\/(en|ar)/, "");
+    return (
+      normalizedPath === normalizedHref ||
+      normalizedPath.startsWith(normalizedHref + "/")
+    );
+  };
+
+  const getDefaultValue = () => {
+    // Find which section contains the active item
+    for (const section of menuSections) {
+      if (section.items.some((item) => isActive(item.href))) {
+        return section.title;
+      }
+    }
+    return undefined;
+  };
+
   return (
     <>
-      <div className="fixed right-0 top-0 h-full px-[15px] py-6">
-        <div className="h-full p-3 rounded-full w-18 flex flex-col gap-4 items-center bg-white/30">
-          <UserAvatar />
+      <div
+        className="fixed right-0 top-0 h-full text-[#2a3042] flex flex-col z-9999"
+        style={{ background: "#fff", width: "230px" }}
+      >
+        {/* Logo Section */}
+        <div className="p-6 border-b border-gray-700">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-xl">A</span>
+            </div>
+            <span className="text-xl font-bold">ALUMEX</span>
+          </div>
+        </div>
 
-          {buttons.map((button, index) => (
-            <Button
-              key={index}
-              variant="outline"
-              size="icon"
-              className={"size-13 rounded-full bg-white/20 cursor-pointer text-black/70"}
-              onClick={() => {
-                if (button.onClick) {
-                  button.onClick();
-                } else if (button.href) {
-                  router.push(button.href);
-                }
-              }}
-            >
-              {button.icon}
-            </Button>
-          ))}
+        {/* Menu Sections */}
+        <div className="flex-1 overflow-y-auto p-4">
+          <Accordion
+            type="single"
+            collapsible
+            defaultValue={getDefaultValue()}
+            className="w-full"
+          >
+            {menuSections.map((section, sectionIndex) => (
+              <AccordionItem
+                key={sectionIndex}
+                value={section.title}
+                className="border-none"
+              >
+                <AccordionTrigger className="text-gray-400 text-xs font-semibold uppercase py-2 hover:no-underline">
+                  {section.title}
+                </AccordionTrigger>
+                <AccordionContent className="pb-2">
+                  <div className="space-y-1">
+                    {section.items.map((item, itemIndex) => {
+                      const ItemIcon = item.icon || Home;
+                      const active = isActive(item.href);
+                      return (
+                        <Link
+                          key={itemIndex}
+                          href={item.href}
+                          className={cn(
+                            "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
+                            active
+                              ? "bg-blue-600 text-white font-semibold"
+                              : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                          )}
+                        >
+                          <ItemIcon className="size-4" />
+                          <span>{item.label}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
+
+        {/* Bottom Actions */}
+        <div className="p-4 border-t border-gray-700 space-y-2">
+          <Button
+            variant="ghost"
+            className="w-full justify-start text-gray-300 hover:bg-gray-700 hover:text-white"
+            onClick={() => onOpen(EModalType.LOGOUT)}
+          >
+            <LogOut className="size-4 ml-2" />
+            تسجيل الخروج
+          </Button>
+          <Button
+            variant="ghost"
+            className="w-full justify-start text-gray-300 hover:bg-gray-700 hover:text-white"
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          >
+            {mounted && theme === "dark" ? (
+              <Sun className="size-4 ml-2" />
+            ) : (
+              <Moon className="size-4 ml-2" />
+            )}
+            {mounted && theme === "dark" ? "الوضع الفاتح" : "الوضع الداكن"}
+          </Button>
         </div>
       </div>
       <LogoutModal />

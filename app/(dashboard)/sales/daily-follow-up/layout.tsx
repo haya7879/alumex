@@ -1,88 +1,65 @@
 "use client";
 
-import { ReactNode, useState, useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
-import Tabs, { TabItem } from "@/components/shared/tabs";
-import { Plus, Calendar, FileX, FileText } from "lucide-react";
+import {
+  ContainerContent,
+  ContainerHeaderLink,
+  ContainerHeaderList,
+} from "@/components/shared/container";
+import PageHeader from "@/components/shared/page-header";
+import { Calendar, FileCheck, FileX, Plus } from "lucide-react";
+import { ReactNode } from "react";
 
 export default function DailyFollowUpLayout({
   children,
 }: {
   children: ReactNode;
 }) {
-  const router = useRouter();
-  const pathname = usePathname();
-
-  // Determine active tab based on pathname
-  const getActiveTab = () => {
-    if (pathname?.includes("add-new-form")) return "add-new-form";
-    if (pathname?.includes("rejected-forms")) return "rejected-forms";
-    if (pathname?.includes("signed-contracts")) return "signed-contracts";
-    return "daily-schedule";
-  };
-
-  const [activeTab, setActiveTab] = useState(getActiveTab());
-
-  // Update active tab when pathname changes
-  useEffect(() => {
-    const newActiveTab = getActiveTab();
-    setActiveTab(newActiveTab);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname]);
-
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
-    switch (value) {
-      case "add-new-form":
-        router.push("/sales/daily-follow-up/add-new-form");
-        break;
-      case "daily-schedule":
-        router.push("/sales/daily-follow-up");
-        break;
-      case "rejected-forms":
-        router.push("/sales/daily-follow-up/rejected-forms");
-        break;
-      case "signed-contracts":
-        router.push("/sales/daily-follow-up/signed-contracts");
-        break;
-    }
-  };
-
-  const tabs: TabItem[] = [
+  const headerLinks = [
     {
-      value: "add-new-form",
-      label: "إضافة نموذج جديد",
-      icon: Plus,
-      content: children,
-    },
-    {
-      value: "daily-schedule",
       label: "برنامج المتابعة اليومي",
+      href: "/sales/daily-follow-up",
       icon: Calendar,
-      content: children,
+      exact: true,
     },
     {
-      value: "rejected-forms",
+      label: "العقود الموقعة",
+      href: "/sales/daily-follow-up/signed-contracts",
+      icon: FileCheck,
+    },
+    {
       label: "النماذج المرفوضة",
+      href: "/sales/daily-follow-up/rejected-forms",
       icon: FileX,
-      content: children,
     },
     {
-      value: "signed-contracts",
-      label: "جدول العقود الموقعة",
-      icon: FileText,
-      content: children,
+      label: "إضافة نموذج جديد",
+      href: "/sales/daily-follow-up/add-new-form",
+      icon: Plus,
     },
   ];
-
   return (
-    <div className="mt-5">
-      <Tabs
-        items={tabs}
-        value={activeTab}
-        onValueChange={handleTabChange}
-      />
-    </div>
+    <>
+      <div className="bg-white rounded-lg">
+        <PageHeader
+          title="المتابعة اليومية"
+          breadcrumb={[
+            { label: "المبيعات", href: "/sales" },
+            { label: "المتابعة اليومية", href: "/sales/daily-follow-up" },
+          ]}
+        />
+        <ContainerHeaderList>
+          {headerLinks.map((link, index) => (
+            <ContainerHeaderLink
+              key={index}
+              label={link.label}
+              href={link.href}
+              Icon={link.icon}
+              exact={link.exact}
+            />
+          ))}
+        </ContainerHeaderList>
+        <ContainerContent>{children}</ContainerContent>
+      </div>
+    </>
   );
 }
-

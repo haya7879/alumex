@@ -23,13 +23,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="ar" dir="rtl" suppressHydrationWarning>
       <body className={`${cairo.variable} antialiased`}>
         <ThemeProvider>
-          <BackgroundGradient variant="purple" />
-          <div className="flex h-full">
-            <div className="flex flex-col w-full h-full transition-all p-4 pt-0 max-w-[calc(100vw-100px)]">
-              {/* <Navbar /> */}
+          <BackgroundGradient  />
+          {/* <Navbar /> */}
+          <div className="flex min-h-screen pt-16 justify-end">
+            <div className="w-full h-full transition-all p-4 pt-4 max-w-[84vw]!" style={{maxWidth:"84vw"}}>
               {children}
             </div>
             <Sidebar />
