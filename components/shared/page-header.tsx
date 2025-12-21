@@ -240,13 +240,6 @@ export default function PageHeader({
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium">{user?.full_name || "User"}</p>
-                <p className="text-xs text-gray-500">{user?.email || user?.role || "User"}</p>
-              </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => handleProfileAction("profile")}>
               <User className="size-4 mr-2" />
               <span>Profile</span>
