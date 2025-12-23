@@ -251,6 +251,7 @@ export default function ArchiveOrdersPage() {
         data={tableData}
         columns={columns}
         emptyMessage="لا توجد بيانات للعرض"
+        
       />
 
       {/* Pagination */}

@@ -10,6 +10,12 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
+import ExportButton from "../shared/export-button";
+import FilterSheet, {
+  FilterField,
+} from "@/modules/sales/components/filter-sheet";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 export interface Column<T = any> {
   key: string;
@@ -28,6 +34,19 @@ export interface DataTableProps<T = any> {
   onRowClick?: (row: T, index: number) => void;
   emptyMessage?: string;
   showHeader?: boolean;
+  // Toolbar props
+  enableExport?: boolean;
+  exportFilename?: string;
+  enableFilter?: boolean;
+  filterFields?: FilterField[];
+  initialFilters?: Record<string, string>;
+  onApplyFilters?: (filters: Record<string, string>) => void;
+  enableSearch?: boolean;
+  searchValue?: string;
+  onSearchChange?: (value: string) => void;
+  searchPlaceholder?: string;
+  searchWidth?: string;
+  renderToolbar?: () => ReactNode;
 }
 
 export function DataTable<T extends Record<string, any>>({
@@ -39,6 +58,18 @@ export function DataTable<T extends Record<string, any>>({
   onRowClick,
   emptyMessage = "لا توجد بيانات",
   showHeader = true,
+  enableExport = false,
+  exportFilename = "export",
+  enableFilter = false,
+  filterFields,
+  initialFilters,
+  onApplyFilters,
+  enableSearch = false,
+  searchValue,
+  onSearchChange,
+  searchPlaceholder = "Search",
+  searchWidth = "250px",
+  renderToolbar,
 }: DataTableProps<T>) {
   const getRowClassName = (row: T, index: number): string => {
     if (typeof rowClassName === "function") {
@@ -47,8 +78,53 @@ export function DataTable<T extends Record<string, any>>({
     return rowClassName || "";
   };
 
+  const showToolbar =
+    enableExport || enableFilter || enableSearch || renderToolbar;
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onSearchChange?.(e.target.value);
+  };
+
   return (
     <div className={cn("bg-white rounded-lg overflow-hidden", className)}>
+      {showToolbar && (
+        <div className="flex items-center gap-3 py-3 justify-between border-b">
+          <div className="flex items-center gap-3">
+            {enableExport && (
+              <ExportButton
+                data={data}
+                filename={exportFilename}
+                columns={columns.map((col) => ({
+                  key: col.key,
+                  header: col.header,
+                }))}
+              />
+            )}
+            {enableFilter && filterFields && (
+              <FilterSheet
+                fields={filterFields}
+                initialFilters={initialFilters}
+                onApplyFilters={onApplyFilters}
+              />
+            )}
+          </div>
+          <div className="flex items-center gap-3">
+            {enableSearch && (
+              <div style={{ width: searchWidth }}>
+                <Input
+                  type="text"
+                  placeholder={searchPlaceholder}
+                  value={searchValue || ""}
+                  onChange={handleSearchChange}
+                  icon={Search}
+                  className="max-w-md"
+                />
+              </div>
+            )}
+            {renderToolbar && renderToolbar()}
+          </div>
+        </div>
+      )}
       <Table>
         {showHeader && (
           <TableHeader>

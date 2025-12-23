@@ -4,7 +4,7 @@ import { useState } from "react";
 import { DataTable, Column } from "@/components/table/data-table";
 import { TablePagination } from "@/components/table";
 import { MoreVertical, Calendar, Hourglass, CheckCircle2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import FilterSheet, {
   FilterField,
 } from "@/modules/sales/components/filter-sheet";
@@ -161,21 +161,19 @@ const columns: Column<ContractRowData>[] = [
     header: "طلبات اليوم المقبل",
     render: (row) => {
       return row.nextDayOrder === "send" ? (
-        <Button
-          size="sm"
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
+        <Badge
+          variant="secondary"
+          className="border-transparent px-3 py-1"
         >
           ارسال طلب تفصيلي
-        </Button>
+        </Badge>
       ) : (
-        <Button
-          size="sm"
-          variant="outline"
-          className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-md"
-          disabled
+        <Badge
+          variant="warning"
+          className="px-3 py-1"
         >
           انتظار الاستجابة
-        </Button>
+        </Badge>
       );
     },
   },

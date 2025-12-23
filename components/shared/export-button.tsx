@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 
 export interface ExportButtonProps {
-  data: Record<string, any>[];
+  data?: Record<string, any>[];
   filename?: string;
   columns?: { key: string; header: string }[];
   className?: string;
@@ -92,7 +92,7 @@ export default function ExportButton({
       className={className}
     >
       <Upload className="size-4" />
-      <span>تصدير Excel</span>
+      {/* <span>تصدير Excel</span> */}
     </Button>
   );
 }

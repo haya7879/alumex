@@ -64,6 +64,11 @@ export const Sidebar = () => {
           icon: ShoppingCart,
         },
         {
+          label: "الحركات اليومية",
+          href: "/sales/daily-movements",
+          icon: ShoppingCart,
+        },
+        {
           label: "خيارات المقاطع",
           href: "/sales/section-options",
           icon: ShoppingCart,
@@ -109,8 +114,8 @@ export const Sidebar = () => {
       title: "قسم القياسات",
       items: [
         {
-          label: "عرض الطلبات",
-          href: "/measurements",
+          label: "الطلبات",
+          href: "/measurements/orders",
           icon: Ruler,
         },
       ],
@@ -119,7 +124,7 @@ export const Sidebar = () => {
       title: "إدارة المهام",
       items: [
         {
-          label: "عرض جميع المهام",
+          label: "جميع المهام",
           href: "/tasks-manager/all-tasks",
           icon: ClipboardList,
         },
@@ -149,86 +154,134 @@ export const Sidebar = () => {
   return (
     <>
       <div
-        className="fixed right-0 top-0 h-full text-[#2a3042] flex flex-col z-9999"
-        style={{ background: "#fff", width: "230px" }}
+        className={cn(
+          "fixed right-0 top-0 h-full text-[#2a3042] flex flex-col z-40 transition-all duration-300 ease-in-out",
+          "bg-white"
+        )}
+        style={{ width: isOpen ? "220px" : "64px" }}
       >
         {/* Logo Section */}
-        <div className="p-6 border-b border-gray-700">
+        <div className={cn(
+          "transition-all duration-300",
+          isOpen ? "p-6" : "p-4 flex justify-center"
+        )}>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
               <span className="text-white font-bold text-xl">A</span>
             </div>
-            <span className="text-xl font-bold">ALUMEX</span>
+            {isOpen && (
+              <span className="text-xl font-bold whitespace-nowrap">ALUMEX</span>
+            )}
           </div>
         </div>
 
         {/* Menu Sections */}
         <div className="flex-1 overflow-y-auto p-4">
-          <Accordion
-            type="single"
-            collapsible
-            defaultValue={getDefaultValue()}
-            className="w-full"
-          >
-            {menuSections.map((section, sectionIndex) => (
-              <AccordionItem
-                key={sectionIndex}
-                value={section.title}
-                className="border-none"
-              >
-                <AccordionTrigger className="text-gray-400 text-xs font-semibold uppercase py-2 hover:no-underline">
-                  {section.title}
-                </AccordionTrigger>
-                <AccordionContent className="pb-2">
-                  <div className="space-y-1">
-                    {section.items.map((item, itemIndex) => {
-                      const ItemIcon = item.icon || Home;
-                      const active = isActive(item.href);
-                      return (
-                        <Link
-                          key={itemIndex}
-                          href={item.href}
-                          className={cn(
-                            "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
-                            active
-                              ? "bg-blue-600 text-white font-semibold"
-                              : "text-gray-300 hover:bg-gray-700 hover:text-white"
-                          )}
-                        >
-                          <ItemIcon className="size-4" />
-                          <span>{item.label}</span>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
+          {isOpen ? (
+            <Accordion
+              type="single"
+              collapsible
+              defaultValue={getDefaultValue()}
+              className="w-full"
+            >
+              {menuSections.map((section, sectionIndex) => (
+                <AccordionItem
+                  key={sectionIndex}
+                  value={section.title}
+                  className="border-none mb-4"
+                >
+                  <AccordionTrigger className="text-black text-sm font-semibold uppercase py-1.5 hover:no-underline">
+                    {section.title}
+                  </AccordionTrigger>
+                  <AccordionContent className="pb-2">
+                    <div className="space-y-1">
+                      {section.items.map((item, itemIndex) => {
+                        const ItemIcon = item.icon || Home;
+                        const active = isActive(item.href);
+                        return (
+                          <Link
+                            key={itemIndex}
+                            href={item.href}
+                            className={cn(
+                              "flex items-center gap-3 px-3 py-1.5 rounded-md text-xs transition-colors text-gray-500",
+                              active
+                                ? "font-semibold"
+                                : ""
+                            )}
+                          >
+                            - <span>{item.label}</span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          ) : (
+            <div>
+              {menuSections.map((section, sectionIndex) => (
+                <div key={sectionIndex} className="space-y-1">
+                  {section.items.map((item, itemIndex) => {
+                    const ItemIcon = item.icon || Home;
+                    const active = isActive(item.href);
+                    return (
+                      <Link
+                        key={itemIndex}
+                        href={item.href}
+                        className={cn(
+                          "flex items-center justify-center px-1.5 py-2 rounded-md text-xs transition-colors",
+                          active
+                            ? "bg-blue-600 text-blue-950 font-semibold"
+                            : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                        )}
+                        title={item.label}
+                      >
+                        <ItemIcon className="size-5" />
+                      </Link>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Bottom Actions */}
-        <div className="p-4 border-t border-gray-700 space-y-2">
+        <div className={cn(
+          "border-t border-gray-700 space-y-2 transition-all duration-300",
+          isOpen ? "p-4" : "p-2"
+        )}>
           <Button
             variant="ghost"
-            className="w-full justify-start text-gray-300 hover:bg-gray-700 hover:text-white"
+            className={cn(
+              "w-full text-gray-300 hover:bg-gray-700 transition-all duration-300 text-sm",
+              isOpen ? "justify-start" : "justify-center"
+            )}
             onClick={() => onOpen(EModalType.LOGOUT)}
+            title="تسجيل الخروج"
           >
-            <LogOut className="size-4 ml-2" />
-            تسجيل الخروج
+            <LogOut className={cn("size-4", isOpen ? "ml-2" : "")} />
+            {isOpen && <span>تسجيل الخروج</span>}
           </Button>
-          <Button
+          {/* <Button
             variant="ghost"
-            className="w-full justify-start text-gray-300 hover:bg-gray-700 hover:text-white"
+            className={cn(
+              "w-full text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-300",
+              isOpen ? "justify-start" : "justify-center"
+            )}
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            title={mounted && theme === "dark" ? "الوضع الفاتح" : "الوضع الداكن"}
           >
             {mounted && theme === "dark" ? (
-              <Sun className="size-4 ml-2" />
+              <Sun className={cn("size-4", isOpen ? "ml-2" : "")} />
             ) : (
-              <Moon className="size-4 ml-2" />
+              <Moon className={cn("size-4", isOpen ? "ml-2" : "")} />
             )}
-            {mounted && theme === "dark" ? "الوضع الفاتح" : "الوضع الداكن"}
-          </Button>
+            {isOpen && (
+              <span>{mounted && theme === "dark" ? "الوضع الفاتح" : "الوضع الداكن"}</span>
+            )}
+          </Button> */}
         </div>
       </div>
       <LogoutModal />

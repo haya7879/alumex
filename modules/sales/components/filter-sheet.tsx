@@ -39,7 +39,7 @@ export interface FilterField {
 }
 
 export interface FilterSheetProps {
-  fields: FilterField[];
+  fields?: FilterField[];
   initialFilters?: Record<string, string>;
   onApplyFilters?: (filters: Record<string, string>) => void;
   title?: string;
@@ -62,7 +62,7 @@ export default function FilterSheet({
   // Initialize filters from fields and initialFilters
   const initializeFilters = () => {
     const defaultFilters: Record<string, string> = {};
-    fields.forEach((field) => {
+    fields?.forEach((field) => {
       defaultFilters[field.key] = initialFilters[field.key] || field.defaultValue || "";
     });
     return defaultFilters;
@@ -137,7 +137,7 @@ export default function FilterSheet({
         <SheetTrigger asChild>
           <Button variant="outline" className={triggerClassName || "gap-2"}>
             <Filter className="size-4" />
-            {buttonText}
+            {/* {buttonText} */}
           </Button>
         </SheetTrigger>
         <SheetContent
@@ -157,7 +157,7 @@ export default function FilterSheet({
           </SheetHeader>
 
           <div className="mt-6 space-y-3">
-            {fields.map((field) => (
+            {fields?.map((field) => (
               <div key={field.key} className="space-y-2">
                 <Label
                   htmlFor={field.key}

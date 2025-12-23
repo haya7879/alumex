@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/providers/theme-provider";
 import { BackgroundGradient } from "@/components/shared/background-gradient";
 import { Sidebar } from "@/components/shared/sidebar";
 import { Navbar } from "@/components/shared/navbar";
+import { ContentWrapper } from "@/components/shared/content-wrapper";
 import "./globals.css";
 
 const cairo = Cairo({
@@ -26,12 +27,12 @@ export default function RootLayout({
     <html lang="ar" dir="rtl" suppressHydrationWarning>
       <body className={`${cairo.variable} antialiased`}>
         <ThemeProvider>
-          <BackgroundGradient  />
-          {/* <Navbar /> */}
-          <div className="flex min-h-screen pt-16 justify-end">
-            <div className="w-full h-full transition-all p-4 pt-4 max-w-[84vw]!" style={{maxWidth:"84vw"}}>
+          <BackgroundGradient variant="default"  />
+          <Navbar />
+          <div className="flex min-h-screen justify-end" style={{marginTop:"60px"}}>
+            <ContentWrapper>
               {children}
-            </div>
+            </ContentWrapper>
             <Sidebar />
           </div>
         </ThemeProvider>

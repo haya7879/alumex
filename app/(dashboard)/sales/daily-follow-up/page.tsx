@@ -6,13 +6,8 @@ import {
   columns,
   TableRowData,
 } from "../../../../modules/sales/components/columns";
-import FilterSheet, {
-  FilterField,
-} from "../../../../modules/sales/components/filter-sheet";
+import { FilterField } from "../../../../modules/sales/components/filter-sheet";
 import { TablePagination } from "@/components/table";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
-import ExportButton from "@/components/shared/export-button";
 
 // Sample data based on the image
 const tableData: TableRowData[] = [
@@ -129,12 +124,6 @@ export default function DailyFollowUpPage() {
     // Apply filters logic here
   };
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-    // Apply search logic here
-    console.log("Search Query:", e.target.value);
-  };
-
   // Define filter fields for daily follow-up
   const filterFields: FilterField[] = [
     {
@@ -193,37 +182,22 @@ export default function DailyFollowUpPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-3">
-        <div className="w-[250px]">
-          <Input
-            type="text"
-            placeholder="Search"
-            value={searchQuery}
-            onChange={handleSearchChange}
-            icon={Search}
-            className="max-w-md"
-          />
-        </div>
-        <div className="flex items-center gap-3">
-          <ExportButton
-            data={tableData}
-            filename="daily-follow-up"
-            columns={columns.map((col) => ({
-              key: col.key,
-              header: col.header,
-            }))}
-          />
-          <FilterSheet
-            fields={filterFields}
-            initialFilters={appliedFilters}
-            onApplyFilters={handleApplyFilters}
-          />
-        </div>
-      </div>
+
       <DataTable
         data={tableData}
         columns={columns}
         emptyMessage="لا توجد بيانات للعرض"
+        enableExport
+        exportFilename="daily-follow-up"
+        enableFilter
+        filterFields={filterFields}
+        initialFilters={appliedFilters}
+        onApplyFilters={handleApplyFilters}
+        enableSearch
+        searchValue={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Search"
+        searchWidth="250px"
       />
       <TablePagination
         currentPage={1}

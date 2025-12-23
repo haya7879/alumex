@@ -6,15 +6,14 @@ import {
   ContainerHeaderList,
 } from "@/components/shared/container";
 import PageHeader from "@/components/shared/page-header";
-import { Archive, FileText, List, Plus, ShoppingCart } from "lucide-react";
+import { Archive, ShoppingCart } from "lucide-react";
 import { ReactNode, useMemo } from "react";
 import { usePathname } from "next/navigation";
 
 // Map path segments to Arabic labels
 const pathLabels: Record<string, string> = {
-  projects: "المشاريع",
-  descriptions: "الوصوف",
-  create: "انشاء وصف جديد",
+  orders: "الطلبات",
+  archive: "الأرشيف",
 };
 
 export default function DailyFollowUpLayout({
@@ -42,20 +41,20 @@ export default function DailyFollowUpLayout({
   const pageTitle = useMemo(() => {
     const segments = pathname.split("/").filter(Boolean);
     const lastSegment = segments[segments.length - 1];
-    return pathLabels[lastSegment] || "الوصوف";
+    return pathLabels[lastSegment] || "الطلبات";
   }, [pathname]);
 
   const headerLinks = [
     {
-      label: "عرض الوصوف النشطة",
-      href: "/projects/descriptions",
-      icon: List,
+      label: "عرض الطلبات",
+      href: "/measurements/orders",
+      icon: ShoppingCart,
       exact: true,
     },
     {
-      label: "انشاء وصف جديد",
-      href: "/projects/descriptions/create",
-      icon: Plus,
+      label: "الأرشيف",
+      href: "/measurements/orders/archive",
+      icon: Archive,
     },
   ];
   return (
