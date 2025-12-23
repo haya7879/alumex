@@ -249,7 +249,7 @@ export const Sidebar = () => {
                         className={cn(
                           "flex items-center justify-center px-1.5 py-2 rounded-md text-xs transition-colors cursor-pointer",
                           sectionActive
-                            ? "bg-blue-600 text-blue-950 font-semibold"
+                            ? "text-blue-950 font-semibold"
                             : "text-gray-600 hover:bg-gray-100"
                         )}
                         onMouseEnter={() => setHoveredSection(section.title)}
