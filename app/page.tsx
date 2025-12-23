@@ -1,4 +1,5 @@
+import { redirect } from "next/navigation";
 
-export default function Home() {
-  return <div>Home Page</div>;
+export default function Page() {
+  redirect("/sales/daily-follow-up");
 }

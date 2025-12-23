@@ -181,10 +181,7 @@ export const Sidebar = () => {
           "transition-all duration-300",
           isOpen ? "p-6" : "p-4 flex justify-center"
         )}>
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center shrink-0">
-              <span className="text-white font-bold text-xl">A</span>
-            </div>
+          <div className="flex items-center gap-3 justify-center">
             {isOpen && (
               <span className="text-xl font-bold whitespace-nowrap">ALUMEX</span>
             )}
