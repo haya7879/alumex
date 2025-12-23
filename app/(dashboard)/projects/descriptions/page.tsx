@@ -11,9 +11,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import FilterSheet, {
+import {
   FilterField,
-} from "@/modules/sales/components/filter-sheet";
+} from "@/components/shared/filter-sheet";
 
 // Data interface
 export interface DescriptionRowData {
@@ -249,21 +249,14 @@ export default function DescriptionsPage() {
 
   return (
     <div className="space-y-4">
-      {/* Filter Section */}
-      <div className="flex justify-end">
-        <FilterSheet
-          fields={filterFields}
-          initialFilters={appliedFilters}
-          onApplyFilters={handleApplyFilters}
-          title="فلترة الوصوف"
-          description="استخدم الحقول التالية لفلترة الوصوف"
-        />
-      </div>
-
       <DataTable
         data={tableData}
         columns={columns}
         emptyMessage="لا توجد بيانات للعرض"
+        enableFilter
+        filterFields={filterFields}
+        initialFilters={appliedFilters}
+        onApplyFilters={handleApplyFilters}
       />
 
       {/* Pagination */}

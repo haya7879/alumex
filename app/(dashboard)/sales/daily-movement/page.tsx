@@ -2,13 +2,11 @@
 
 import { useState } from "react";
 import { DataTable, Column } from "@/components/table/data-table";
-import FilterSheet, {
+import {
   FilterField,
-} from "../../../../modules/sales/components/filter-sheet";
+} from "../../../../components/shared/filter-sheet";
 import { TablePagination } from "@/components/table";
-import { Input } from "@/components/ui/input";
-import { Search, MoreVertical, Calendar } from "lucide-react";
-import ExportButton from "@/components/shared/export-button";
+import { MoreVertical, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 // Data interface
@@ -161,11 +159,6 @@ export default function DailyMovementPage() {
     // Apply filters logic here
   };
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-    // Apply search logic here
-    console.log("Search Query:", e.target.value);
-  };
 
   // Define filter fields for daily movement
   const filterFields: FilterField[] = [
@@ -207,44 +200,24 @@ export default function DailyMovementPage() {
 
   return (
     <div className="space-y-4">
-      {/* Filter and Search Section */}
-      <div className="bg-white rounded-lg p-4">
-        <div className="flex items-center justify-between gap-3">
-          <div className="w-[250px]">
-            <Input
-              type="text"
-              placeholder="Search"
-              value={searchQuery}
-              onChange={handleSearchChange}
-              icon={Search}
-              className="max-w-md"
-            />
-          </div>
-          <div className="flex items-center gap-3">
-            <ExportButton
-              data={tableData}
-              filename="daily-movement"
-              columns={columns.map((col) => ({
-                key: col.key,
-                header: col.header,
-              }))}
-            />
-            <FilterSheet
-              fields={filterFields}
-              initialFilters={appliedFilters}
-              onApplyFilters={handleApplyFilters}
-              title="فلترة الحركة اليومية"
-              description="استخدم الحقول التالية لفلترة الحركة اليومية"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Table Section */}
       <DataTable
         data={tableData}
         columns={columns}
         emptyMessage="لا توجد بيانات للعرض"
+        enableExport
+        exportFilename="daily-movement"
+        enableFilter
+        filterFields={filterFields}
+        initialFilters={appliedFilters}
+        onApplyFilters={handleApplyFilters}
+        enableSearch
+        searchValue={searchQuery}
+        onSearchChange={(value) => {
+          setSearchQuery(value);
+          console.log("Search Query:", value);
+        }}
+        searchPlaceholder="Search"
+        searchWidth="250px"
       />
 
       {/* Pagination */}

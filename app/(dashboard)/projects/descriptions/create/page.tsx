@@ -594,14 +594,14 @@ export default function CreateDescriptionPage() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-3">
+        {/* <div className="flex gap-3">
           <Button
             type="button"
             onClick={handleRequestCheck}
           >
             طلب تشك
           </Button>
-        </div>
+        </div> */}
 
         {/* Toolbar */}
         <div className="bg-white rounded-lg p-4 border">

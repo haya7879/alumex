@@ -6,7 +6,7 @@ import {
   columns,
   TableRowData,
 } from "../../../../modules/sales/components/columns";
-import { FilterField } from "../../../../modules/sales/components/filter-sheet";
+import { FilterField } from "../../../../components/shared/filter-sheet";
 import { TablePagination } from "@/components/table";
 
 // Sample data based on the image

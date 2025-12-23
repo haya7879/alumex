@@ -6,9 +6,9 @@ import { TablePagination } from "@/components/table";
 import { MoreVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import FilterSheet, {
+import {
   FilterField,
-} from "@/modules/sales/components/filter-sheet";
+} from "@/components/shared/filter-sheet";
 
 // Data interface
 export interface ProductionOrderRowData {
@@ -173,21 +173,14 @@ export default function ProductionOrdersPage() {
 
   return (
     <div className="space-y-4">
-      {/* Filter Section */}
-      <div className="flex justify-end">
-        <FilterSheet
-          fields={filterFields}
-          initialFilters={appliedFilters}
-          onApplyFilters={handleApplyFilters}
-          title="فلترة طلبات الإنتاج"
-          description="استخدم الحقول التالية لفلترة طلبات الإنتاج"
-        />
-      </div>
-
       <DataTable
         data={tableData}
         columns={columns}
         emptyMessage="لا توجد بيانات للعرض"
+        enableFilter
+        filterFields={filterFields}
+        initialFilters={appliedFilters}
+        onApplyFilters={handleApplyFilters}
       />
 
       {/* Pagination */}

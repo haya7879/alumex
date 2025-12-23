@@ -5,9 +5,9 @@ import { DataTable, Column } from "@/components/table/data-table";
 import { TablePagination } from "@/components/table";
 import { MoreVertical, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import FilterSheet, {
+import {
   FilterField,
-} from "@/modules/sales/components/filter-sheet";
+} from "@/components/shared/filter-sheet";
 
 // Data interface
 export interface ArchiveTaskRowData {
@@ -164,21 +164,14 @@ export default function ArchiveTasksPage() {
 
   return (
     <div className="space-y-4">
-      {/* Filter Section */}
-      <div className="flex justify-end">
-        <FilterSheet
-          fields={filterFields}
-          initialFilters={appliedFilters}
-          onApplyFilters={handleApplyFilters}
-          title="فلترة الأرشيف"
-          description="استخدم الحقول التالية لفلترة الأرشيف"
-        />
-      </div>
-
       <DataTable
         data={tableData}
         columns={columns}
         emptyMessage="لا توجد بيانات للعرض"
+        enableFilter
+        filterFields={filterFields}
+        initialFilters={appliedFilters}
+        onApplyFilters={handleApplyFilters}
       />
 
       {/* Pagination */}

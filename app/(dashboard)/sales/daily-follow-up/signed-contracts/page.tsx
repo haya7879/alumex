@@ -3,17 +3,14 @@
 import { useState } from "react";
 import { DataTable } from "@/components/table/data-table";
 import { TablePagination } from "@/components/table";
-import FilterSheet, {
+import {
   FilterField,
-} from "../../../../../modules/sales/components/filter-sheet";
+} from "../../../../../components/shared/filter-sheet";
 import { Calendar } from "lucide-react";
 import {
   SignedContractRowData,
   signedContractsColumns,
 } from "@/modules/sales/components/columns";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
-import ExportButton from "@/components/shared/export-button";
 
 // Sample data based on the image
 const tableData: SignedContractRowData[] = [
@@ -138,11 +135,6 @@ export default function SignedContractsPage() {
     console.log("Applied Filters:", filters);
   };
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-    // Apply search logic here
-    console.log("Search Query:", e.target.value);
-  };
 
   // Define filter fields for signed contracts
   const filterFields: FilterField[] = [
@@ -178,36 +170,6 @@ export default function SignedContractsPage() {
 
   return (
     <div className="space-y-2">
-      {/* Filter Section */}
-      <div className="flex items-center justify-between gap-3">
-        <div className="w-[250px]">
-          <Input
-            type="text"
-            placeholder="Search"
-            value={searchQuery}
-            onChange={handleSearchChange}
-            icon={Search}
-            className="max-w-md"
-          />
-        </div>
-        <div className="flex items-center gap-3">
-          <ExportButton
-            data={tableData}
-            filename="signed-contracts"
-            columns={signedContractsColumns.map((col) => ({
-              key: col.key,
-              header: col.header,
-            }))}
-          />
-          <FilterSheet
-            fields={filterFields}
-            initialFilters={appliedFilters}
-            onApplyFilters={handleApplyFilters}
-            title="فلترة العقود الموقعة"
-            description="استخدم الحقول التالية لفلترة العقود الموقعة"
-          />
-        </div>
-      </div>
 
       {/* Summary Statistics */}
       <div className="bg-white rounded-xl p-3 shadow-sm">
@@ -232,6 +194,20 @@ export default function SignedContractsPage() {
           data={tableData}
           columns={signedContractsColumns}
           emptyMessage="لا توجد بيانات للعرض"
+          enableExport
+          exportFilename="signed-contracts"
+          enableFilter
+          filterFields={filterFields}
+          initialFilters={appliedFilters}
+          onApplyFilters={handleApplyFilters}
+          enableSearch
+          searchValue={searchQuery}
+          onSearchChange={(value) => {
+            setSearchQuery(value);
+            console.log("Search Query:", value);
+          }}
+          searchPlaceholder="Search"
+          searchWidth="250px"
         />
         <TablePagination
           currentPage={currentPage}

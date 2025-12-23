@@ -25,6 +25,11 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface MenuItem {
   label: string;
@@ -35,6 +40,7 @@ interface MenuItem {
 interface MenuSection {
   title: string;
   items: MenuItem[];
+  icon?: React.ElementType;
 }
 
 export const Sidebar = () => {
@@ -43,6 +49,7 @@ export const Sidebar = () => {
   const [mounted, setMounted] = React.useState(false);
   const pathname = usePathname();
   const { isOpen } = useSidebarStore();
+  const [hoveredSection, setHoveredSection] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     setMounted(true);
@@ -52,6 +59,7 @@ export const Sidebar = () => {
   const menuSections: MenuSection[] = [
     {
       title: "قسم المبيعات",
+      icon: ShoppingCart,
       items: [
         {
           label: "المتابعة اليومية",
@@ -65,7 +73,7 @@ export const Sidebar = () => {
         },
         {
           label: "الحركات اليومية",
-          href: "/sales/daily-movements",
+          href: "/sales/daily-movement",
           icon: ShoppingCart,
         },
         {
@@ -82,6 +90,7 @@ export const Sidebar = () => {
     },
     {
       title: "القسم المالي",
+      icon: DollarSign,
       items: [
         {
           label: "المستحقات",
@@ -92,6 +101,7 @@ export const Sidebar = () => {
     },
     {
       title: "قسم المشاريع",
+      icon: FolderKanban,
       items: [
         {
           label: "قائمة العقود",
@@ -112,6 +122,7 @@ export const Sidebar = () => {
     },
     {
       title: "قسم القياسات",
+      icon: Ruler,
       items: [
         {
           label: "الطلبات",
@@ -122,6 +133,7 @@ export const Sidebar = () => {
     },
     {
       title: "إدارة المهام",
+      icon: ClipboardList,
       items: [
         {
           label: "جميع المهام",
@@ -151,6 +163,10 @@ export const Sidebar = () => {
     return undefined;
   };
 
+  const isSectionActive = (section: MenuSection) => {
+    return section.items.some((item) => isActive(item.href));
+  };
+
   return (
     <>
       <div
@@ -166,7 +182,7 @@ export const Sidebar = () => {
           isOpen ? "p-6" : "p-4 flex justify-center"
         )}>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center shrink-0">
               <span className="text-white font-bold text-xl">A</span>
             </div>
             {isOpen && (
@@ -219,30 +235,69 @@ export const Sidebar = () => {
               ))}
             </Accordion>
           ) : (
-            <div>
-              {menuSections.map((section, sectionIndex) => (
-                <div key={sectionIndex} className="space-y-1">
-                  {section.items.map((item, itemIndex) => {
-                    const ItemIcon = item.icon || Home;
-                    const active = isActive(item.href);
-                    return (
-                      <Link
-                        key={itemIndex}
-                        href={item.href}
+            <div className="space-y-4">
+              {menuSections.map((section, sectionIndex) => {
+                const SectionIcon = section.icon || section.items[0]?.icon || Home;
+                const sectionActive = isSectionActive(section);
+                const isHovered = hoveredSection === section.title;
+
+                return (
+                  <Popover
+                    key={sectionIndex}
+                    open={isHovered}
+                    onOpenChange={(open) => setHoveredSection(open ? section.title : null)}
+                  >
+                    <PopoverTrigger asChild>
+                      <div
                         className={cn(
-                          "flex items-center justify-center px-1.5 py-2 rounded-md text-xs transition-colors",
-                          active
+                          "flex items-center justify-center px-1.5 py-2 rounded-md text-xs transition-colors cursor-pointer",
+                          sectionActive
                             ? "bg-blue-600 text-blue-950 font-semibold"
-                            : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                            : "text-gray-600 hover:bg-gray-100"
                         )}
-                        title={item.label}
+                        onMouseEnter={() => setHoveredSection(section.title)}
+                        onMouseLeave={() => setHoveredSection(null)}
+                        title={section.title}
                       >
-                        <ItemIcon className="size-5" />
-                      </Link>
-                    );
-                  })}
-                </div>
-              ))}
+                        <SectionIcon className="size-5" />
+                      </div>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      side="left"
+                      align="start"
+                      style={{width:"170px"}}
+                      className="p-2"
+                      onMouseEnter={() => setHoveredSection(section.title)}
+                      onMouseLeave={() => setHoveredSection(null)}
+                    >
+                      <div className="space-y-1">
+                        <div className="px-2 py-1.5 text-xs font-semibold text-gray-700 border-b border-gray-200 mb-1">
+                          {section.title}
+                        </div>
+                        {section.items.map((item, itemIndex) => {
+                          const ItemIcon = item.icon || Home;
+                          const active = isActive(item.href);
+                          return (
+                            <Link
+                              key={itemIndex}
+                              href={item.href}
+                              className={cn(
+                                "flex items-center gap-2 px-2 py-1.5 rounded-md text-xs transition-colors",
+                                active
+                                  ? "bg-blue-50 text-blue-600 font-semibold"
+                                  : "text-gray-700 hover:bg-gray-100"
+                              )}
+                              onClick={() => setHoveredSection(null)}
+                            >
+                              <span>{item.label}</span>
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                );
+              })}
             </div>
           )}
         </div>
@@ -264,13 +319,13 @@ export const Sidebar = () => {
             <LogOut className={cn("size-4", isOpen ? "ml-2" : "")} />
             {isOpen && <span>تسجيل الخروج</span>}
           </Button>
-          {/* <Button
+          <Button
             variant="ghost"
             className={cn(
               "w-full text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-300",
               isOpen ? "justify-start" : "justify-center"
             )}
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            // onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             title={mounted && theme === "dark" ? "الوضع الفاتح" : "الوضع الداكن"}
           >
             {mounted && theme === "dark" ? (
@@ -281,7 +336,7 @@ export const Sidebar = () => {
             {isOpen && (
               <span>{mounted && theme === "dark" ? "الوضع الفاتح" : "الوضع الداكن"}</span>
             )}
-          </Button> */}
+          </Button>
         </div>
       </div>
       <LogoutModal />

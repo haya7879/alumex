@@ -172,14 +172,7 @@ export default function FilterSheet({
 
           <div className="mt-6 flex gap-3">
             <Button onClick={handleGetResults} className="flex-1">
-              الحصول على النتائج
-            </Button>
-            <Button
-              variant="outline"
-              onClick={handleReset}
-              className="flex-1"
-            >
-              إعادة تعيين
+              فلترة
             </Button>
             <SheetClose asChild>
               <Button variant="outline" className="flex-1">

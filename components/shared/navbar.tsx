@@ -100,27 +100,6 @@ export const Navbar = () => {
           )}
         </Button>
 
-        {/* Language Icon */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="hover:bg-gray-100 size-9"
-              title="Language"
-            >
-              <Globe className="size-5 text-gray-700" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-40">
-            <DropdownMenuItem onClick={() => handleLanguageChange("ar")}>
-              <span className="text-sm">العربية</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleLanguageChange("en")}>
-              <span className="text-sm">English</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
 
         {/* Notification Icon */}
         <Button

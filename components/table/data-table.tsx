@@ -13,7 +13,7 @@ import { ReactNode } from "react";
 import ExportButton from "../shared/export-button";
 import FilterSheet, {
   FilterField,
-} from "@/modules/sales/components/filter-sheet";
+} from "@/components/shared/filter-sheet";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 

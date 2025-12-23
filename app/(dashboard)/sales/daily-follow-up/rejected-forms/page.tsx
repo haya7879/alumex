@@ -2,7 +2,7 @@
 
 import { DataTable } from "@/components/table/data-table";
 import { columns, TableRowData } from "@/modules/sales/components/columns";
-import FilterSheet, { FilterField } from "@/modules/sales/components/filter-sheet";
+import { FilterField } from "@/components/shared/filter-sheet";
 import { TablePagination } from "@/components/table";
 import { useState } from "react";
 
@@ -58,17 +58,14 @@ export default function RejectedFormsPage() {
 
   return (
     <div className="space-y-3">
-      <FilterSheet
-        fields={filterFields}
-        initialFilters={appliedFilters}
-        onApplyFilters={handleApplyFilters}
-        title="فلترة النماذج المرفوضة"
-        description="استخدم الحقول التالية لفلترة النماذج المرفوضة"
-      />
       <DataTable
         data={tableData}
         columns={columns}
         emptyMessage="لا توجد بيانات للعرض"
+        enableFilter
+        filterFields={filterFields}
+        initialFilters={appliedFilters}
+        onApplyFilters={handleApplyFilters}
       />
       <TablePagination currentPage={1} totalPages={1} pageSize={10} totalItems={2} onPageChange={() => {}} />
     </div>
