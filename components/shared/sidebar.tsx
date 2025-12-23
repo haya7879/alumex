@@ -307,7 +307,7 @@ export const Sidebar = () => {
           <Button
             variant="ghost"
             className={cn(
-              "w-full text-gray-300 hover:bg-gray-700 transition-all duration-300 text-sm",
+              "w-full text-black hover:bg-gray-700 hover:text-white transition-all duration-300 text-sm",
               isOpen ? "justify-start" : "justify-center"
             )}
             onClick={() => onOpen(EModalType.LOGOUT)}
@@ -319,7 +319,7 @@ export const Sidebar = () => {
           <Button
             variant="ghost"
             className={cn(
-              "w-full text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-300",
+              "w-full text-black hover:bg-gray-700 hover:text-white transition-all duration-300",
               isOpen ? "justify-start" : "justify-center"
             )}
             // onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
