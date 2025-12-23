@@ -1,9 +1,6 @@
-import React from 'react'
+import { redirect } from "next/navigation";
 
-export default function page() {
-  return (
-    <div>
-      
-    </div>
-  )
+export default function FinancialPage() {
+  redirect("/financial/debts");
 }
+

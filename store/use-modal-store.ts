@@ -4,9 +4,6 @@ export enum EModalType {
   LOGOUT = "LOGOUT",
 }
 
-// Re-export EModalType for backward compatibility
-export { EModalType };
-
 interface ModalStore {
   isOpen: boolean;
   modalType: EModalType | null;
