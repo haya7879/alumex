@@ -9,7 +9,7 @@ export function ContentWrapper({ children }: { children: React.ReactNode }) {
   return (
     <div
       className={cn(
-        "w-full h-full transition-all duration-300 p-4 pt-4",
+        "w-full h-full transition-all duration-300 p-4 pt-4 mt-[60px]",
         isOpen ? "mr-[85px]" : "mr-0"
       )}
       style={{ width: "calc(100vw - 100px)" }}
