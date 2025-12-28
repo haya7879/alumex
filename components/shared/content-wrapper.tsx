@@ -1,17 +1,20 @@
 "use client";
 
 import { useSidebarStore } from "@/store/use-sidebar-store";
+import { cn } from "@/lib/utils";
 
 export function ContentWrapper({ children }: { children: React.ReactNode }) {
   const { isOpen } = useSidebarStore();
 
   return (
-    <div 
-      className="w-full h-full transition-all p-4 pt-4" 
-      style={{ width: isOpen ? "calc(100vw - 235px)" : "calc(100vw - 80px)" }}
+    <div
+      className={cn(
+        "w-full h-full transition-all duration-300 p-4 pt-4",
+        isOpen ? "mr-[85px]" : "mr-0"
+      )}
+      style={{ width: "calc(100vw - 100px)" }}
     >
       {children}
     </div>
   );
 }
-

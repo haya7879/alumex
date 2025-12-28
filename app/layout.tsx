@@ -29,12 +29,10 @@ export default function RootLayout({
         <ThemeProvider>
           <BackgroundGradient variant="default"  />
           <Navbar />
-          <div className="flex min-h-screen justify-end" style={{marginTop:"60px"}}>
             <ContentWrapper>
               {children}
             </ContentWrapper>
             <Sidebar />
-          </div>
         </ThemeProvider>
       </body>
     </html>

@@ -49,34 +49,35 @@ export default function DailyFollowUpLayout({
 
   const headerLinks = [
     {
-      label: "برنامج المتابعة اليومي",
-      href: "/sales/daily-follow-up",
-      icon: Calendar,
-      exact: true,
-    },
-    {
-      label: "العقود الموقعة",
-      href: "/sales/daily-follow-up/signed-contracts",
-      icon: FileCheck,
+      label: "إضافة نموذج جديد",
+      href: "/sales/daily-follow-up/add-new-form",
+      icon: Plus,
     },
     {
       label: "النماذج المرفوضة",
       href: "/sales/daily-follow-up/rejected-forms",
       icon: FileX,
     },
+
     {
-      label: "إضافة نموذج جديد",
-      href: "/sales/daily-follow-up/add-new-form",
-      icon: Plus,
+      label: "العقود الموقعة",
+      href: "/sales/daily-follow-up/signed-contracts",
+      icon: FileCheck,
+    },
+    {
+      label: "برنامج المتابعة اليومي",
+      href: "/sales/daily-follow-up",
+      icon: Calendar,
+      exact: true,
     },
   ];
   return (
     <>
-      <div className="bg-white rounded-lg">
-        <PageHeader
+      <div className="rounded-lg">
+        {/* <PageHeader
           title={pageTitle}
           breadcrumb={breadcrumb}
-        />
+        /> */}
         <ContainerHeaderList>
           {headerLinks.map((link, index) => (
             <ContainerHeaderLink

@@ -25,30 +25,21 @@ export interface ContainerProps {
   shadow?: boolean | string;
 }
 
-export function ContainerContent({
-  children,
-  className,
-}: ContainerProps) {
-
+export function ContainerContent({ children, className }: ContainerProps) {
   const containerClasses = cn(
     "bg-white h-full flex flex-col rounded-tr-2xl rounded-b-2xl p-4",
     className
   );
 
-  const contentClasses = cn(
-    "flex-1"
-  );
+  const contentClasses = cn("flex-1");
 
   return (
     <div className={containerClasses}>
       {/* Content Area */}
-      <div className={contentClasses}>
-        {children}
-      </div>
+      <div className={contentClasses}>{children}</div>
     </div>
   );
 }
-
 
 export function ContainerHeaderLink({
   label,
@@ -70,22 +61,25 @@ export function ContainerHeaderLink({
   // Check if this is an exact match or if we should check for path segments
   const isActive = exact
     ? normalizedPath === normalizedHref
-    : normalizedPath === normalizedHref || normalizedPath.startsWith(normalizedHref + "/");
+    : normalizedPath === normalizedHref ||
+      normalizedPath.startsWith(normalizedHref + "/");
 
   return (
     <Link
       href={href}
       data-active={isActive}
       className={cn(
-        "relative text-xs font-medium px-4 py-2.5 flex items-center gap-2 rounded-t-md transition-all cursor-pointer",
+        "text-sm font-medium px-6 py-3 relative flex items-center gap-2 rounded-t-lg transition-all cursor-pointer",
+        "before:absolute before:bottom-0 before:-left-6 before:h-11 before:w-6 before:bg-[url('/carved-left.svg')] before:bg-contain before:bg-bottom before:bg-no-repeat before:content-[''] before:opacity-0 before:transition-opacity",
+        "after:absolute after:-bottom-0 after:-right-6 after:h-11 after:w-6 after:bg-[url('/carved-right.svg')] after:bg-contain after:bg-bottom after:bg-no-repeat after:content-[''] after:opacity-0 after:transition-opacity",
         isActive
-          ? "bg-blue-50 text-gray-900 border-b-2 border-gray-900"
-          : "bg-gray-100 text-gray-600 hover:text-gray-900 hover:bg-gray-200"
+          ? "bg-background text-brand-primary before:opacity-100 after:opacity-100"
+          : "hover:text-brand-primary hover:before:opacity-100 hover:after:opacity-100 hover:bg-background"
       )}
       {...props}
     >
       {Icon && <Icon className="w-4 h-4" />}
-      <span>{label}</span>
+      <span className="sr-only xl:not-sr-only">{label}</span>
     </Link>
   );
 }
@@ -96,7 +90,7 @@ export function ContainerHeaderList({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex items-center gap-2 overflow-hidden px-4">
+    <div className="flex items-center gap-2 overflow-hidden justify-end">
       {children}
     </div>
   );

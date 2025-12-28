@@ -54,7 +54,7 @@ export default function DailyFollowUpLayout({
   ];
   return (
     <>
-      <div className="bg-white rounded-lg">
+      <div className="b rounded-lg">
         <PageHeader
           title={pageTitle}
           breadcrumb={breadcrumb}
