@@ -73,11 +73,7 @@ export default function DailyFollowUpLayout({
   ];
   return (
     <>
-      <div className="rounded-lg">
-        {/* <PageHeader
-          title={pageTitle}
-          breadcrumb={breadcrumb}
-        /> */}
+      <div className="rounded-lg mr-[90px]">
         <ContainerHeaderList>
           {headerLinks.map((link, index) => (
             <ContainerHeaderLink
