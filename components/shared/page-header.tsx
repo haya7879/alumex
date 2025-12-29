@@ -54,13 +54,13 @@ export default function PageHeader({
   return (
     <div
       className={cn(
-        "flex items-center justify-between bg-white p-4 rounded-lg mb-4 border-b",
+        "flex items-center justify-between bg-white pb-4 rounded-lg",
         className
       )}
     >
       <div className="flex-1">
         {/* Page Title */}
-        <h1 className="font-bold text-gray-900 mb-2 text-sm">{pageTitle}</h1>
+        {/* <h1 className="font-bold text-gray-900 mb-2 text-sm">{pageTitle}</h1> */}
         {/* Breadcrumb */}
         <Breadcrumb>
           <BreadcrumbList>

@@ -199,7 +199,7 @@ export default function DailyMovementPage() {
   ];
 
   return (
-    <div className="space-y-4">
+    <>
       <DataTable
         data={tableData}
         columns={columns}
@@ -228,6 +228,6 @@ export default function DailyMovementPage() {
         totalItems={tableData.length}
         onPageChange={() => {}}
       />
-    </div>
+    </>
   );
 }

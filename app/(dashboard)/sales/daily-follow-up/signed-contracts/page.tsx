@@ -3,9 +3,7 @@
 import { useState } from "react";
 import { DataTable } from "@/components/table/data-table";
 import { TablePagination } from "@/components/table";
-import {
-  FilterField,
-} from "../../../../../components/shared/filter-sheet";
+import { FilterField } from "../../../../../components/shared/filter-sheet";
 import { Calendar } from "lucide-react";
 import {
   SignedContractRowData,
@@ -135,7 +133,6 @@ export default function SignedContractsPage() {
     console.log("Applied Filters:", filters);
   };
 
-
   // Define filter fields for signed contracts
   const filterFields: FilterField[] = [
     {
@@ -169,10 +166,9 @@ export default function SignedContractsPage() {
   const totalArea = "456784 م2";
 
   return (
-    <div className="space-y-2">
-
+    <>
       {/* Summary Statistics */}
-      <div className="bg-white rounded-xl p-3 shadow-sm">
+      {/* <div className="bg-white rounded-xl p-3 shadow-sm">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex items-center gap-2">
             <h3 className="font-semibold text-gray-700">
@@ -187,37 +183,35 @@ export default function SignedContractsPage() {
             <p className="text-lg font-bold text-primary">{totalArea}</p>
           </div>
         </div>
-      </div>
+      </div> */}
       {/* Table Section */}
-      <div className="space-y-3">
-        <DataTable
-          data={tableData}
-          columns={signedContractsColumns}
-          emptyMessage="لا توجد بيانات للعرض"
-          enableExport
-          exportFilename="signed-contracts"
-          enableFilter
-          filterFields={filterFields}
-          initialFilters={appliedFilters}
-          onApplyFilters={handleApplyFilters}
-          enableSearch
-          searchValue={searchQuery}
-          onSearchChange={(value) => {
-            setSearchQuery(value);
-            console.log("Search Query:", value);
-          }}
-          searchPlaceholder="Search"
-          searchWidth="250px"
-        />
-        <TablePagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          pageSize={pageSize}
-          totalItems={totalItems}
-          onPageChange={setCurrentPage}
-          onPageSizeChange={setPageSize}
-        />
-      </div>
-    </div>
+      <DataTable
+        data={tableData}
+        columns={signedContractsColumns}
+        emptyMessage="لا توجد بيانات للعرض"
+        enableExport
+        exportFilename="signed-contracts"
+        enableFilter
+        filterFields={filterFields}
+        initialFilters={appliedFilters}
+        onApplyFilters={handleApplyFilters}
+        enableSearch
+        searchValue={searchQuery}
+        onSearchChange={(value) => {
+          setSearchQuery(value);
+          console.log("Search Query:", value);
+        }}
+        searchPlaceholder="Search"
+        searchWidth="250px"
+      />
+      <TablePagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        pageSize={pageSize}
+        totalItems={totalItems}
+        onPageChange={setCurrentPage}
+        onPageSizeChange={setPageSize}
+      />
+    </>
   );
 }

@@ -104,16 +104,16 @@ export function TablePagination({
   return (
     <div
       className={cn(
-        "flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-3",
+        "flex flex-col sm:flex-row items-center justify-center gap-4 px-4 py-3 mt-5",
         className
       )}
     >
       {/* Info Section */}
-      {showInfo && (
+      {/* {showInfo && (
         <div className="text-sm text-gray-600">
           عرض {startItem} إلى {endItem} من {totalItems} نتيجة
         </div>
-      )}
+      )} */}
 
       {/* Pagination Controls */}
       <div className="flex items-center gap-2">

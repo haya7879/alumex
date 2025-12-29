@@ -181,8 +181,7 @@ export default function DailyFollowUpPage() {
   ];
 
   return (
-    <div className="space-y-6">
-
+    <>
       <DataTable
         data={tableData}
         columns={columns}
@@ -206,6 +205,6 @@ export default function DailyFollowUpPage() {
         totalItems={10}
         onPageChange={() => {}}
       />
-    </div>
+    </>
   );
 }

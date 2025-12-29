@@ -29,7 +29,9 @@ const tableData: TableRowData[] = [
 ];
 
 export default function RejectedFormsPage() {
-  const [appliedFilters, setAppliedFilters] = useState<Record<string, string>>({});
+  const [appliedFilters, setAppliedFilters] = useState<Record<string, string>>(
+    {}
+  );
 
   const handleApplyFilters = (filters: Record<string, string>) => {
     setAppliedFilters(filters);
@@ -57,7 +59,7 @@ export default function RejectedFormsPage() {
   ];
 
   return (
-    <div className="space-y-3">
+    <>
       <DataTable
         data={tableData}
         columns={columns}
@@ -67,8 +69,13 @@ export default function RejectedFormsPage() {
         initialFilters={appliedFilters}
         onApplyFilters={handleApplyFilters}
       />
-      <TablePagination currentPage={1} totalPages={1} pageSize={10} totalItems={2} onPageChange={() => {}} />
-    </div>
+      <TablePagination
+        currentPage={1}
+        totalPages={1}
+        pageSize={10}
+        totalItems={2}
+        onPageChange={() => {}}
+      />
+    </>
   );
 }
-

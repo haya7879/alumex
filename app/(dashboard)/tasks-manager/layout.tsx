@@ -1,60 +1,51 @@
 "use client";
 
-import {
-  ContainerContent,
-  ContainerHeaderLink,
-  ContainerHeaderList,
-} from "@/components/shared/container";
-import PageHeader from "@/components/shared/page-header";
+import DynamicLayout from "@/components/shared/dynamic-layout";
 import { Archive, ClipboardList, Plus } from "lucide-react";
 import { ReactNode } from "react";
 
-export default function DailyFollowUpLayout({
+// Map path segments to Arabic labels
+const pathLabels: Record<string, string> = {
+  "tasks-manager": "إدارة المهام",
+  "all-tasks": "جميع المهام",
+  create: "إضافة",
+  archive: "أرشيف المهام",
+};
+
+const headerLinks = [
+
+  {
+    label: "إضافة مهمة",
+    href: "/tasks-manager/create",
+    icon: Plus,
+  },
+  {
+    label: "أرشيف المهام",
+    href: "/tasks-manager/archive",
+    icon: Archive,
+  },
+  {
+    label: "جميع المهام",
+    href: "/tasks-manager/all-tasks",
+    icon: ClipboardList,
+    exact: true,
+  },
+];
+
+export default function TasksManagerLayout({
   children,
 }: {
   children: ReactNode;
 }) {
-  const headerLinks = [
-    {
-      label: "عرض جميع المهام",
-      href: "/tasks-manager/all-tasks",
-      icon: ClipboardList,
-      exact: true,
-    },
-    {
-      label: "إضافة مهمة جديدة",
-      href: "/tasks-manager/create",
-      icon: Plus,
-    },
-    {
-      label: "أرشيف المهام",
-      href: "/tasks-manager/archive",
-      icon: Archive,
-    },
-  ];
   return (
-    <>
-      <div className="bg-white rounded-lg">
-        <PageHeader
-          title="إدارة المهام"
-          breadcrumb={[
-            { label: "إدارة المهام", href: "/tasks-manager" },
-            { label: "عرض جميع المهام", href: "/tasks-manager/all-tasks" },
-          ]}
-        />
-        <ContainerHeaderList>
-          {headerLinks.map((link, index) => (
-            <ContainerHeaderLink
-              key={index}
-              label={link.label}
-              href={link.href}
-              Icon={link.icon}
-              exact={link.exact}
-            />
-          ))}
-        </ContainerHeaderList>
-        <ContainerContent>{children}</ContainerContent>
-      </div>
-    </>
+    <DynamicLayout
+      pathLabels={pathLabels}
+      headerLinks={headerLinks}
+      defaultTitle="إدارة المهام"
+       className="mr-[90px]"
+      layoutVariant="links-first"
+    >
+      {children}
+    </DynamicLayout>
   );
 }

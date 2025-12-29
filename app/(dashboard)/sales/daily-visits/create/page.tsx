@@ -58,110 +58,103 @@ export default function CreateDailyVisitPage() {
   };
 
   return (
-    <div className="bg-white rounded-lg p-6 border">
-      <h2 className="text-xl font-semibold mb-6">اضافة حركة جديد</h2>
-
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Two Column Layout */}
-        <div className="grid grid-cols-3 gap-6">
-          {/* Right Column */}
-          <div className="space-y-2">
-            <Label htmlFor="customerName">اسم الزبون</Label>
-            <Input
-              id="customerName"
-              placeholder="ادخل اسم المقطع هنا"
-              value={formData.customerName}
-              onChange={(e) =>
-                handleInputChange("customerName", e.target.value)
-              }
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="phone">رقم الهاتف</Label>
-            <Input
-              id="phone"
-              placeholder="ادخل رقم الهاتف هنا"
-              value={formData.phone}
-              onChange={(e) => handleInputChange("phone", e.target.value)}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="location">اسم الموقع</Label>
-            <Input
-              id="location"
-              placeholder="ادخل اسم الموقع هنا"
-              value={formData.location}
-              onChange={(e) => handleInputChange("location", e.target.value)}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="status">الحالة</Label>
-            <Select
-              value={formData.status}
-              onValueChange={(value) => handleInputChange("status", value)}
-            >
-              <SelectTrigger id="status">
-                <SelectValue placeholder="حدد هل تم أخذ القياس" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="completed">تم أخذ القياس</SelectItem>
-                <SelectItem value="not-completed">لم يتم أخذ القياس</SelectItem>
-                <SelectItem value="postponed">مؤجل</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {formData.status === "postponed" && (
-            <div className="space-y-2">
-              <Label htmlFor="postponementDate">تاريخ التأجيل</Label>
-              <Input
-                id="postponementDate"
-                type="text"
-                placeholder="____/__/__"
-                icon={Calendar}
-                value={formData.postponementDate}
-                onChange={(e) =>
-                  handleInputChange("postponementDate", e.target.value)
-                }
-              />
-            </div>
-          )}
-        </div>
-
-        {/* Notes - Full Width */}
+    <form onSubmit={handleSubmit} className="space-y-6 mt-5">
+      {/* Two Column Layout */}
+      <div className="grid grid-cols-3 gap-6">
+        {/* Right Column */}
         <div className="space-y-2">
-          <Label htmlFor="notes">الملاحظات</Label>
-          <Textarea
-            id="notes"
-            placeholder="ادخل الملاحظات هنا"
-            value={formData.notes}
-            onChange={(e) => handleInputChange("notes", e.target.value)}
-            className="min-h-[120px]"
+          <Label htmlFor="customerName">اسم الزبون</Label>
+          <Input
+            id="customerName"
+            placeholder="ادخل اسم المقطع هنا"
+            value={formData.customerName}
+            onChange={(e) => handleInputChange("customerName", e.target.value)}
           />
         </div>
 
-        {/* Submit Button */}
-        <div className="flex justify-start pt-4 gap-2">
-          <Button
-            type="submit"
-            className="bg-[#0A3158] text-white hover:bg-[#0A3158]/90 px-8"
-          >
-            تأكيد
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => router.back()}
-            className="px-8"
-          >
-            الغاء
-          </Button>
+        <div className="space-y-2">
+          <Label htmlFor="phone">رقم الهاتف</Label>
+          <Input
+            id="phone"
+            placeholder="ادخل رقم الهاتف هنا"
+            value={formData.phone}
+            onChange={(e) => handleInputChange("phone", e.target.value)}
+          />
         </div>
-      </form>
-    </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="location">اسم الموقع</Label>
+          <Input
+            id="location"
+            placeholder="ادخل اسم الموقع هنا"
+            value={formData.location}
+            onChange={(e) => handleInputChange("location", e.target.value)}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="status">الحالة</Label>
+          <Select
+            value={formData.status}
+            onValueChange={(value) => handleInputChange("status", value)}
+          >
+            <SelectTrigger id="status">
+              <SelectValue placeholder="حدد هل تم أخذ القياس" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="completed">تم أخذ القياس</SelectItem>
+              <SelectItem value="not-completed">لم يتم أخذ القياس</SelectItem>
+              <SelectItem value="postponed">مؤجل</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {formData.status === "postponed" && (
+          <div className="space-y-2">
+            <Label htmlFor="postponementDate">تاريخ التأجيل</Label>
+            <Input
+              id="postponementDate"
+              type="text"
+              placeholder="____/__/__"
+              icon={Calendar}
+              value={formData.postponementDate}
+              onChange={(e) =>
+                handleInputChange("postponementDate", e.target.value)
+              }
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Notes - Full Width */}
+      <div className="space-y-2">
+        <Label htmlFor="notes">الملاحظات</Label>
+        <Textarea
+          id="notes"
+          placeholder="ادخل الملاحظات هنا"
+          value={formData.notes}
+          onChange={(e) => handleInputChange("notes", e.target.value)}
+          className="min-h-[120px]"
+        />
+      </div>
+
+      {/* Submit Button */}
+      <div className="flex justify-start pt-4 gap-2">
+        <Button
+          type="submit"
+          className="bg-[#0A3158] text-white hover:bg-[#0A3158]/90 px-8"
+        >
+          تأكيد
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => router.back()}
+          className="px-8"
+        >
+          الغاء
+        </Button>
+      </div>
+    </form>
   );
 }
-
