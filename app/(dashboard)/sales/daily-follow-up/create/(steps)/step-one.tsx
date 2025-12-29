@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Calendar, ChevronRight } from "lucide-react";
+import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 
 export interface BasicInfoFormData {
   approvedCompany: string;
@@ -32,12 +32,14 @@ interface StepOneProps {
   onNext: () => void;
 }
 
-export default function StepOne({ formData, onInputChange, onNext }: StepOneProps) {
+export default function StepOne({
+  formData,
+  onInputChange,
+  onNext,
+}: StepOneProps) {
   return (
-    <div className="bg-white rounded-lg p-4 border">
-      <h2 className="text-xl font-semibold mb-6">المعلومات الاساسية</h2>
-
-      <div className="grid grid-cols-3 gap-6">
+    <>
+      <div className="grid grid-cols-4 gap-4 mt-6">
         <div className="space-y-2">
           <Label htmlFor="approvedCompany">الشركة المتعتمدة</Label>
           <Select
@@ -154,12 +156,11 @@ export default function StepOne({ formData, onInputChange, onNext }: StepOneProp
             />
             <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-gray-400 pointer-events-none" />
           </div>
-          <p className="text-xs text-red-500 mt-1">
+          <p className="text-xs text-[#D32729] mt-1">
             انتبه لا يمكن تعديل التاريخ بعد انشاؤه الا بموافقة المدير
           </p>
         </div>
-
-        <div className="space-y-2 col-span-2">
+        <div className="space-y-2 col-span-4">
           <Label htmlFor="address">العنوان</Label>
           <Textarea
             id="address"
@@ -172,11 +173,13 @@ export default function StepOne({ formData, onInputChange, onNext }: StepOneProp
       </div>
 
       <div className="flex justify-end gap-4 pt-4">
-        <Button onClick={onNext} className="bg-primary hover:bg-primary/80 min-w-[100px]">
-          التالي <ChevronRight className="size-4 mr-2" />
+        <Button
+          onClick={onNext}
+          className="min-w-[100px]"
+        >
+          التالي <ChevronLeft className="size-4 mr-2" />
         </Button>
       </div>
-    </div>
+    </>
   );
 }
-

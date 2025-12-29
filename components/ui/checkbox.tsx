@@ -18,9 +18,9 @@ const Checkbox = React.forwardRef<
   const getThemeColor = () => {
     switch (theme) {
       case "primary":
-        return "data-[state=checked]:bg-primary data-[state=checked]:border-primary";
+        return "data-[state=checked]:bg-[#3675AF] data-[state=checked]:border-[#3675AF]";
       case "blue":
-        return "data-[state=checked]:bg-brand-600 data-[state=checked]:border-brand-600";
+        return "data-[state=checked]:bg-[#3675AF] data-[state=checked]:border-[#3675AF]";
       case "warning":
         return "data-[state=checked]:bg-yellow-500 data-[state=checked]:border-yellow-500";
       case "danger":
@@ -34,7 +34,7 @@ const Checkbox = React.forwardRef<
     <CheckboxPrimitive.Root
       ref={ref}
       className={cn(
-        "peer h-4 w-4 shrink-0 rounded-sm border border-gray-300 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:text-white group",
+        "peer h-4 w-4 shrink-0 rounded-sm border border-[#3675AF] ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:text-[#3675AF] group",
         getThemeColor(),
         className
       )}
@@ -43,7 +43,7 @@ const Checkbox = React.forwardRef<
       <CheckboxPrimitive.Indicator
         className={cn("flex items-center justify-center text-current")}
       >
-        <Check className="h-4 w-4 group-data-[state=checked]:text-white" />
+        <Check className="h-4 w-4" />
       </CheckboxPrimitive.Indicator>
     </CheckboxPrimitive.Root>
   );

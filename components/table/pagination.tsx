@@ -120,7 +120,7 @@ export function TablePagination({
         {/* Page Size Selector */}
         {showPageSizeSelector && onPageSizeChange && (
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">عرض:</span>
+            <span className="text-sm text-gray-600 dark:text-gray-400">عرض:</span>
             <Select
               value={pageSize.toString()}
               onValueChange={(value) => onPageSizeChange(Number(value))}
@@ -157,7 +157,7 @@ export function TablePagination({
               return (
                 <span
                   key={`ellipsis-${index}`}
-                  className="px-2 text-gray-400"
+                  className="px-2 text-gray-400 dark:text-gray-400"
                 >
                   ...
                 </span>
@@ -175,7 +175,7 @@ export function TablePagination({
                 onClick={() => handlePageClick(pageNumber)}
                 className={cn(
                   "h-8 w-8",
-                  isActive && "bg-primary hover:bg-primary/80 text-white"
+                  isActive && "bg-[#3675AF] hover:bg-[#3675AF]/80 text-white dark:text-white"
                 )}
               >
                 {pageNumber}

@@ -86,9 +86,9 @@ export function DataTable<T extends Record<string, any>>({
   };
 
   return (
-    <div className={cn("bg-white rounded-lg overflow-hidden", className)}>
+    <div className={cn("overflow-hidden", className)}>
       {showToolbar && (
-        <div className="flex items-center gap-3 py-3 justify-between border-b">
+        <div className="flex items-center gap-3 py-3 justify-end border-b dark:border-gray-700">
           <div className="flex items-center gap-3">
             {enableExport && (
               <ExportButton
@@ -145,7 +145,7 @@ export function DataTable<T extends Record<string, any>>({
             <TableRow>
               <TableCell
                 colSpan={columns.length}
-                className="text-center py-8 text-gray-500"
+                className="text-center py-8 text-gray-500 dark:text-gray-400"
               >
                 {emptyMessage}
               </TableCell>

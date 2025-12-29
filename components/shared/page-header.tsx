@@ -54,7 +54,7 @@ export default function PageHeader({
   return (
     <div
       className={cn(
-        "flex items-center justify-between bg-white pb-4 rounded-lg",
+        "flex items-center justify-between pb-4 rounded-lg",
         className
       )}
     >
@@ -68,7 +68,7 @@ export default function PageHeader({
               <React.Fragment key={index}>
                 <BreadcrumbItem>
                   {index === breadcrumbItems.length - 1 ? (
-                    <BreadcrumbPage>{item.label}</BreadcrumbPage>
+                    <BreadcrumbPage className="text-[#3675AF]">{item.label}</BreadcrumbPage>
                   ) : (
                     <BreadcrumbLink asChild>
                       <Link href={item.href}>{item.label}</Link>

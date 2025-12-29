@@ -27,7 +27,7 @@ export interface ContainerProps {
 
 export function ContainerContent({ children, className }: ContainerProps) {
   const containerClasses = cn(
-    "bg-white h-full flex flex-col rounded-tr-2xl rounded-b-2xl p-4",
+    "bg-white dark:bg-gray-900 h-full flex flex-col rounded-tr-2xl rounded-b-2xl p-4",
     className
   );
 
@@ -69,12 +69,12 @@ export function ContainerHeaderLink({
       href={href}
       data-active={isActive}
       className={cn(
-        "text-sm font-medium px-6 py-3 relative flex items-center gap-2 rounded-t-lg transition-all cursor-pointer",
+        "text-[13px] font-medium px-6 py-3 relative flex items-center gap-2 rounded-t-lg transition-all cursor-pointer",
         "before:absolute before:bottom-0 before:-left-6 before:h-11 before:w-6 before:bg-[url('/carved-left.svg')] before:bg-contain before:bg-bottom before:bg-no-repeat before:content-[''] before:opacity-0 before:transition-opacity",
         "after:absolute after:-bottom-0 after:-right-6 after:h-11 after:w-6 after:bg-[url('/carved-right.svg')] after:bg-contain after:bg-bottom after:bg-no-repeat afte:content-[''] after:opacity-0 after:transition-opacity",
         isActive
-          ? "bg-background text-brand-primary before:opacity-100 after:opacity-100"
-          : "hover:text-brand-primary hover:before:opacity-100 hover:after:opacity-100 hover:bg-background"
+          ? "dark:bg-gray-900 bg-white text-brand-primary before:opacity-100 after:opacity-100"
+          : "hover:text-brand-primary hover:before:opacity-100 hover:after:opacity-100 hover:dark:bg-gray-900 hover:bg-white"
       )}
       {...props}
     >

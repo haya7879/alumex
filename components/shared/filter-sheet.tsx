@@ -156,12 +156,12 @@ export default function FilterSheet({
             <SheetDescription>{description}</SheetDescription>
           </SheetHeader>
 
-          <div className="mt-6 space-y-3">
+          <div className="mt-4 space-y-4">
             {fields?.map((field) => (
               <div key={field.key} className="space-y-2">
                 <Label
                   htmlFor={field.key}
-                  className="text-sm font-medium text-gray-700"
+                  className="text-xs font-medium"
                 >
                   {field.label}
                 </Label>
@@ -170,12 +170,12 @@ export default function FilterSheet({
             ))}
           </div>
 
-          <div className="mt-6 flex gap-3">
-            <Button onClick={handleGetResults} className="flex-1">
+          <div className="mt-6 flex items-center justify-start gap-2">
+            <Button onClick={handleGetResults} className="min-w-[100px]">
               فلترة
             </Button>
             <SheetClose asChild>
-              <Button variant="outline" className="flex-1">
+              <Button variant="outline" className="min-w-[100px]">
                 إلغاء
               </Button>
             </SheetClose>

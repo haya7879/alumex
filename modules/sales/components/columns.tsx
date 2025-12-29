@@ -45,16 +45,10 @@ export const columns: Column<TableRowData>[] = [
     key: "followUp",
     header: "المتابعة أصل / فرع",
     render: (row: TableRowData) => (
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3">
         <MoreVertical className="size-4 cursor-pointer" />
-        <Folder
-          className={`size-4 cursor-pointer ${
-            row.followUp.origin === "green"
-              ? "text-green-500"
-              : "text-blue-500"
-          }`}
-        />
-        <Menu className="size-4 text-blue-500 cursor-pointer" />
+        <Folder className="size-4 cursor-pointer" />
+        <Menu className="size-4 cursor-pointer" />
       </div>
     ),
   },
@@ -92,15 +86,11 @@ export const signedContractsColumns: Column<SignedContractRowData>[] = [
   },
   {
     key: "totalProjectArea",
-    header: "المساحة الكلية للمشرع",
+    header: "المساحة الكلية للمشروع",
   },
   {
     key: "actions",
     header: "",
-    className: "w-12",
-    render: () => (
-      <MoreVertical className="size-4 cursor-pointer text-gray-500 hover:text-gray-700" />
-    ),
+    render: () => <MoreVertical className="size-4 cursor-pointer" />,
   },
 ];
-

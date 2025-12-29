@@ -24,7 +24,7 @@ export default function StepsIndicator({
   showNumbers = true,
 }: StepsIndicatorProps) {
   return (
-    <div className={cn("bg-white rounded-xl p-3", className)}>
+    <div className={cn("p-3", className)}>
       <div className="flex items-start justify-between">
         <div className="flex items-center">
           {steps.map((step, index) => {
@@ -41,8 +41,8 @@ export default function StepsIndicator({
                     className={cn(
                       "flex items-center justify-center w-6 h-6 rounded-full text-xs mb-1",
                       isActive || isCompleted
-                        ? "bg-primary text-white"
-                        : "bg-gray-200 text-gray-600"
+                        ? "bg-[#3675AF] text-white"
+                        : "bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-200"
                     )}
                   >
                     {showNumbers ? stepNumber : null}
@@ -52,7 +52,7 @@ export default function StepsIndicator({
                       "text-xs",
                       isActive
                         ? "font-semibold text-primary"
-                        : "text-gray-600"
+                        : "text-gray-600 dark:text-gray-200"
                     )}
                   >
                     {step.label}
@@ -61,11 +61,11 @@ export default function StepsIndicator({
 
                 {/* Connector */}
                 {!isLast && (
-                  <div className={cn("h-0.5 bg-gray-200 -mt-4", connectorWidth)}>
+                  <div className={cn("h-0.5 bg-gray-200 dark:bg-gray-200 -mt-4", connectorWidth)}>
                     <div
                       className={cn(
                         "h-full transition-all",
-                        isCompleted ? "bg-primary" : "bg-gray-200"
+                        isCompleted ? "bg-[#3675AF]" : "bg-gray-200"
                       )}
                       style={{ width: isCompleted ? "100%" : "0%" }}
                     />

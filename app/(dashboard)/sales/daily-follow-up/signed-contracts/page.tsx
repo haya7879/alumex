@@ -4,7 +4,7 @@ import { useState } from "react";
 import { DataTable } from "@/components/table/data-table";
 import { TablePagination } from "@/components/table";
 import { FilterField } from "../../../../../components/shared/filter-sheet";
-import { Calendar } from "lucide-react";
+import { Calendar, MoreVertical } from "lucide-react";
 import {
   SignedContractRowData,
   signedContractsColumns,
@@ -161,9 +161,6 @@ export default function SignedContractsPage() {
     },
   ];
 
-  // Calculate summary statistics
-  const totalContractValue = "56461,56145,45444 د.ع";
-  const totalArea = "456784 م2";
 
   return (
     <>

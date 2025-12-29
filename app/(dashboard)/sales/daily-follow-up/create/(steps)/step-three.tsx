@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTable, Column } from "@/components/table";
-import { ChevronLeft, Plus, Trash2, Download } from "lucide-react";
+import { ChevronLeft, Plus, Trash2, Download, ChevronRight } from "lucide-react";
 
 export interface MeasurementRow {
   id: number;
@@ -86,7 +86,7 @@ export default function StepThree({
         <Input
           value={row.floor}
           onChange={(e) => onRowChange(row.id, "floor", e.target.value)}
-          className="w-20"
+          className="w-20 h-8 py-1"
         />
       ),
     },
@@ -97,7 +97,7 @@ export default function StepThree({
         <Input
           value={row.location}
           onChange={(e) => onRowChange(row.id, "location", e.target.value)}
-          className="w-48"
+          className="w-48 h-8 py-1 text-xs!"
         />
       ),
     },
@@ -108,7 +108,7 @@ export default function StepThree({
         <Input
           value={row.width}
           onChange={(e) => onRowChange(row.id, "width", e.target.value)}
-          className="w-24"
+          className="w-24 h-8 py-1 text-xs!"
         />
       ),
     },
@@ -119,7 +119,7 @@ export default function StepThree({
         <Input
           value={row.length}
           onChange={(e) => onRowChange(row.id, "length", e.target.value)}
-          className="w-24"
+          className="w-24 h-8 py-1 text-xs!"
         />
       ),
     },
@@ -130,7 +130,7 @@ export default function StepThree({
         <Input
           value={row.count}
           onChange={(e) => onRowChange(row.id, "count", e.target.value)}
-          className="w-16"
+          className="w-16 h-8 py-1 text-xs!"
         />
       ),
     },
@@ -141,7 +141,7 @@ export default function StepThree({
         <Input
           value={row.areaCm2}
           onChange={(e) => onRowChange(row.id, "areaCm2", e.target.value)}
-          className="w-28"
+          className="w-28 h-8 py-1 text-xs!"
         />
       ),
     },
@@ -152,7 +152,7 @@ export default function StepThree({
         <Input
           value={row.areaM2}
           onChange={(e) => onRowChange(row.id, "areaM2", e.target.value)}
-          className="w-24"
+          className="w-24 h-8 py-1 text-xs!"
         />
       ),
     },
@@ -163,7 +163,7 @@ export default function StepThree({
         <Input
           value={row.pricePerMeter}
           onChange={(e) => onRowChange(row.id, "pricePerMeter", e.target.value)}
-          className="w-32"
+          className="w-32 h-8 py-1 text-xs!"
         />
       ),
     },
@@ -174,26 +174,24 @@ export default function StepThree({
         <Input
           value={row.total}
           onChange={(e) => onRowChange(row.id, "total", e.target.value)}
-          className="w-32"
+          className="w-32 h-8 py-1 text-xs!"
         />
       ),
     },
   ];
 
   return (
-    <div className="bg-white rounded-xl p-4 border">
-      <h2 className="text-xl font-semibold mb-6">جدول القياس</h2>
-
+    <div className="mt-6">
       {/* Section Tabs */}
       <div className="flex items-center gap-2 mb-4">
-        <Button className="bg-primary text-white hover:bg-primary/80" size="sm">
-          ألمنيوم مقطع السحاب (ALUMAX 16 SLIDING SYSTEM)
+        <Button className="bg-gray-100 text-gray-600 hover:text-white dark:text-gray-100 dark:bg-gray-800 text-xs" size="sm">
+          ألمنيوم مقطع السحاب
         </Button>
-        <Button variant="outline" size="sm">
-          ألمنيوم مقطع السحاب (ALUMAX 16 SLIDING SYSTEM)
+        <Button variant="outline" size="sm" className="text-xs">
+          ألمنيوم مقطع السحاب
         </Button>
-        <Button variant="outline" size="sm">
-          ألمنيوم مقطع السحاب (ALUMAX 16 SLIDING SYSTEM)
+        <Button variant="outline" size="sm" className="text-xs">
+          ألمنيوم مقطع السحاب
         </Button>
       </div>
 
@@ -201,14 +199,14 @@ export default function StepThree({
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm">
-            <Trash2 className="size-4 ml-2" /> حذف الفقرة
+            <Trash2 className="size-4 ml-2" /> حذف 
           </Button>
           <Button variant="outline" size="sm">
-            <Download className="size-4 ml-2" /> تصدير PDF المحدد
+            <Download className="size-4 ml-2" /> تصدير PDF 
           </Button>
         </div>
-        <Button onClick={onAddRow} className="bg-primary hover:bg-primary/80 text-white">
-          <Plus className="size-4 ml-2" /> أضف أسطر
+        <Button onClick={onAddRow}>
+          <Plus className="size-4" />
         </Button>
       </div>
 
@@ -220,7 +218,7 @@ export default function StepThree({
           emptyMessage="لا توجد بيانات"
         />
         {/* Total Row */}
-        <div className="bg-gray-100 border-t">
+        <div className="bg-gray-100 dark:bg-gray-800 border-t text-sm">
           <div className="grid grid-cols-12 gap-4 px-4 py-3 font-semibold items-center">
             <div className="col-span-2 text-center">المجموع</div>
             <div></div>
@@ -239,9 +237,9 @@ export default function StepThree({
 
       <div className="flex justify-between gap-4 pt-4">
         <Button onClick={onPrev} variant="outline" className="min-w-[100px]">
-          <ChevronLeft className="size-4 ml-2" /> السابق
+          <ChevronRight className="size-4 ml-2" /> السابق
         </Button>
-        <Button onClick={onSubmit} className="bg-primary hover:bg-primary/80 min-w-[100px]">
+        <Button onClick={onSubmit} className="min-w-[100px]">
           حفظ
         </Button>
       </div>
