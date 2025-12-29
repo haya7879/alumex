@@ -11,9 +11,7 @@ import {
 import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
 import ExportButton from "../shared/export-button";
-import FilterSheet, {
-  FilterField,
-} from "@/components/shared/filter-sheet";
+import FilterSheet, { FilterField } from "@/components/shared/filter-sheet";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 
@@ -67,7 +65,7 @@ export function DataTable<T extends Record<string, any>>({
   enableSearch = false,
   searchValue,
   onSearchChange,
-  searchPlaceholder = "Search",
+  searchPlaceholder = "البحث",
   searchWidth = "250px",
   renderToolbar,
 }: DataTableProps<T>) {
@@ -88,8 +86,30 @@ export function DataTable<T extends Record<string, any>>({
   return (
     <div className={cn("overflow-hidden", className)}>
       {showToolbar && (
-        <div className="flex items-center gap-3 py-3 justify-end border-b dark:border-gray-700">
+        <div className="flex items-center gap-3 py-3 justify-start border-b dark:border-gray-700">
           <div className="flex items-center gap-3">
+            {enableSearch && (
+              <div style={{ width: searchWidth }}>
+                <Input
+                  type="text"
+                  placeholder="البحث"
+                  value={searchValue || ""}
+                  onChange={handleSearchChange}
+                  icon={Search}
+                  className="max-w-md"
+                />
+              </div>
+            )}
+            {renderToolbar && renderToolbar()}
+          </div>
+          <div className="flex items-center gap-3">
+            {enableFilter && filterFields && (
+              <FilterSheet
+                fields={filterFields}
+                initialFilters={initialFilters}
+                onApplyFilters={onApplyFilters}
+              />
+            )}
             {enableExport && (
               <ExportButton
                 data={data}
@@ -100,28 +120,6 @@ export function DataTable<T extends Record<string, any>>({
                 }))}
               />
             )}
-            {enableFilter && filterFields && (
-              <FilterSheet
-                fields={filterFields}
-                initialFilters={initialFilters}
-                onApplyFilters={onApplyFilters}
-              />
-            )}
-          </div>
-          <div className="flex items-center gap-3">
-            {enableSearch && (
-              <div style={{ width: searchWidth }}>
-                <Input
-                  type="text"
-                  placeholder={searchPlaceholder}
-                  value={searchValue || ""}
-                  onChange={handleSearchChange}
-                  icon={Search}
-                  className="max-w-md"
-                />
-              </div>
-            )}
-            {renderToolbar && renderToolbar()}
           </div>
         </div>
       )}
