@@ -569,11 +569,7 @@ export default function StepThree({
       header: "المساحة سم²",
       className: "w-28",
       render: (row) => (
-        <Input
-          value={row.areaCm2}
-          readOnly
-          className="h-8 text-xs"
-        />
+        <Input value={row.areaCm2} readOnly className="h-8 text-xs" />
       ),
     },
     {
@@ -631,16 +627,22 @@ export default function StepThree({
       </div>
 
       {/* Action Buttons */}
-      <div className="flex items-center gap-2 mb-4">
-        <Button variant="outline" size="sm" onClick={handleDeleteSelected}>
-          <Trash2 className="size-4 ml-2" /> حذف
-        </Button>
-        <Button variant="outline" size="sm" onClick={handleExportPDF}>
-          <Download className="size-4 ml-2" /> تصدير PDF
-        </Button>
-        <Button variant="outline" onClick={() => setAddRowsDialog(true)} size="sm">
+      <div className="flex items-center gap-2 justify-between mb-4">
+        <Button
+          variant="outline"
+          onClick={() => setAddRowsDialog(true)}
+          size="sm"
+        >
           <Plus className="size-4 ml-2" /> إضافة أسطر
         </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={handleDeleteSelected}>
+            <Trash2 className="size-4 ml-2" /> حذف
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleExportPDF}>
+            <Download className="size-4 ml-2" /> تصدير PDF
+          </Button>
+        </div>
       </div>
 
       {/* Table */}
