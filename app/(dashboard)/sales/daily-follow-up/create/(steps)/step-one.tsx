@@ -232,7 +232,7 @@ export default function StepOne({
           </div>
           {projectExists !== null && (
             <div
-              className={`mt-t space-y-2 ${
+              className={`space-y-2 ${
                 projectExists ? "text-yellow-500" : "text-green-600"
               }`}
             >
@@ -241,20 +241,20 @@ export default function StepOne({
                   <div className="text-xs">
                     <div className="mb-1">
                       <span>
-                        يبدو أن الاسم موجود سابقا برقم تسلسلي :{" "} <span className="text-gray-100">{serialNumber}</span>
+                        يبدو أن الاسم موجود سابقا برقم تسلسلي :{" "} <span className="text-gray-600 dark:text-gray-100">{serialNumber}</span>
                       </span>
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
                         onClick={handleCopySerialNumber}
-                        className="h-6 w-6"
+                        className="h-6 w-6 mt-0.5 mx-0.5"
                         title="نسخ الرقم التسلسلي"
                       >
                         {copied ? (
                           <Check className="size-3 text-green-600" />
                         ) : (
-                          <Copy className="size-3 text-gray-100" />
+                          <Copy className="size-3 text-gray-600 dark:text-gray-100" />
                         )}
                       </Button>
                     </div>
