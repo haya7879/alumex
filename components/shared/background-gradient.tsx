@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 const BACKGROUND_THEMES = {
   default: {
-    topRight: "bg-[#C4D2De]",
+    topRight: "bg-[#3675AF]",
     bottomLeft: "bg-[#3675AF]",
     topLeft: "bg-[#3675AF]",
     bottomRight: "bg-[#3675AF]",
