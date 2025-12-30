@@ -20,9 +20,9 @@ export interface HeaderLink {
 
 export interface DynamicLayoutProps {
   children: ReactNode;
-  pathLabels: Record<string, string>;
-  headerLinks: HeaderLink[];
-  defaultTitle: string;
+  pathLabels?: Record<string, string>;
+  headerLinks?: HeaderLink[];
+  defaultTitle?: string;
   className?: string;
 }
 
@@ -42,7 +42,7 @@ export default function DynamicLayout({
 
     segments.forEach((segment, index) => {
       const href = "/" + segments.slice(0, index + 1).join("/");
-      const label = pathLabels[segment] || segment;
+      const label = pathLabels?.[segment] || segment;
       breadcrumbItems.push({ label, href });
     });
 
@@ -53,12 +53,12 @@ export default function DynamicLayout({
   const pageTitle = useMemo(() => {
     const segments = pathname.split("/").filter(Boolean);
     const lastSegment = segments[segments.length - 1];
-    return pathLabels[lastSegment] || defaultTitle;
+    return pathLabels?.[lastSegment] || defaultTitle;
   }, [pathname, pathLabels, defaultTitle]);
 
   const headerLinksComponent = (
     <ContainerHeaderList>
-      {headerLinks.map((link, index) => (
+      {headerLinks?.map((link, index) => (
         <ContainerHeaderLink
           key={index}
           label={link.label}

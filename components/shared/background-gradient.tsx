@@ -12,27 +12,9 @@ import { usePathname } from "next/navigation";
 const BACKGROUND_THEMES = {
   default: {
     topRight: "bg-[#C4D2De]",
-    bottomLeft: "bg-[#3B6992]",
-    topLeft: "bg-[#3B6992]",
-    bottomRight: "bg-[#3B6992]",
-  },
-  blue: {
-    topRight: "bg-[#A1C4F9]",
-    bottomLeft: "bg-[#D7F9F1]",
-    topLeft: "bg-[#7FB3D5]",
-    bottomRight: "bg-[#2874A6]",
-  },
-  purple: {
-    topRight: "bg-[#D7BDE2]",
-    bottomLeft: "bg-[#F5EEF8]",
-    topLeft: "bg-[#AF7AC5]",
-    bottomRight: "bg-[#6C3483]",
-  },
-  gray: {
-    topRight: "bg-[#1A4765]",
-    bottomLeft: "bg-[#1A4765]",
-    topLeft: "bg-[#1A4765]",
-    bottomRight: "bg-[#1A4765]",
+    bottomLeft: "bg-[#3675AF]",
+    topLeft: "bg-[#3675AF]",
+    bottomRight: "bg-[#3675AF]",
   },
 };
 

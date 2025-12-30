@@ -17,7 +17,7 @@ const UserAvatar = () => {
     <div className="flex items-center w-full">
       <Avatar className="size-12">
         <AvatarImage src="" />
-        <AvatarFallback className="bg-slate-600 dark:bg-white/70 text-white">
+        <AvatarFallback className="bg-slate-600 dark:bg-gray-800 text-white">
           {user?.full_name
             ?.split(" ")
             .map((name: string) => name.charAt(0))
@@ -51,6 +51,7 @@ export const Sidebar = () => {
             variant="outline"
             size="icon"
             className="size-12 rounded-full bg-white/40 dark:bg-[#0C111DB2]"
+            onClick={() => router.push("/settings")}
           >
             <Settings className="size-4" />
           </Button>

@@ -24,8 +24,8 @@ export default function StepsIndicator({
   showNumbers = true,
 }: StepsIndicatorProps) {
   return (
-    <div className={cn("p-3", className)}>
-      <div className="flex items-start justify-between">
+    <div className={cn("py-3", className)}>
+      <div className="flex items-start">
         <div className="flex items-center">
           {steps.map((step, index) => {
             const stepNumber = step.number ?? index + 1;
