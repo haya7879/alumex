@@ -114,7 +114,7 @@ export default function StepTwo({
       render: (row) => (
         <Checkbox
           checked={row.checked}
-          onChange={() => handleCheckboxChange(row.id, !row.checked)}
+          onCheckedChange={(checked) => handleCheckboxChange(row.id, checked as boolean)}
         />
       ),
     },
