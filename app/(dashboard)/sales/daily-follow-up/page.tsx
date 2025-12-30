@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { DataTable } from "@/components/table/data-table";
+import { useState, useMemo } from "react";
 import {
-  columns,
   TableRowData,
 } from "../../../../modules/sales/components/columns";
-import { FilterField } from "../../../../components/shared/filter-sheet";
+import FilterSheet, { FilterField } from "../../../../components/shared/filter-sheet";
 import { TablePagination } from "@/components/table";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Search, Folder, Menu, MoreVertical } from "lucide-react";
 
 // Sample data based on the image
 const tableData: TableRowData[] = [
@@ -124,6 +125,45 @@ export default function DailyFollowUpPage() {
     // Apply filters logic here
   };
 
+  // Filter and search data
+  const filteredData = useMemo(() => {
+    let filtered = [...tableData];
+
+    // Apply search
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (item) =>
+          item.customerName.toLowerCase().includes(query) ||
+          item.phone.includes(query) ||
+          item.lastOfferDate.includes(query) ||
+          item.lastOfferPrice.includes(query) ||
+          item.receivedOffer.includes(query) ||
+          item.response.toLowerCase().includes(query)
+      );
+    }
+
+    // Apply filters
+    if (appliedFilters.customerName) {
+      filtered = filtered.filter((item) =>
+        item.customerName
+          .toLowerCase()
+          .includes(appliedFilters.customerName.toLowerCase())
+      );
+    }
+
+    if (appliedFilters.hasPriceOffer) {
+      const hasOffer = appliedFilters.hasPriceOffer === "yes";
+      filtered = filtered.filter(
+        (item) => (item.lastOfferPrice !== "") === hasOffer
+      );
+    }
+
+    // Add more filter logic as needed
+
+    return filtered;
+  }, [searchQuery, appliedFilters]);
+
   // Define filter fields for daily follow-up
   const filterFields: FilterField[] = [
     {
@@ -181,30 +221,89 @@ export default function DailyFollowUpPage() {
   ];
 
   return (
-    <>
-      <DataTable
-        data={tableData}
-        columns={columns}
-        emptyMessage="لا توجد بيانات للعرض"
-        enableExport
-        exportFilename="daily-follow-up"
-        enableFilter
-        filterFields={filterFields}
-        initialFilters={appliedFilters}
-        onApplyFilters={handleApplyFilters}
-        enableSearch
-        searchValue={searchQuery}
-        onSearchChange={setSearchQuery}
-        searchPlaceholder="Search"
-        searchWidth="250px"
-      />
+    <div className="space-y-6">
+      {/* Toolbar with Search and Filter */}
+      <div className="flex items-center gap-3 justify-between border-b dark:border-gray-700 pb-4">
+        <div className="flex items-center gap-3 flex-1">
+          <div style={{ width: "250px" }}>
+            <Input
+              type="text"
+              placeholder="البحث"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              icon={Search}
+              className="max-w-md"
+            />
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <FilterSheet
+            fields={filterFields}
+            initialFilters={appliedFilters}
+            onApplyFilters={handleApplyFilters}
+          />
+        </div>
+      </div>
+
+      {/* Cards Grid */}
+      {filteredData.length === 0 ? (
+        <div className="text-center py-12 text-muted-foreground">
+          لا توجد بيانات للعرض
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-3">
+          {filteredData.map((item, index) => (
+            <Card key={index} className="w-full">
+              <CardContent className="p-3">
+                <div className="flex flex-col gap-3">
+                  {/* Customer Name */}
+                  <div className="flex items-center justify-between border-b pb-2">
+                    <h3 className="text-sm font-semibold">{item.customerName}</h3>
+                    <div className="flex items-center gap-2">
+                      <MoreVertical className="size-4 cursor-pointer text-muted-foreground hover:text-foreground" />
+                      <Folder className="size-4 cursor-pointer text-muted-foreground hover:text-foreground" />
+                      <Menu className="size-4 cursor-pointer text-muted-foreground hover:text-foreground" />
+                    </div>
+                  </div>
+                  
+                  {/* Information Grid - Compact Layout */}
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-4 gap-y-2">
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">رقم الهاتف</p>
+                      <p className="text-sm font-medium">{item.phone}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">آخر عرض سعر</p>
+                      <p className="text-sm font-medium">{item.lastOfferDate}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">سعر آخر عرض</p>
+                      <p className="text-sm font-medium">{item.lastOfferPrice || "-"}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">هل استلم العرض</p>
+                      <p className="text-sm font-medium">{item.receivedOffer}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">الرد</p>
+                      <p className="text-sm font-medium">{item.response || "-"}</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {/* Pagination */}
       <TablePagination
         currentPage={1}
         totalPages={1}
         pageSize={10}
-        totalItems={10}
+        totalItems={filteredData.length}
         onPageChange={() => {}}
       />
-    </>
+    </div>
   );
 }
