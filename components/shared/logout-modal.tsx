@@ -8,38 +8,40 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Button } from "../ui/button";
 
 export const LogoutModal = () => {
   const { isOpen, modalType, onClose } = useModalStore();
 
   return (
-    <Dialog open={isOpen && modalType === EModalType.LOGOUT} onOpenChange={onClose}>
+    <Dialog
+      open={isOpen && modalType === EModalType.LOGOUT}
+      onOpenChange={onClose}
+    >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Logout</DialogTitle>
+          <DialogTitle>تسجيل خروج</DialogTitle>
           <DialogDescription>
-            Are you sure you want to logout?
+            هل أنت متأكد من تسجيل الخروج ؟
           </DialogDescription>
         </DialogHeader>
-        <div className="flex justify-end gap-2 mt-4">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80"
+        <div className="flex justify-start pt-4 gap-2">
+          <Button
+            type="submit"
+            className="bg-[#0A3158] text-white hover:bg-[#0A3158]/90 px-8"
           >
-            Cancel
-          </button>
-          <button
-            onClick={() => {
-              // Add logout logic here
-              onClose();
-            }}
-            className="px-4 py-2 rounded-md bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            تأكيد 
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            // onClick={() => router.back()}
+            className="px-8"
           >
-            Logout
-          </button>
+            الغاء
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
   );
 };
-

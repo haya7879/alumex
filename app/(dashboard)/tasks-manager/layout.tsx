@@ -13,7 +13,6 @@ const pathLabels: Record<string, string> = {
 };
 
 const headerLinks = [
-
   {
     label: "إضافة مهمة",
     href: "/tasks-manager/create",
@@ -42,8 +41,6 @@ export default function TasksManagerLayout({
       pathLabels={pathLabels}
       headerLinks={headerLinks}
       defaultTitle="إدارة المهام"
-       className="mr-[90px]"
-      layoutVariant="links-first"
     >
       {children}
     </DynamicLayout>

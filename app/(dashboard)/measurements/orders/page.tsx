@@ -175,15 +175,15 @@ const columns: Column<OrderRowData>[] = [
       const statusConfig = {
         waiting: {
           label: "في حالة انتظار",
-          variant: "default" as const,
+          variant: "warning" as const,
         },
         "measurement-taken": {
           label: "تم أخذ القياس",
-          variant: "success" as const,
+          variant: "outline" as const,
         },
         "check-taken": {
           label: "تم أخذ التشك",
-          variant: "warning" as const,
+          variant: "success" as const,
         },
       };
 

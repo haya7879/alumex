@@ -58,9 +58,9 @@ export default function CreateDailyVisitPage() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 mt-5">
+    <form onSubmit={handleSubmit} className="space-y-3 mt-5">
       {/* Two Column Layout */}
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-4 gap-3">
         {/* Right Column */}
         <div className="space-y-2">
           <Label htmlFor="customerName">اسم الزبون</Label>
@@ -144,7 +144,7 @@ export default function CreateDailyVisitPage() {
           type="submit"
           className="bg-[#0A3158] text-white hover:bg-[#0A3158]/90 px-8"
         >
-          تأكيد
+          حفظ
         </Button>
         <Button
           type="button"

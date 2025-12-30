@@ -9,20 +9,18 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        secondary:
-          "border-transparent bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90",
           default:
           "border-transparent bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90",
         outline:
           "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
         success:
-          "border-green-200 text-green-700 bg-[#ECFDF3] dark:bg-transparent [&>svg]:text-green-500",
+          "border-green-200 text-green-700 bg-[#ECFDF3] dark:border-green-700 dark:bg-transparent [&>svg]:text-green-500",
         destructive:
-          "border-[#FECDCA] bg-[#FEF3F2] text-[#B42318] [&>svg]:text-[#B42318]",
+          "border-[#FECDCA] bg-[#FEF3F2] dark:bg-transparent dark:border-[#B42318] text-[#B42318] [&>svg]:text-[#B42318]",
         error:
           "bg-red-100 text-red-700 dark:bg-transparent dark:border-red-700 dark:border [&>svg]:text-[#B42318]",
         warning:
-          "border-yellow-200 bg-yellow-50 text-yellow-700 [&>svg]:text-yellow-500",
+          "border-yellow-200 bg-yellow-50 dark:bg-transparent dark:border-yellow-700 text-yellow-700 [&>svg]:text-yellow-500",
         "1:1 Coaching":
           "bg-[#FAECEE] text-[#B94C64] border-none px-2.5 py-1 text-sm",
         "Group coaching":

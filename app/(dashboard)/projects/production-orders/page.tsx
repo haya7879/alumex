@@ -76,7 +76,7 @@ const columns: Column<ProductionOrderRowData>[] = [
     header: "الطلب",
     render: (row) => {
       return row.order === "main" ? (
-        <Badge variant="default" className="px-3 py-1">
+        <Badge variant="outline" className="px-3 py-1">
           رئيسي
         </Badge>
       ) : (

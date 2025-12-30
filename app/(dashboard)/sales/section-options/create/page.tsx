@@ -38,7 +38,7 @@ export default function CreateSectionPage() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 mt-5">
+    <form onSubmit={handleSubmit} className="space-y-5 mt-5">
       {/* Section Name */}
       <div className="space-y-2 w-1/3">
         <Label htmlFor="sectionName">اسم المقطع</Label>
@@ -73,7 +73,7 @@ export default function CreateSectionPage() {
           type="submit"
           className="bg-[#0A3158] text-white hover:bg-[#0A3158]/90 px-8"
         >
-          تأكيد
+          حفظ
         </Button>
         <Button
           type="button"

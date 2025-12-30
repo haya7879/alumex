@@ -162,8 +162,8 @@ const columns: Column<ContractRowData>[] = [
     render: (row) => {
       return row.nextDayOrder === "send" ? (
         <Badge
-          variant="secondary"
-          className="border-transparent px-3 py-1"
+          variant="outline"
+          className="px-3 py-1"
         >
           ارسال طلب تفصيلي
         </Badge>

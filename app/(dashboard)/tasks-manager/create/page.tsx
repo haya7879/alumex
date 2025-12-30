@@ -48,9 +48,9 @@ export default function CreateTaskPage() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 mt-5">
+    <form onSubmit={handleSubmit} className="space-y-3 mt-5">
       {/* Three Column Layout */}
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-3 gap-3">
         <div className="space-y-2">
           <Label htmlFor="taskName">اسم المهمة</Label>
           <Input
@@ -144,7 +144,7 @@ export default function CreateTaskPage() {
           type="submit"
           className="bg-[#0A3158] text-white hover:bg-[#0A3158]/90 px-8"
         >
-          تأكيد
+          حفظ
         </Button>
         <Button
           type="button"

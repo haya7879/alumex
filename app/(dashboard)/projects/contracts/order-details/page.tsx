@@ -194,8 +194,8 @@ const columns: Column<OrderDetailRowData>[] = [
     render: (row) => {
       return row.nextDayOrder === "send" ? (
         <Badge
-          variant="secondary"
-          className="border-transparent px-3 py-1"
+          variant="outline"
+          className="px-3 py-1"
         >
           ارسال طلب تفصيلي
         </Badge>
@@ -220,11 +220,11 @@ const columns: Column<OrderDetailRowData>[] = [
         },
         "waiting-response": {
           label: "انتظار الاستجابة",
-          variant: "secondary" as const,
+          variant: "warning" as const,
         },
         "openings-not-ready": {
           label: "الفتحات غير جاهزة",
-          variant: "secondary" as const,
+          variant: "destructive" as const,
         },
       };
 

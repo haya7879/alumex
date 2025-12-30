@@ -59,11 +59,8 @@ export default function FinancialLayout({ children }: { children: ReactNode }) {
       pathLabels={pathLabels}
       headerLinks={headerLinks}
       defaultTitle={defaultTitle}
-      className="mr-[90px]"
-      layoutVariant="links-first"
     >
       {children}
     </DynamicLayout>
   );
 }
-

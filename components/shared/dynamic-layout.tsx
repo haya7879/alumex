@@ -24,7 +24,6 @@ export interface DynamicLayoutProps {
   headerLinks: HeaderLink[];
   defaultTitle: string;
   className?: string;
-  layoutVariant?: "header-first" | "links-first";
 }
 
 export default function DynamicLayout({
@@ -33,7 +32,6 @@ export default function DynamicLayout({
   headerLinks,
   defaultTitle,
   className,
-  layoutVariant = "header-first",
 }: DynamicLayoutProps) {
   const pathname = usePathname();
 
@@ -76,20 +74,8 @@ export default function DynamicLayout({
     <PageHeader title={pageTitle} breadcrumb={breadcrumb} />
   );
 
-  // Variant 1: PageHeader first, then ContainerHeaderList, then ContainerContent (daily-movement style)
-  if (layoutVariant === "header-first") {
-    return (
-      <div className={cn("rounded-lg", className)}>
-        {pageHeaderComponent}
-        {headerLinksComponent}
-        <ContainerContent>{children}</ContainerContent>
-      </div>
-    );
-  }
-
-  // Variant 2: ContainerHeaderList first, then ContainerContent with PageHeader inside (daily-follow-up style)
   return (
-    <div className={cn("rounded-lg", className)}>
+    <div className={cn("rounded-lg mr-[90px]", className)}>
       {headerLinksComponent}
       <ContainerContent>
         {pageHeaderComponent}

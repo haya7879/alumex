@@ -17,15 +17,15 @@ const pathLabels: Record<string, string> = {
 const routeHeaderLinks: Record<string, HeaderLink[]> = {
   orders: [
     {
+      label: "الأرشيف",
+      href: "/measurements/orders/archive",
+      icon: Archive,
+    },
+    {
       label: "عرض الطلبات",
       href: "/measurements/orders",
       icon: ShoppingCart,
       exact: true,
-    },
-    {
-      label: "الأرشيف",
-      href: "/measurements/orders/archive",
-      icon: Archive,
     },
   ],
 };
@@ -69,11 +69,8 @@ export default function MeasurementsLayout({
       pathLabels={pathLabels}
       headerLinks={headerLinks}
       defaultTitle={defaultTitle}
-      className="mr-[90px]"
-      layoutVariant="links-first"
     >
       {children}
     </DynamicLayout>
   );
 }
-

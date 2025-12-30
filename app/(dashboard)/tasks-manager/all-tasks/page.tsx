@@ -108,7 +108,7 @@ const columns: Column<TaskRowData>[] = [
       const statusConfig = {
         "not-started": {
           label: "لم تبدأ بعد",
-          variant: "default" as const,
+          variant: "outline" as const,
         },
         pending: {
           label: "قيد الانتظار",
