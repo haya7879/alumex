@@ -20,7 +20,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Calendar, ChevronLeft, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import {
+  Calendar,
+  ChevronLeft,
+  CheckCircle2,
+  AlertCircle,
+  Loader2,
+  Copy,
+  Check,
+} from "lucide-react";
 import { toast } from "sonner";
 
 export interface BasicInfoFormData {
@@ -40,7 +48,10 @@ export interface BasicInfoFormData {
 
 interface StepOneProps {
   formData: BasicInfoFormData;
-  onInputChange: (field: keyof BasicInfoFormData, value: string | number | boolean) => void;
+  onInputChange: (
+    field: keyof BasicInfoFormData,
+    value: string | number | boolean
+  ) => void;
   onSave: (formData: BasicInfoFormData) => Promise<number>;
   onNext: () => void;
 }
@@ -56,6 +67,8 @@ export default function StepOne({
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [savedFormId, setSavedFormId] = useState<number | null>(null);
+  const [serialNumber, setSerialNumber] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const checkProjectName = async () => {
     if (!formData.projectName.trim()) {
@@ -69,17 +82,20 @@ export default function StepOne({
     try {
       // Dummy API call - replace with actual API
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      
+
       // Simulate API response - randomly return true/false for demo
       const exists = Math.random() > 0.5;
       setProjectExists(exists);
 
       if (exists) {
-        toast.warning("اسم المشروع موجود سابقاً، سيتم حفظه كنسخة مكررة");
+        // In real implementation, get serialNumber from API
+        const mockSerialNumber = `DF-${Math.floor(Math.random() * 10000)}`;
+        setSerialNumber(mockSerialNumber);
         onInputChange("isDuplicate", true);
         // In real implementation, get parentId from API
         onInputChange("parentId", Math.floor(Math.random() * 1000));
       } else {
+        setSerialNumber(null);
         toast.success("اسم المشروع صالح، يرجى تعبئة بقية الخانات");
         onInputChange("isDuplicate", false);
         // Remove parentId when project doesn't exist - set to 0 to clear it
@@ -95,7 +111,11 @@ export default function StepOne({
 
   const handleSave = async () => {
     // Validate required fields
-    if (!formData.approvedCompany || !formData.followUpEngineer || !formData.projectName) {
+    if (
+      !formData.approvedCompany ||
+      !formData.followUpEngineer ||
+      !formData.projectName
+    ) {
       toast.error("يرجى تعبئة جميع الحقول المطلوبة");
       return;
     }
@@ -117,6 +137,20 @@ export default function StepOne({
     setShowSaveDialog(false);
     if (addNotes) {
       onNext();
+    }
+  };
+
+  const handleCopySerialNumber = async () => {
+    if (!serialNumber) return;
+
+    try {
+      await navigator.clipboard.writeText(serialNumber);
+      setCopied(true);
+      toast.success("تم نسخ الرقم التسلسلي");
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      toast.error("فشل نسخ الرقم التسلسلي");
+      console.error(error);
     }
   };
 
@@ -197,17 +231,44 @@ export default function StepOne({
             </Button>
           </div>
           {projectExists !== null && (
-            <div className={`flex items-center gap-2 text-xs mt-1 ${projectExists ? 'text-orange-600' : 'text-green-600'}`}>
+            <div
+              className={`mt-t space-y-2 ${
+                projectExists ? "text-yellow-500" : "text-green-600"
+              }`}
+            >
               {projectExists ? (
-                <>
-                  <AlertCircle className="size-4" />
-                  <span>اسم المشروع موجود سابقاً، سيتم حفظه كنسخة مكررة</span>
-                </>
+                <div className="space-y-2">
+                  <div className="text-xs">
+                    <div className="mb-1">
+                      <span>
+                        يبدو أن الاسم موجود سابقا برقم تسلسلي :{" "} <span className="text-gray-100">{serialNumber}</span>
+                      </span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleCopySerialNumber}
+                        className="h-6 w-6"
+                        title="نسخ الرقم التسلسلي"
+                      >
+                        {copied ? (
+                          <Check className="size-3 text-green-600" />
+                        ) : (
+                          <Copy className="size-3 text-gray-100" />
+                        )}
+                      </Button>
+                    </div>
+                    <div className="text-yellow-500">
+                      تابع ادخال الفورم في حال أردت ادخال هذا النموذج ك نموذج
+                      مكرر
+                    </div>
+                  </div>
+                </div>
               ) : (
-                <>
+                <div className="flex items-center gap-2 text-xs">
                   <CheckCircle2 className="size-4" />
                   <span>اسم المشروع صالح، يرجى تعبئة بقية الخانات</span>
-                </>
+                </div>
               )}
             </div>
           )}
@@ -327,7 +388,10 @@ export default function StepOne({
             >
               لا
             </Button>
-            <Button className="w-11 h-11" onClick={() => handleSaveDialogResponse(true)}>
+            <Button
+              className="w-11 h-11"
+              onClick={() => handleSaveDialogResponse(true)}
+            >
               نعم
             </Button>
           </DialogFooter>

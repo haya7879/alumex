@@ -141,11 +141,6 @@ export default function StepTwo({
       ),
     },
     {
-      key: "createdBy",
-      header: "المسجل",
-      className: "w-32",
-    },
-    {
       key: "createdAt",
       header: "التوقيت",
       className: "w-40",
@@ -154,10 +149,17 @@ export default function StepTwo({
 
   return (
     <div className="mt-6">
+      {/* Header Banner */}
+      <div className="py-3">
+        <p className="text-sm text-right">
+          سوف يتم ادراج الملاحظة باسمك بشكل تلقائي مع تاريخ الادخال
+        </p>
+      </div>
+
       <div className="space-y-4">
         <div className="flex gap-2">
           <Input
-            placeholder="أدخل الملاحظة..."
+            placeholder="أدخل الملاحظة واضغط Enter"
             value={newNote}
             onChange={(e) => setNewNote(e.target.value)}
             onKeyDown={(e) => {
@@ -167,7 +169,7 @@ export default function StepTwo({
             }}
             className="flex-1"
           />
-          <Button onClick={handleAddNote}>
+          <Button variant="outline" onClick={handleAddNote}>
             <Plus className="size-4" />
           </Button>
         </div>
