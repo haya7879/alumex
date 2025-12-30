@@ -1,27 +1,26 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import {
-  TableRowData,
-} from "../../../../modules/sales/components/columns";
-import FilterSheet, { FilterField } from "../../../../components/shared/filter-sheet";
+import { TableRowData } from "../../../../modules/sales/components/columns";
+import FilterSheet, {
+  FilterField,
+} from "../../../../components/shared/filter-sheet";
 import { TablePagination } from "@/components/table";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { 
-  Search, 
-  Folder, 
-  Menu, 
-  MoreVertical, 
-  FileText, 
-  Eye,
-  Edit,
-  X,
-  FileDown,
-  CheckCircle2
+import {
+  Search,
+  Menu,
+  FileText,
+  CheckCircle2,
+  MoreVerticalIcon,
 } from "lucide-react";
 import { FaFileAlt, FaCopy } from "react-icons/fa";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -48,7 +47,7 @@ import jsPDF from "jspdf";
 // Sample data based on the image
 const tableData: TableRowData[] = [
   {
-    customerName: "شركة اليد البناء م. عباس المحترم اين",
+    customerName: "شركة اليد البناء م. عباس المحترم",
     phone: "07 705582933",
     lastOfferDate: "23/8/2525",
     lastOfferPrice: "450,000",
@@ -57,7 +56,7 @@ const tableData: TableRowData[] = [
     followUp: { origin: "blue" as const, branch: "blue" },
   },
   {
-    customerName: "شركة اليد البناء م. عباس المحترم اين",
+    customerName: "شركة اليد البناء م. عباس المحترم",
     phone: "07 705582933",
     lastOfferDate: "23/8/2525",
     lastOfferPrice: "450,000",
@@ -66,7 +65,7 @@ const tableData: TableRowData[] = [
     followUp: { origin: "blue" as const, branch: "blue" },
   },
   {
-    customerName: "شركة اليد البناء م. عباس المحترم اين",
+    customerName: "شركة اليد البناء م. عباس المحترم",
     phone: "07 705582933",
     lastOfferDate: "23/8/2525",
     lastOfferPrice: "450,000",
@@ -75,7 +74,7 @@ const tableData: TableRowData[] = [
     followUp: { origin: "blue" as const, branch: "blue" },
   },
   {
-    customerName: "شركة اليد البناء م. عباس المحترم اين",
+    customerName: "شركة اليد البناء م. عباس المحترم",
     phone: "07 705582933",
     lastOfferDate: "23/8/2525",
     lastOfferPrice: "450,000",
@@ -84,7 +83,7 @@ const tableData: TableRowData[] = [
     followUp: { origin: "blue" as const, branch: "blue" },
   },
   {
-    customerName: "شركة اليد البناء م. عباس المحترم اين",
+    customerName: "شركة اليد البناء م. عباس المحترم",
     phone: "07 705582933",
     lastOfferDate: "23/8/2525",
     lastOfferPrice: "450,000",
@@ -93,7 +92,7 @@ const tableData: TableRowData[] = [
     followUp: { origin: "blue" as const, branch: "blue" },
   },
   {
-    customerName: "شركة اليد البناء م. عباس المحترم اين",
+    customerName: "شركة اليد البناء م. عباس المحترم",
     phone: "07 705582933",
     lastOfferDate: "23/8/2525",
     lastOfferPrice: "450,000",
@@ -102,7 +101,7 @@ const tableData: TableRowData[] = [
     followUp: { origin: "blue" as const, branch: "blue" },
   },
   {
-    customerName: "شركة اليد البناء م. عباس المحترم اين",
+    customerName: "شركة اليد البناء م. عباس المحترم",
     phone: "07 705582933",
     lastOfferDate: "23/8/2525",
     lastOfferPrice: "450,000",
@@ -111,7 +110,7 @@ const tableData: TableRowData[] = [
     followUp: { origin: "blue" as const, branch: "blue" },
   },
   {
-    customerName: "شركة اليد البناء م. عباس المحترم اين",
+    customerName: "شركة اليد البناء م. عباس المحترم",
     phone: "07 705582933",
     lastOfferDate: "23/8/2525",
     lastOfferPrice: "",
@@ -120,7 +119,7 @@ const tableData: TableRowData[] = [
     followUp: { origin: "green" as const, branch: "blue" },
   },
   {
-    customerName: "شركة اليد البناء م. عباس المحترم اين",
+    customerName: "شركة اليد البناء م. عباس المحترم",
     phone: "07 705582933",
     lastOfferDate: "23/8/2525",
     lastOfferPrice: "450,000",
@@ -129,7 +128,7 @@ const tableData: TableRowData[] = [
     followUp: { origin: "blue" as const, branch: "blue" },
   },
   {
-    customerName: "شركة اليد البناء م. عباس المحترم اين",
+    customerName: "شركة اليد البناء م. عباس المحترم",
     phone: "07 705582933",
     lastOfferDate: "23/8/2525",
     lastOfferPrice: "",
@@ -138,7 +137,7 @@ const tableData: TableRowData[] = [
     followUp: { origin: "green" as const, branch: "blue" },
   },
   {
-    customerName: "شركة اليد البناء م. عباس المحترم اين",
+    customerName: "شركة اليد البناء م. عباس المحترم",
     phone: "07 705582933",
     lastOfferDate: "23/8/2525",
     lastOfferPrice: "450,000",
@@ -183,7 +182,7 @@ export default function DailyFollowUpPage() {
     {}
   );
   const [searchQuery, setSearchQuery] = useState("");
-  
+
   // Dialog states
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [contractDialogOpen, setContractDialogOpen] = useState(false);
@@ -193,7 +192,9 @@ export default function DailyFollowUpPage() {
     offerDate: "",
     contractDuration: "",
   });
-  const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(null);
+  const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(
+    null
+  );
 
   const handleApplyFilters = (filters: Record<string, string>) => {
     setAppliedFilters(filters);
@@ -223,10 +224,19 @@ export default function DailyFollowUpPage() {
   };
 
   const handleConfirmContract = () => {
-    if (!contractData.offerNumber || !contractData.offerDate || !contractData.contractDuration) {
+    if (
+      !contractData.offerNumber ||
+      !contractData.offerDate ||
+      !contractData.contractDuration
+    ) {
       return;
     }
-    console.log("Contract signed for item:", selectedItemIndex, "Data:", contractData);
+    console.log(
+      "Contract signed for item:",
+      selectedItemIndex,
+      "Data:",
+      contractData
+    );
     // TODO: Add API call to mark as signed
     setContractDialogOpen(false);
     setContractData({ offerNumber: "", offerDate: "", contractDuration: "" });
@@ -253,7 +263,10 @@ export default function DailyFollowUpPage() {
     console.log("View item:", index);
   };
 
-  const handleEdit = (section: "basic" | "followup" | "measurements", index: number) => {
+  const handleEdit = (
+    section: "basic" | "followup" | "measurements",
+    index: number
+  ) => {
     // TODO: Navigate to edit page with section
     console.log("Edit", section, "for item:", index);
   };
@@ -387,17 +400,19 @@ export default function DailyFollowUpPage() {
         <div className="grid grid-cols-1 gap-3">
           {filteredData.map((item, index) => (
             <Card key={index} className="w-full">
-              <CardContent className="p-3">
+              <CardContent className="p-2.5">
                 <div className="flex flex-col gap-3">
                   {/* Customer Name */}
                   <div className="flex items-center justify-between border-b pb-2">
-                    <h3 className="text-sm font-semibold">{item.customerName}</h3>
+                    <h3 className="text-xs font-semibold">
+                      {item.customerName}
+                    </h3>
                     <div className="flex items-center gap-2">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <button className="p-1 hover:bg-accent border rounded-sm transition-colors">
-                            <Menu className="size-4 text-[#3675AF] dark:text-white" />
-                          </button>
+                          <Button variant="outline" size="icon" className="">
+                            <MoreVerticalIcon className="size-4 text-[#3675AF] dark:text-white" />
+                          </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
                           <DropdownMenuSub>
@@ -405,28 +420,40 @@ export default function DailyFollowUpPage() {
                               تعديل
                             </DropdownMenuSubTrigger>
                             <DropdownMenuSubContent>
-                              <DropdownMenuItem onClick={() => handleEdit("basic", index)}>
+                              <DropdownMenuItem
+                                onClick={() => handleEdit("basic", index)}
+                              >
                                 المعلومات الأساسية
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleEdit("followup", index)}>
+                              <DropdownMenuItem
+                                onClick={() => handleEdit("followup", index)}
+                              >
                                 برنامج المتابعة
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleEdit("measurements", index)}>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleEdit("measurements", index)
+                                }
+                              >
                                 القياسات
                               </DropdownMenuItem>
                             </DropdownMenuSubContent>
                           </DropdownMenuSub>
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             onClick={() => handleReject(index)}
                             variant="destructive"
                           >
                             رفض
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleCreatePriceOffer(index)}>
+                          <DropdownMenuItem
+                            onClick={() => handleCreatePriceOffer(index)}
+                          >
                             إنشاء عرض سعر
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={() => handleContractSigned(index)}>
+                          <DropdownMenuItem
+                            onClick={() => handleContractSigned(index)}
+                          >
                             <CheckCircle2 className="size-4 ml-2" />
                             تم توقيع العقد
                           </DropdownMenuItem>
@@ -434,54 +461,83 @@ export default function DailyFollowUpPage() {
                       </DropdownMenu>
                     </div>
                   </div>
-                  
+
                   {/* Information Grid - Compact Layout */}
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-x-4 gap-y-2">
                     <div>
-                      <p className="text-xs text-muted-foreground mb-3">رقم الهاتف</p>
+                      <p className="text-xs text-muted-foreground mb-3">
+                        رقم الهاتف
+                      </p>
                       <p className="text-sm font-medium">{item.phone}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-muted-foreground mb-3">آخر عرض سعر</p>
-                      <p className="text-sm font-medium">{item.lastOfferDate}</p>
+                      <p className="text-xs text-muted-foreground mb-3">
+                        آخر عرض سعر
+                      </p>
+                      <p className="text-sm font-medium">
+                        {item.lastOfferDate}
+                      </p>
                     </div>
                     <div>
-                      <p className="text-xs text-muted-foreground mb-3">سعر آخر عرض</p>
-                      <p className="text-sm font-medium">{item.lastOfferPrice || "-"}</p>
+                      <p className="text-xs text-muted-foreground mb-3">
+                        سعر آخر عرض
+                      </p>
+                      <p className="text-sm font-medium">
+                        {item.lastOfferPrice || "-"}
+                      </p>
                     </div>
                     <div>
-                      <p className="text-xs text-muted-foreground mb-3">هل استلم العرض</p>
-                      <p className="text-sm font-medium">{item.receivedOffer}</p>
+                      <p className="text-xs text-muted-foreground mb-3">
+                        هل استلم العرض
+                      </p>
+                      <p className="text-sm font-medium">
+                        {item.receivedOffer}
+                      </p>
                     </div>
                     <div>
                       <p className="text-xs text-muted-foreground mb-3">الرد</p>
-                      <p className="text-sm font-medium">{item.response || "-"}</p>
+                      <p className="text-sm font-medium">
+                        {item.response || "-"}
+                      </p>
                     </div>
                     <div>
-                      <p className="text-xs text-muted-foreground mb-3">المتابعة</p>
+                      <p className="text-xs text-muted-foreground mb-3">
+                        المتابعة
+                      </p>
                       <Popover>
                         <PopoverTrigger asChild>
-                          <button className="flex items-center gap-1 text-sm font-medium hover:text-primary transition-colors">
+                          <button className="flex items-center gap-1 text-xs font-medium hover:text-primary transition-colors">
                             <FileText className="size-4" />
                             <span>برنامج المتابعة</span>
                           </button>
                         </PopoverTrigger>
                         <PopoverContent className="w-80" align="start">
                           <div className="space-y-3">
-                            <h4 className="font-semibold text-sm">ملاحظات المتابعة</h4>
+                            <h4 className="font-semibold text-sm">
+                              ملاحظات المتابعة
+                            </h4>
                             <div className="space-y-2 max-h-60 overflow-y-auto">
                               {(sampleFollowUpNotes[index] || []).length > 0 ? (
-                                sampleFollowUpNotes[index].map((note, noteIndex) => (
-                                  <div key={noteIndex} className="border-b pb-2 last:border-0">
-                                    <p className="text-sm mb-3">{note.text}</p>
-                                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                                      <span>{note.employeeName}</span>
-                                      <span>{note.date}</span>
+                                sampleFollowUpNotes[index].map(
+                                  (note, noteIndex) => (
+                                    <div
+                                      key={noteIndex}
+                                      className="border-b pb-2 last:border-0"
+                                    >
+                                      <p className="text-sm mb-3">
+                                        {note.text}
+                                      </p>
+                                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                        <span>{note.employeeName}</span>
+                                        <span>{note.date}</span>
+                                      </div>
                                     </div>
-                                  </div>
-                                ))
+                                  )
+                                )
                               ) : (
-                                <p className="text-sm text-muted-foreground">لا توجد ملاحظات</p>
+                                <p className="text-sm text-muted-foreground">
+                                  لا توجد ملاحظات
+                                </p>
                               )}
                             </div>
                           </div>
@@ -489,8 +545,17 @@ export default function DailyFollowUpPage() {
                       </Popover>
                     </div>
                     <div>
-                      <p className="text-xs text-muted-foreground mb-3">أصل / فرع</p>
-                      <div className="flex items-center gap-1" title={item.followUp.origin === "blue" ? "نسخة أصلية" : "نسخة مكررة"}>
+                      <p className="text-xs text-muted-foreground mb-3">
+                        أصل / فرع
+                      </p>
+                      <div
+                        className="flex items-center gap-1"
+                        title={
+                          item.followUp.origin === "blue"
+                            ? "نسخة أصلية"
+                            : "نسخة مكررة"
+                        }
+                      >
                         {item.followUp.origin === "blue" ? (
                           <FaFileAlt className="text-base text-blue-500" />
                         ) : (
@@ -523,9 +588,7 @@ export default function DailyFollowUpPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>رفض النموذج</DialogTitle>
-            <DialogDescription>
-              يرجى إدخال سبب الرفض
-            </DialogDescription>
+            <DialogDescription>يرجى إدخال سبب الرفض</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
@@ -564,9 +627,7 @@ export default function DailyFollowUpPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>تم توقيع العقد</DialogTitle>
-            <DialogDescription>
-              يرجى إدخال معلومات العقد
-            </DialogDescription>
+            <DialogDescription>يرجى إدخال معلومات العقد</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
@@ -576,7 +637,10 @@ export default function DailyFollowUpPage() {
                 placeholder="أدخل رقم العرض"
                 value={contractData.offerNumber}
                 onChange={(e) =>
-                  setContractData({ ...contractData, offerNumber: e.target.value })
+                  setContractData({
+                    ...contractData,
+                    offerNumber: e.target.value,
+                  })
                 }
               />
             </div>
@@ -587,7 +651,10 @@ export default function DailyFollowUpPage() {
                 type="date"
                 value={contractData.offerDate}
                 onChange={(e) =>
-                  setContractData({ ...contractData, offerDate: e.target.value })
+                  setContractData({
+                    ...contractData,
+                    offerDate: e.target.value,
+                  })
                 }
               />
             </div>
@@ -599,7 +666,10 @@ export default function DailyFollowUpPage() {
                 placeholder="أدخل مدة العقد"
                 value={contractData.contractDuration}
                 onChange={(e) =>
-                  setContractData({ ...contractData, contractDuration: e.target.value })
+                  setContractData({
+                    ...contractData,
+                    contractDuration: e.target.value,
+                  })
                 }
               />
             </div>
@@ -609,7 +679,11 @@ export default function DailyFollowUpPage() {
               variant="outline"
               onClick={() => {
                 setContractDialogOpen(false);
-                setContractData({ offerNumber: "", offerDate: "", contractDuration: "" });
+                setContractData({
+                  offerNumber: "",
+                  offerDate: "",
+                  contractDuration: "",
+                });
               }}
             >
               إلغاء

@@ -13,7 +13,7 @@ import {
 // Sample data based on the image
 const tableData: SignedContractRowData[] = [
   {
-    customerName: "شركة اليد البناء م. عباس المحترم اين",
+    customerName: "شركة اليد البناء م. عباس المحترم",
     location: "حي النجار",
     representativeName: "م. سجاد حسن",
     contractSigningDate: "23/8/2525",
@@ -21,7 +21,7 @@ const tableData: SignedContractRowData[] = [
     totalProjectArea: "25",
   },
   {
-    customerName: "شركة اليد البناء م. عباس المحترم اين",
+    customerName: "شركة اليد البناء م. عباس المحترم",
     location: "حي النجار",
     representativeName: "م. سجاد حسن",
     contractSigningDate: "23/8/2525",
@@ -29,7 +29,7 @@ const tableData: SignedContractRowData[] = [
     totalProjectArea: "30",
   },
   {
-    customerName: "شركة اليد البناء م. عباس المحترم اين",
+    customerName: "شركة اليد البناء م. عباس المحترم",
     location: "حي النجار",
     representativeName: "م. سجاد حسن",
     contractSigningDate: "23/8/2525",
@@ -37,7 +37,7 @@ const tableData: SignedContractRowData[] = [
     totalProjectArea: "80",
   },
   {
-    customerName: "شركة اليد البناء م. عباس المحترم اين",
+    customerName: "شركة اليد البناء م. عباس المحترم",
     location: "حي النجار",
     representativeName: "م. سجاد حسن",
     contractSigningDate: "23/8/2525",
@@ -45,7 +45,7 @@ const tableData: SignedContractRowData[] = [
     totalProjectArea: "45",
   },
   {
-    customerName: "شركة اليد البناء م. عباس المحترم اين",
+    customerName: "شركة اليد البناء م. عباس المحترم",
     location: "حي النجار",
     representativeName: "م. سجاد حسن",
     contractSigningDate: "23/8/2525",
@@ -53,7 +53,7 @@ const tableData: SignedContractRowData[] = [
     totalProjectArea: "70",
   },
   {
-    customerName: "شركة اليد البناء م. عباس المحترم اين",
+    customerName: "شركة اليد البناء م. عباس المحترم",
     location: "حي النجار",
     representativeName: "م. سجاد حسن",
     contractSigningDate: "23/8/2525",
@@ -61,7 +61,7 @@ const tableData: SignedContractRowData[] = [
     totalProjectArea: "25",
   },
   {
-    customerName: "شركة اليد البناء م. عباس المحترم اين",
+    customerName: "شركة اليد البناء م. عباس المحترم",
     location: "حي النجار",
     representativeName: "م. سجاد حسن",
     contractSigningDate: "23/8/2525",
@@ -69,7 +69,7 @@ const tableData: SignedContractRowData[] = [
     totalProjectArea: "45",
   },
   {
-    customerName: "شركة اليد البناء م. عباس المحترم اين",
+    customerName: "شركة اليد البناء م. عباس المحترم",
     location: "حي النجار",
     representativeName: "م. سجاد حسن",
     contractSigningDate: "23/8/2525",
@@ -77,7 +77,7 @@ const tableData: SignedContractRowData[] = [
     totalProjectArea: "25",
   },
   {
-    customerName: "شركة اليد البناء م. عباس المحترم اين",
+    customerName: "شركة اليد البناء م. عباس المحترم",
     location: "حي النجار",
     representativeName: "م. سجاد حسن",
     contractSigningDate: "23/8/2525",
@@ -85,7 +85,7 @@ const tableData: SignedContractRowData[] = [
     totalProjectArea: "45",
   },
   {
-    customerName: "شركة اليد البناء م. عباس المحترم اين",
+    customerName: "شركة اليد البناء م. عباس المحترم",
     location: "حي النجار",
     representativeName: "م. سجاد حسن",
     contractSigningDate: "23/8/2525",
@@ -93,7 +93,7 @@ const tableData: SignedContractRowData[] = [
     totalProjectArea: "25",
   },
   {
-    customerName: "شركة اليد البناء م. عباس المحترم اين",
+    customerName: "شركة اليد البناء م. عباس المحترم",
     location: "حي النجار",
     representativeName: "م. سجاد حسن",
     contractSigningDate: "23/8/2525",
@@ -101,7 +101,7 @@ const tableData: SignedContractRowData[] = [
     totalProjectArea: "30",
   },
   {
-    customerName: "شركة اليد البناء م. عباس المحترم اين",
+    customerName: "شركة اليد البناء م. عباس المحترم",
     location: "حي النجار",
     representativeName: "م. سجاد حسن",
     contractSigningDate: "23/8/2525",
@@ -109,7 +109,7 @@ const tableData: SignedContractRowData[] = [
     totalProjectArea: "25",
   },
   {
-    customerName: "شركة اليد البناء م. عباس المحترم اين",
+    customerName: "شركة اليد البناء م. عباس المحترم",
     location: "حي النجار",
     representativeName: "م. سجاد حسن",
     contractSigningDate: "23/8/2525",

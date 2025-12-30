@@ -1,5 +1,6 @@
-import { Folder, Menu, MoreVertical } from "lucide-react";
+import { Folder, Menu, MoreVertical, MoreVerticalIcon } from "lucide-react";
 import { Column } from "@/components/table/data-table";
+import { Button } from "@/components/ui/button";
 
 export interface TableRowData {
   customerName: string;
@@ -82,15 +83,19 @@ export const signedContractsColumns: Column<SignedContractRowData>[] = [
   },
   {
     key: "totalContractValue",
-    header: "القيمة الكلية للعقد",
+    header: "قيمة العقد",
   },
   {
     key: "totalProjectArea",
-    header: "المساحة الكلية للمشروع",
+    header: "مساحة المشروع",
   },
   {
     key: "actions",
     header: "",
-    render: () => <MoreVertical className="size-4 cursor-pointer" />,
+    render: () => (
+      <Button variant="outline" size="icon" className="">
+        <MoreVerticalIcon className="size-4 text-[#3675AF] dark:text-white" />
+      </Button>
+    ),
   },
 ];
