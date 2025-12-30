@@ -195,6 +195,9 @@ export default function DailyFollowUpPage() {
   const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(
     null
   );
+  const [hoveredPopoverIndex, setHoveredPopoverIndex] = useState<number | null>(
+    null
+  );
 
   const handleApplyFilters = (filters: Record<string, string>) => {
     setAppliedFilters(filters);
@@ -504,14 +507,27 @@ export default function DailyFollowUpPage() {
                       <p className="text-xs text-muted-foreground mb-3">
                         المتابعة
                       </p>
-                      <Popover>
+                      <Popover
+                        open={hoveredPopoverIndex === index}
+                        onOpenChange={(open) =>
+                          setHoveredPopoverIndex(open ? index : null)
+                        }
+                      >
                         <PopoverTrigger asChild>
-                          <button className="flex items-center gap-1 text-xs font-medium hover:text-primary transition-colors">
+                          <button
+                            className="flex items-center gap-1 text-xs font-medium hover:text-primary transition-colors"
+                            onMouseEnter={() => setHoveredPopoverIndex(index)}
+                          >
                             <FileText className="size-4" />
                             <span>برنامج المتابعة</span>
                           </button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-80" align="start">
+                        <PopoverContent
+                          className="w-80"
+                          align="start"
+                          onMouseEnter={() => setHoveredPopoverIndex(index)}
+                          onMouseLeave={() => setHoveredPopoverIndex(null)}
+                        >
                           <div className="space-y-3">
                             <h4 className="font-semibold text-sm">
                               ملاحظات المتابعة

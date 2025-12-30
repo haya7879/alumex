@@ -28,17 +28,16 @@ export const LogoutModal = () => {
         <div className="flex justify-start pt-4 gap-2">
           <Button
             type="submit"
-            className="bg-[#0A3158] text-white hover:bg-[#0A3158]/90 px-8"
+            className="bg-[#0A3158] text-white hover:bg-[#0A3158]/90 px-3"
           >
-            تأكيد 
+            نعم 
           </Button>
           <Button
             type="button"
             variant="outline"
             // onClick={() => router.back()}
-            className="px-8"
           >
-            الغاء
+            لا
           </Button>
         </div>
       </DialogContent>

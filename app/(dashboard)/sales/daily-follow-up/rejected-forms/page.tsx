@@ -89,6 +89,9 @@ export default function RejectedFormsPage() {
   const [appliedFilters, setAppliedFilters] = useState<Record<string, string>>(
     {}
   );
+  const [hoveredPopoverIndex, setHoveredPopoverIndex] = useState<number | null>(
+    null
+  );
 
   const handleApplyFilters = (filters: Record<string, string>) => {
     setAppliedFilters(filters);
@@ -155,14 +158,27 @@ export default function RejectedFormsPage() {
       key: "followUp",
       header: "المتابعة",
       render: (row: TableRowData, index: number) => (
-        <Popover>
+        <Popover
+          open={hoveredPopoverIndex === index}
+          onOpenChange={(open) =>
+            setHoveredPopoverIndex(open ? index : null)
+          }
+        >
           <PopoverTrigger asChild>
-            <button className="flex items-center gap-1 text-xs font-medium hover:text-primary transition-colors">
+            <button
+              className="flex items-center gap-1 text-xs font-medium hover:text-primary transition-colors"
+              onMouseEnter={() => setHoveredPopoverIndex(index)}
+            >
               <FileText className="size-4" />
               <span>برنامج المتابعة</span>
             </button>
           </PopoverTrigger>
-          <PopoverContent className="w-80" align="start">
+          <PopoverContent
+            className="w-80"
+            align="start"
+            onMouseEnter={() => setHoveredPopoverIndex(index)}
+            onMouseLeave={() => setHoveredPopoverIndex(null)}
+          >
             <div className="space-y-3">
               <h4 className="font-semibold text-sm">ملاحظات المتابعة</h4>
               <div className="space-y-2 max-h-60 overflow-y-auto">

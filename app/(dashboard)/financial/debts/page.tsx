@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { DataTable, Column } from "@/components/table/data-table";
 import { TablePagination } from "@/components/table";
-import { MoreVertical, Calendar } from "lucide-react";
+import { MoreVertical, Calendar, MoreVerticalIcon } from "lucide-react";
 import {
   FilterField,
 } from "../../../../components/shared/filter-sheet";
+import { Button } from "@/components/ui/button";
 
 // Data interface
 export interface DebtRowData {
@@ -172,7 +173,9 @@ const columns: Column<DebtRowData>[] = [
     key: "options",
     header: "",
     render: () => (
-      <MoreVertical className="size-4 cursor-pointer text-gray-500 hover:text-gray-700" />
+      <Button variant="outline" size="icon" className="">
+        <MoreVerticalIcon className="size-4 text-[#3675AF] dark:text-white" />
+      </Button>
     ),
   },
 ];
