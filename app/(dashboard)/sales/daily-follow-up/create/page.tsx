@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import StepOne, { BasicInfoFormData } from "./(steps)/step-one";
-import StepTwo from "./(steps)/step-two";
-import StepThree, { MeasurementRow } from "./(steps)/step-three";
+import StepTwo, { NoteRow } from "./(steps)/step-two";
+import StepThree, { Section } from "./(steps)/step-three";
 import StepsIndicator from "@/components/shared/steps-indicator";
+import { toast } from "sonner";
 
 export default function AddNewFormPage() {
   const [currentStep, setCurrentStep] = useState(1);
+  const [formId, setFormId] = useState<number | null>(null);
   const [basicInfo, setBasicInfo] = useState<BasicInfoFormData>({
     approvedCompany: "",
     followUpEngineer: "",
@@ -20,55 +22,70 @@ export default function AddNewFormPage() {
     date: "",
     address: "",
   });
-  const [notes, setNotes] = useState("");
+  const [notes, setNotes] = useState<NoteRow[]>([]);
+  const [sections, setSections] = useState<Section[]>([]);
 
-  const [measurementRows, setMeasurementRows] = useState<MeasurementRow[]>([
-    {
-      id: 1,
-      floor: "GF",
-      location: "صالة على منور وسطي",
-      width: "262.15",
-      length: "262.15",
-      count: "1",
-      areaCm2: "121,600.0",
-      areaM2: "12.160",
-      pricePerMeter: "245,000 د.ع",
-      total: "2,245,000 د.ع",
-      checked: true,
-    },
-  ]);
-
-  const handleBasicInfoChange = (field: keyof BasicInfoFormData, value: string) => {
+  const handleBasicInfoChange = (
+    field: keyof BasicInfoFormData,
+    value: string | number | boolean
+  ) => {
     setBasicInfo((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleAddRow = () => {
-    const newRow: MeasurementRow = {
-      id: measurementRows.length + 1,
-      floor: "",
-      location: "",
-      width: "",
-      length: "",
-      count: "",
-      areaCm2: "",
-      areaM2: "",
-      pricePerMeter: "",
-      total: "",
-      checked: false,
-    };
-    setMeasurementRows([...measurementRows, newRow]);
+  const handleSaveForm = async (formData: BasicInfoFormData): Promise<number> => {
+    // Dummy API call - replace with actual API
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    
+    // Simulate API response with form ID
+    const newFormId = Math.floor(Math.random() * 10000);
+    setFormId(newFormId);
+    
+    // In real implementation:
+    // const response = await fetch('/api/daily-follow-up', {
+    //   method: 'POST',
+    //   body: JSON.stringify(formData)
+    // });
+    // const data = await response.json();
+    // return data.id;
+    
+    toast.success("تم حفظ النموذج بنجاح");
+    return newFormId;
   };
 
-  const handleRowChange = (id: number, field: keyof MeasurementRow, value: string | boolean) => {
-    setMeasurementRows(
-      measurementRows.map((row) =>
-        row.id === id ? { ...row, [field]: value } : row
-      )
-    );
+  const handleSaveNotes = async () => {
+    if (!formId) {
+      toast.error("خطأ: لم يتم حفظ النموذج");
+      return;
+    }
+
+    // Dummy API call - replace with actual API
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    
+    // In real implementation:
+    // await fetch(`/api/daily-follow-up/${formId}/notes`, {
+    //   method: 'POST',
+    //   body: JSON.stringify(notes)
+    // });
+    
+    toast.success("تم حفظ الملاحظات بنجاح");
   };
 
-  const handleCheckboxChange = (id: number, checked: boolean) => {
-    handleRowChange(id, "checked", checked);
+  const handleSaveMeasurements = async () => {
+    if (!formId) {
+      toast.error("خطأ: لم يتم حفظ النموذج");
+      return;
+    }
+
+    // Dummy API call - replace with actual API
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    
+    // In real implementation:
+    // await fetch(`/api/daily-follow-up/${formId}/measurements`, {
+    //   method: 'POST',
+    //   body: JSON.stringify(sections)
+    // });
+    
+    toast.success("تم حفظ جميع القياسات بنجاح");
   };
 
   const nextStep = () => {
@@ -81,13 +98,6 @@ export default function AddNewFormPage() {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     }
-  };
-
-  const handleSubmit = () => {
-    // Handle form submission
-    console.log("Basic Info:", basicInfo);
-    console.log("Notes:", notes);
-    console.log("Measurements:", measurementRows);
   };
 
   const steps = [
@@ -105,29 +115,31 @@ export default function AddNewFormPage() {
         <StepOne
           formData={basicInfo}
           onInputChange={handleBasicInfoChange}
+          onSave={handleSaveForm}
           onNext={nextStep}
         />
       )}
 
       {/* Step 2: Notes */}
-      {currentStep === 2 && (
+      {currentStep === 2 && formId && (
         <StepTwo
+          formId={formId}
           notes={notes}
           onNotesChange={setNotes}
+          onSave={handleSaveNotes}
           onNext={nextStep}
           onPrev={prevStep}
         />
       )}
 
       {/* Step 3: Measurements Table */}
-      {currentStep === 3 && (
+      {currentStep === 3 && formId && (
         <StepThree
-          measurementRows={measurementRows}
-          onRowChange={handleRowChange}
-          onCheckboxChange={handleCheckboxChange}
-          onAddRow={handleAddRow}
+          formId={formId}
+          sections={sections}
+          onSectionsChange={setSections}
+          onSave={handleSaveMeasurements}
           onPrev={prevStep}
-          onSubmit={handleSubmit}
         />
       )}
     </div>

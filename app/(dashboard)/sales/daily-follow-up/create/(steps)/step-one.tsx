@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -11,7 +12,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Calendar, ChevronLeft, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 export interface BasicInfoFormData {
   approvedCompany: string;
@@ -24,24 +34,97 @@ export interface BasicInfoFormData {
   projectStage: string;
   date: string;
   address: string;
+  isDuplicate?: boolean;
+  parentId?: number;
 }
 
 interface StepOneProps {
   formData: BasicInfoFormData;
-  onInputChange: (field: keyof BasicInfoFormData, value: string) => void;
+  onInputChange: (field: keyof BasicInfoFormData, value: string | number | boolean) => void;
+  onSave: (formData: BasicInfoFormData) => Promise<number>;
   onNext: () => void;
 }
 
 export default function StepOne({
   formData,
   onInputChange,
+  onSave,
   onNext,
 }: StepOneProps) {
+  const [isChecking, setIsChecking] = useState(false);
+  const [projectExists, setProjectExists] = useState<boolean | null>(null);
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [savedFormId, setSavedFormId] = useState<number | null>(null);
+
+  const checkProjectName = async () => {
+    if (!formData.projectName.trim()) {
+      toast.error("يرجى إدخال اسم المشروع أولاً");
+      return;
+    }
+
+    setIsChecking(true);
+    setProjectExists(null);
+
+    try {
+      // Dummy API call - replace with actual API
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      
+      // Simulate API response - randomly return true/false for demo
+      const exists = Math.random() > 0.5;
+      setProjectExists(exists);
+
+      if (exists) {
+        toast.warning("اسم المشروع موجود سابقاً، سيتم حفظه كنسخة مكررة");
+        onInputChange("isDuplicate", true);
+        // In real implementation, get parentId from API
+        onInputChange("parentId", Math.floor(Math.random() * 1000));
+      } else {
+        toast.success("اسم المشروع صالح، يرجى تعبئة بقية الخانات");
+        onInputChange("isDuplicate", false);
+        // Remove parentId when project doesn't exist - set to 0 to clear it
+        onInputChange("parentId", 0);
+      }
+    } catch (error) {
+      toast.error("حدث خطأ أثناء التحقق من اسم المشروع");
+      console.error(error);
+    } finally {
+      setIsChecking(false);
+    }
+  };
+
+  const handleSave = async () => {
+    // Validate required fields
+    if (!formData.approvedCompany || !formData.followUpEngineer || !formData.projectName) {
+      toast.error("يرجى تعبئة جميع الحقول المطلوبة");
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const formId = await onSave(formData);
+      setSavedFormId(formId);
+      setShowSaveDialog(true);
+    } catch (error) {
+      toast.error("حدث خطأ أثناء حفظ النموذج");
+      console.error(error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSaveDialogResponse = (addNotes: boolean) => {
+    setShowSaveDialog(false);
+    if (addNotes) {
+      onNext();
+    }
+  };
+
   return (
     <>
       <div className="grid grid-cols-4 gap-4 mt-6">
         <div className="space-y-2">
-          <Label htmlFor="approvedCompany">الشركة المتعتمدة</Label>
+          <Label htmlFor="approvedCompany">الشركة المعتمدة</Label>
           <Select
             value={formData.approvedCompany}
             onValueChange={(value) => onInputChange("approvedCompany", value)}
@@ -57,7 +140,7 @@ export default function StepOne({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="followUpEngineer">المهندس المتابع</Label>
+          <Label htmlFor="followUpEngineer">المهندس المشرف</Label>
           <Input
             id="followUpEngineer"
             placeholder="مثال: م. فادي خرشوم"
@@ -84,12 +167,50 @@ export default function StepOne({
 
         <div className="space-y-2">
           <Label htmlFor="projectName">اسم المشروع</Label>
-          <Input
-            id="projectName"
-            placeholder="الشركة المعتمدة _ _ المهندس المتابع"
-            value={formData.projectName}
-            onChange={(e) => onInputChange("projectName", e.target.value)}
-          />
+          <div className="flex gap-2 items-center">
+            <Input
+              id="projectName"
+              placeholder="الشركة المعتمدة _ _ المهندس المتابع"
+              value={formData.projectName}
+              onChange={(e) => {
+                onInputChange("projectName", e.target.value);
+                setProjectExists(null);
+              }}
+              className="flex-1"
+            />
+            <Button
+              type="button"
+              onClick={checkProjectName}
+              disabled={isChecking || !formData.projectName.trim()}
+              variant="outline"
+              size="sm"
+              className="min-w-[80px]"
+            >
+              {isChecking ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <>
+                  <CheckCircle2 className="size-4 ml-2" />
+                  تحقق
+                </>
+              )}
+            </Button>
+          </div>
+          {projectExists !== null && (
+            <div className={`flex items-center gap-2 text-xs mt-1 ${projectExists ? 'text-orange-600' : 'text-green-600'}`}>
+              {projectExists ? (
+                <>
+                  <AlertCircle className="size-4" />
+                  <span>اسم المشروع موجود سابقاً، سيتم حفظه كنسخة مكررة</span>
+                </>
+              ) : (
+                <>
+                  <CheckCircle2 className="size-4" />
+                  <span>اسم المشروع صالح، يرجى تعبئة بقية الخانات</span>
+                </>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="space-y-2">
@@ -174,12 +295,44 @@ export default function StepOne({
 
       <div className="flex justify-end gap-4 pt-4">
         <Button
-          onClick={onNext}
+          onClick={handleSave}
+          disabled={isSaving}
           className="min-w-[100px]"
         >
-          التالي <ChevronLeft className="size-4 mr-2" />
+          {isSaving ? (
+            <>
+              <Loader2 className="size-4 mr-2 animate-spin" />
+              جاري الحفظ...
+            </>
+          ) : (
+            "حفظ"
+          )}
         </Button>
       </div>
+
+      {/* Save Dialog - Ask about notes */}
+      <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>تم حفظ النموذج بنجاح</DialogTitle>
+            <DialogDescription>
+              هل تريد إدخال الملاحظات المرتبطة بهذا المشروع؟
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              className="w-11! h-11"
+              onClick={() => handleSaveDialogResponse(false)}
+            >
+              لا
+            </Button>
+            <Button className="w-11 h-11" onClick={() => handleSaveDialogResponse(true)}>
+              نعم
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

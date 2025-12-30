@@ -114,7 +114,7 @@ function DialogDescription({
   return (
     <DialogPrimitive.Description
       data-slot="dialog-description"
-      className={cn("text-muted-foreground text-sm text-right mt-2", className)}
+      className={cn("text-muted-foreground text-sm text-right", className)}
       {...props}
     />
   );
