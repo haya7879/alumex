@@ -28,13 +28,6 @@ const navItems: NavItem[] = [
     ],
   },
   {
-    label: "القياسات",
-    href: "/measurements/orders",
-    subRoutes: [
-      { label: "الطلبات", href: "/measurements/orders" },
-    ],
-  },
-  {
     label: "المشاريع",
     href: "/projects/descriptions",
     subRoutes: [
@@ -44,20 +37,16 @@ const navItems: NavItem[] = [
     ],
   },
   {
+    label: "القياسات",
+    href: "/measurements/orders",
+  },
+  {
     label: "القسم المالي",
     href: "/financial/debts",
-    subRoutes: [
-      { label: "المستحقات", href: "/financial/debts" },
-    ],
   },
   {
     label: "إدارة المهام",
     href: "/tasks-manager/all-tasks",
-    subRoutes: [
-      { label: "جميع المهام", href: "/tasks-manager/all-tasks" },
-      { label: "إضافة مهمة", href: "/tasks-manager/create" },
-      { label: "أرشيف المهام", href: "/tasks-manager/archive" },
-    ],
   },
 ];
 
@@ -85,7 +74,7 @@ export const Navbar = () => {
     >
       <div className="h-full w-full p-3 rounded-full flex gap-4 items-center justify-between bg-white/30 dark:bg-[#0C111D4D]">
         <Logo />
-        <ul className="flex items-center gap-2 text-sm relative">
+        <ul className="flex items-center gap-2 text-sm relative" dir="rtl">
           {navItems.map((item) => (
             <li key={item.label} className="relative">
               <div
@@ -116,8 +105,8 @@ export const Navbar = () => {
                   {item.label}
                 </Link>
                 {item.subRoutes && hoveredItem === item.label && (
-                  <div 
-                    className="absolute top-full left-0 w-48 z-50"
+                  <div
+                    className="absolute top-full right-0 w-48 z-50"
                     onMouseEnter={() => {
                       if (timeoutRef.current) {
                         clearTimeout(timeoutRef.current);
