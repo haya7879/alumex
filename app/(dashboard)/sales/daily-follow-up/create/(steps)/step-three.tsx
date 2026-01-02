@@ -1,10 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTable, Column } from "@/components/table";
+import {
+  useSections,
+  useCreateMeasurements,
+} from "@/services/sales/sales-hooks";
 import {
   Dialog,
   DialogContent,
@@ -60,17 +65,6 @@ interface StepThreeProps {
   onPrev: () => void;
 }
 
-// Available sections - in real app, fetch from API
-const availableSections = [
-  "ألمنيوم مقطع السحاب (ALUMAX 16 SLIDING SYSTEM)",
-  "ألمنيوم مقطع السحاب (ALUMAX 20 SLIDING SYSTEM)",
-  "ألمنيوم مقطع السحاب (ALUMAX 25 SLIDING SYSTEM)",
-  "ألمنيوم مقطع السحاب (ALUMAX 30 SLIDING SYSTEM)",
-  "ألمنيوم مقطع السحاب (ALUMAX 35 SLIDING SYSTEM)",
-  "ألمنيوم مقطع السحاب (ALUMAX 40 SLIDING SYSTEM)",
-  "ألمنيوم مقطع السحاب (ALUMAX 45 SLIDING SYSTEM)",
-  "ألمنيوم مقطع السحاب (ALUMAX 50 SLIDING SYSTEM)",
-];
 
 const floors = [
   "GF",
@@ -100,6 +94,14 @@ export default function StepThree({
   onSave,
   onPrev,
 }: StepThreeProps) {
+  const router = useRouter();
+  
+  // Fetch available sections from API
+  const { data: availableSectionsData, isLoading: isLoadingSections } = useSections();
+  
+  // Create measurements mutation
+  const createMeasurementsMutation = useCreateMeasurements();
+  
   const [selectedSectionId, setSelectedSectionId] = useState<number | null>(
     sections.length > 0 ? sections[0].id : null
   );
@@ -113,6 +115,9 @@ export default function StepThree({
   const [addRowsDialog, setAddRowsDialog] = useState(false);
   const [selectedFloor, setSelectedFloor] = useState("GF");
   const [rowsToAdd, setRowsToAdd] = useState(1);
+
+  // Convert API sections to array of names for selection
+  const availableSections = availableSectionsData?.map((section) => section.name) || [];
 
   const calculateArea = (width: string, length: string) => {
     const w = parseFloat(width) || 0;
@@ -146,11 +151,16 @@ export default function StepThree({
       return;
     }
 
-    const newSections: Section[] = selectedSections.map((name, index) => ({
-      id: index + 1,
-      name,
-      measurements: [],
-    }));
+    // Map selected section names to section IDs from API
+    const newSections: Section[] = selectedSections.map((name, index) => {
+      // Find the section ID from API data
+      const apiSection = availableSectionsData?.find((s) => s.name === name);
+      return {
+        id: apiSection?.id || index + 1,
+        name,
+        measurements: [],
+      };
+    });
 
     onSectionsChange(newSections);
     setSelectedSectionId(newSections[0].id);
@@ -397,12 +407,58 @@ export default function StepThree({
   };
 
   const handleSave = async () => {
+    if (sections.length === 0) {
+      toast.error("يرجى إضافة مقاطع أولاً");
+      return;
+    }
+
+    // Check if there are any measurements
+    const hasMeasurements = sections.some(
+      (section) => section.measurements.length > 0
+    );
+    if (!hasMeasurements) {
+      toast.error("يرجى إضافة قياسات على الأقل");
+      return;
+    }
+
     setIsSaving(true);
     try {
-      await onSave();
+      // Prepare measurements array from all sections
+      const measurements = sections.flatMap((section) =>
+        section.measurements.map((row) => {
+          // Extract price number from string (e.g., "260,000 د.ع" -> 260000)
+          const pricePerMeter = parseFloat(
+            row.pricePerMeter.replace(/[^0-9.]/g, "")
+          ) || 0;
+
+          return {
+            section_id: section.id,
+            width: parseFloat(row.width) || 0,
+            height: parseFloat(row.length) || 0, // length is height in API
+            qty: parseFloat(row.count) || 1,
+            floor: row.floor,
+            location: row.location || "",
+            price_per_meter: pricePerMeter,
+            is_selected_for_quote: row.checked,
+          };
+        })
+      );
+
+      const requestBody = {
+        form_id: formId,
+        measurements,
+      };
+
+      await createMeasurementsMutation.mutateAsync(requestBody);
+
+      // Call optional onSave callback if provided
+      if (onSave) {
+        await onSave();
+      }
+
       toast.success("تم حفظ جميع القياسات بنجاح");
       // Return to step one
-      window.location.reload();
+      router.push(`/sales/daily-follow-up/create`);
     } catch (error) {
       toast.error("حدث خطأ أثناء حفظ القياسات");
       console.error(error);
@@ -416,27 +472,39 @@ export default function StepThree({
       <div className="mt-6">
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">اختر المقاطع المتاحة</h3>
-          <div className="grid grid-cols-3 gap-4">
-            {availableSections.map((section) => (
-              <div key={section} className="flex items-center gap-2">
-                <Checkbox
-                  id={section}
-                  checked={selectedSections.includes(section)}
-                  onCheckedChange={(checked) => {
-                    if (checked) {
-                      setSelectedSections([...selectedSections, section]);
-                    } else {
-                      setSelectedSections(
-                        selectedSections.filter((s) => s !== section)
-                      );
-                    }
-                  }}
-                />
-                <label htmlFor={section} className="text-sm cursor-pointer">
-                  {section}
-                </label>
-              </div>
-            ))}
+          {isLoadingSections ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="size-6 animate-spin text-muted-foreground" />
+              <span className="mr-2 text-sm text-muted-foreground">جاري التحميل...</span>
+            </div>
+          ) : availableSections.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              لا توجد مقاطع متاحة
+            </div>
+          ) : (
+            <div className="grid grid-cols-3 gap-4">
+              {availableSections.map((section) => (
+                <div key={section} className="flex items-center gap-2">
+                  <Checkbox
+                    id={section}
+                    checked={selectedSections.includes(section)}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setSelectedSections([...selectedSections, section]);
+                      } else {
+                        setSelectedSections(
+                          selectedSections.filter((s) => s !== section)
+                        );
+                      }
+                    }}
+                  />
+                  <label htmlFor={section} className="text-sm cursor-pointer">
+                    {section}
+                  </label>
+                </div>
+              ))}
+            </div>
+          )}
           </div>
           <Button
             onClick={handleSectionSelection}
@@ -444,7 +512,6 @@ export default function StepThree({
           >
             تأكيد
           </Button>
-        </div>
       </div>
     );
   }
@@ -678,10 +745,10 @@ export default function StepThree({
         </Button>
         <Button
           onClick={handleSave}
-          disabled={isSaving}
+          disabled={isSaving || createMeasurementsMutation.isPending}
           className="min-w-[100px]"
         >
-          {isSaving ? (
+          {isSaving || createMeasurementsMutation.isPending ? (
             <>
               <Loader2 className="size-4 mr-2 animate-spin" />
               جاري الحفظ...

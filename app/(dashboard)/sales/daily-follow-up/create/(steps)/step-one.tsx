@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -21,7 +22,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  Calendar,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Calendar as CalendarIcon,
   ChevronLeft,
   CheckCircle2,
   AlertCircle,
@@ -30,6 +37,12 @@ import {
   Check,
 } from "lucide-react";
 import { toast } from "sonner";
+import {
+  useAuthorizedCompanies,
+  useCheckProjectName,
+  useSalesAgents,
+  useCreateForm,
+} from "@/services/sales/sales-hooks";
 
 export interface BasicInfoFormData {
   approvedCompany: string;
@@ -52,7 +65,8 @@ interface StepOneProps {
     field: keyof BasicInfoFormData,
     value: string | number | boolean
   ) => void;
-  onSave: (formData: BasicInfoFormData) => Promise<number>;
+  onSave?: (formData: BasicInfoFormData) => Promise<number>;
+  onFormIdChange?: (formId: number) => void;
   onNext: () => void;
 }
 
@@ -60,15 +74,82 @@ export default function StepOne({
   formData,
   onInputChange,
   onSave,
+  onFormIdChange,
   onNext,
 }: StepOneProps) {
-  const [isChecking, setIsChecking] = useState(false);
+  const router = useRouter();
   const [projectExists, setProjectExists] = useState<boolean | null>(null);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [savedFormId, setSavedFormId] = useState<number | null>(null);
   const [serialNumber, setSerialNumber] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [dateCalendarOpen, setDateCalendarOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  
+  // Fetch authorized companies
+  const { data: authorizedCompanies, isLoading: isLoadingCompanies } =
+    useAuthorizedCompanies();
+
+  // Fetch sales agents
+  const { data: salesAgents, isLoading: isLoadingAgents } = useSalesAgents();
+
+  // Check project name mutation
+  const checkProjectNameMutation = useCheckProjectName();
+
+  // Create form mutation
+  const createFormMutation = useCreateForm();
+
+  // Helper function to format date from Date object to DD/MM/YYYY
+  const formatDateToDisplay = (date: Date | undefined): string => {
+    if (!date) return "";
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+  // Helper function to parse date from DD/MM/YYYY string to Date object
+  const parseDateFromString = (dateString: string): Date | undefined => {
+    if (!dateString) return undefined;
+    // Try DD/MM/YYYY format first
+    const parts = dateString.split("/");
+    if (parts.length === 3) {
+      const [day, month, year] = parts;
+      const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+      if (!isNaN(date.getTime())) {
+        return date;
+      }
+    }
+    // Try YYYY-MM-DD format (from HTML date input)
+    const parts2 = dateString.split("-");
+    if (parts2.length === 3) {
+      const [year, month, day] = parts2;
+      const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+      if (!isNaN(date.getTime())) {
+        return date;
+      }
+    }
+    return undefined;
+  };
+
+  // Handle date selection from calendar
+  const handleDateSelect = (date: Date | undefined) => {
+    if (date) {
+      setSelectedDate(date);
+      const formattedDate = formatDateToDisplay(date);
+      onInputChange("date", formattedDate);
+      setDateCalendarOpen(false);
+    }
+  };
+
+  // Update selectedDate when formData.date changes
+  useEffect(() => {
+    if (formData.date) {
+      const parsedDate = parseDateFromString(formData.date);
+      setSelectedDate(parsedDate);
+    }
+  }, [formData.date]);
 
   const checkProjectName = async () => {
     if (!formData.projectName.trim()) {
@@ -76,36 +157,29 @@ export default function StepOne({
       return;
     }
 
-    setIsChecking(true);
     setProjectExists(null);
 
     try {
-      // Dummy API call - replace with actual API
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await checkProjectNameMutation.mutateAsync(
+        formData.projectName.trim()
+      );
 
-      // Simulate API response - randomly return true/false for demo
-      const exists = Math.random() > 0.5;
-      setProjectExists(exists);
+      setProjectExists(response.exists);
 
-      if (exists) {
-        // In real implementation, get serialNumber from API
-        const mockSerialNumber = `DF-${Math.floor(Math.random() * 10000)}`;
-        setSerialNumber(mockSerialNumber);
+      if (response.exists && response.original) {
+        setSerialNumber(response.original.serial_number);
         onInputChange("isDuplicate", true);
-        // In real implementation, get parentId from API
-        onInputChange("parentId", Math.floor(Math.random() * 1000));
+        onInputChange("parentId", response.original.id);
       } else {
         setSerialNumber(null);
         toast.success("اسم المشروع صالح، يرجى تعبئة بقية الخانات");
         onInputChange("isDuplicate", false);
-        // Remove parentId when project doesn't exist - set to 0 to clear it
         onInputChange("parentId", 0);
       }
     } catch (error) {
       toast.error("حدث خطأ أثناء التحقق من اسم المشروع");
       console.error(error);
-    } finally {
-      setIsChecking(false);
+      setProjectExists(null);
     }
   };
 
@@ -114,7 +188,12 @@ export default function StepOne({
     if (
       !formData.approvedCompany ||
       !formData.followUpEngineer ||
-      !formData.projectName
+      !formData.projectName ||
+      !formData.delegate ||
+      !formData.projectCategory ||
+      !formData.projectStage ||
+      !formData.date ||
+      !formData.address
     ) {
       toast.error("يرجى تعبئة جميع الحقول المطلوبة");
       return;
@@ -122,9 +201,28 @@ export default function StepOne({
 
     setIsSaving(true);
     try {
-      const formId = await onSave(formData);
-      setSavedFormId(formId);
+      // Prepare request body
+      const requestBody = {
+        authorized_company_id: parseInt(formData.approvedCompany),
+        engineer_name: formData.followUpEngineer,
+        sales_agent_id: parseInt(formData.delegate),
+        form_name: formData.projectName,
+        phone1: formData.phoneNumber || "",
+        phone2: formData.phoneNumber2 || undefined,
+        project_type: formData.projectCategory,
+        project_stage: formData.projectStage,
+        entry_date: formData.date,
+        address: formData.address,
+        ...(formData.parentId && formData.parentId > 0
+          ? { parent_id: formData.parentId }
+          : {}),
+      };
+
+      const response = await createFormMutation.mutateAsync(requestBody);
+      setSavedFormId(response.data.id);
+      setSerialNumber(response.data.serial_number);
       setShowSaveDialog(true);
+      toast.success(response.message || "تم حفظ النموذج بنجاح");
     } catch (error) {
       toast.error("حدث خطأ أثناء حفظ النموذج");
       console.error(error);
@@ -135,7 +233,9 @@ export default function StepOne({
 
   const handleSaveDialogResponse = (addNotes: boolean) => {
     setShowSaveDialog(false);
-    if (addNotes) {
+    if (addNotes && savedFormId) {
+      // Update URL with form_id
+      router.push(`/sales/daily-follow-up/create?form_id=${savedFormId}&step=2`);
       onNext();
     }
   };
@@ -162,13 +262,27 @@ export default function StepOne({
           <Select
             value={formData.approvedCompany}
             onValueChange={(value) => onInputChange("approvedCompany", value)}
+            disabled={isLoadingCompanies}
           >
             <SelectTrigger id="approvedCompany">
-              <SelectValue placeholder="أختر الشركة المعتمدة لهذا المشروع" />
+              <SelectValue placeholder="الشركة المعتمدة للمشروع" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="company1">شركة 1</SelectItem>
-              <SelectItem value="company2">شركة 2</SelectItem>
+              {isLoadingCompanies ? (
+                <SelectItem value="loading" disabled>
+                  جاري التحميل...
+                </SelectItem>
+              ) : authorizedCompanies && authorizedCompanies.length > 0 ? (
+                authorizedCompanies.map((company) => (
+                  <SelectItem key={company.id} value={company.id.toString()}>
+                    {company.name}
+                  </SelectItem>
+                ))
+              ) : (
+                <SelectItem value="no-data" disabled>
+                  لا توجد شركات متاحة
+                </SelectItem>
+              )}
             </SelectContent>
           </Select>
         </div>
@@ -188,13 +302,27 @@ export default function StepOne({
           <Select
             value={formData.delegate}
             onValueChange={(value) => onInputChange("delegate", value)}
+            disabled={isLoadingAgents}
           >
             <SelectTrigger id="delegate">
               <SelectValue placeholder="أختر المندوب من القائمة" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="delegate1">مندوب 1</SelectItem>
-              <SelectItem value="delegate2">مندوب 2</SelectItem>
+              {isLoadingAgents ? (
+                <SelectItem value="loading" disabled>
+                  جاري التحميل...
+                </SelectItem>
+              ) : salesAgents && salesAgents.length > 0 ? (
+                salesAgents.map((agent) => (
+                  <SelectItem key={agent.id} value={agent.id.toString()}>
+                    {agent.name}
+                  </SelectItem>
+                ))
+              ) : (
+                <SelectItem value="no-data" disabled>
+                  لا يوجد مندوبون متاحون
+                </SelectItem>
+              )}
             </SelectContent>
           </Select>
         </div>
@@ -215,12 +343,15 @@ export default function StepOne({
             <Button
               type="button"
               onClick={checkProjectName}
-              disabled={isChecking || !formData.projectName.trim()}
+              disabled={
+                checkProjectNameMutation.isPending ||
+                !formData.projectName.trim()
+              }
               variant="outline"
               size="sm"
               className="min-w-[80px]"
             >
-              {isChecking ? (
+              {checkProjectNameMutation.isPending ? (
                 <Loader2 className="size-4 animate-spin" />
               ) : (
                 <>
@@ -304,8 +435,7 @@ export default function StepOne({
               <SelectValue placeholder="أختر الصنف من القائمة" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="category1">صنف 1</SelectItem>
-              <SelectItem value="category2">صنف 2</SelectItem>
+              <SelectItem value="منزل">منزل</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -320,25 +450,39 @@ export default function StepOne({
               <SelectValue placeholder="أختر مرحلة المشروع من القائمة" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="stage1">مرحلة 1</SelectItem>
-              <SelectItem value="stage2">مرحلة 2</SelectItem>
+              <SelectItem value="جاهز">جاهز</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="date">التاريخ</Label>
-          <div className="relative">
-            <Input
-              id="date"
-              type="date"
-              value={formData.date}
-              onChange={(e) => onInputChange("date", e.target.value)}
-              className="pr-10"
-            />
-            <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-gray-400 pointer-events-none" />
-          </div>
-          <p className="text-xs text-[#D32729] mt-1">
+          <Popover open={dateCalendarOpen} onOpenChange={setDateCalendarOpen}>
+            <PopoverTrigger asChild>
+              <div className="relative">
+                <Input
+                  id="date"
+                  type="text"
+                  placeholder="----/--/--"
+                  value={formData.date}
+                  onChange={(e) => {
+                    onInputChange("date", e.target.value);
+                    const parsedDate = parseDateFromString(e.target.value);
+                    setSelectedDate(parsedDate);
+                  }}
+                />
+              </div>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={handleDateSelect}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+          <p className="text-xs text-yellow-500 mt-1">
             انتبه لا يمكن تعديل التاريخ بعد انشاؤه الا بموافقة المدير
           </p>
         </div>
@@ -357,10 +501,10 @@ export default function StepOne({
       <div className="flex justify-end gap-4 pt-4">
         <Button
           onClick={handleSave}
-          disabled={isSaving}
+          disabled={isSaving || createFormMutation.isPending}
           className="min-w-[100px]"
         >
-          {isSaving ? (
+          {isSaving || createFormMutation.isPending ? (
             <>
               <Loader2 className="size-4 mr-2 animate-spin" />
               جاري الحفظ...

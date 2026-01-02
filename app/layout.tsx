@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import { Cairo } from "next/font/google";
 import { ThemeProvider } from "@/providers/theme-provider";
-import { BackgroundGradient } from "@/components/shared/background-gradient";
-import { Sidebar } from "@/components/shared/sidebar";
-import { Navbar } from "@/components/shared/navbar";
-import { ContentWrapper } from "@/components/shared/content-wrapper";
+import { QueryProvider } from "@/providers/query-provider";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const cairo = Cairo({
@@ -26,15 +24,14 @@ export default function RootLayout({
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning>
       <body className={`${cairo.variable} antialiased`}>
-        <ThemeProvider>
-          <BackgroundGradient variant="default"  />
-          <Navbar />
-            <ContentWrapper>
-              {children}
-            </ContentWrapper>
-            <Sidebar />
-        </ThemeProvider>
+        <QueryProvider>
+          <ThemeProvider>
+            {children}
+            <Toaster />
+          </ThemeProvider>
+        </QueryProvider>
       </body>
     </html>
   );
 }
+

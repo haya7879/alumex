@@ -12,6 +12,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
+import { useCreateSection } from "@/services/sales/sales-hooks";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 export interface SectionFormData {
   sectionName: string;
@@ -20,6 +23,9 @@ export interface SectionFormData {
 
 export default function CreateSectionPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const createSectionMutation = useCreateSection();
+  
   const [formData, setFormData] = useState<SectionFormData>({
     sectionName: "",
     status: "",
@@ -29,12 +35,32 @@ export default function CreateSectionPage() {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form Data:", formData);
-    // Handle form submission here
-    // After successful submission, you might want to redirect
-    // router.push("/sales/section-options");
+    
+    // Validate form
+    if (!formData.sectionName.trim()) {
+      toast.error("يرجى إدخال اسم المقطع");
+      return;
+    }
+
+    try {
+      // Send only name to API (as per API requirements)
+      await createSectionMutation.mutateAsync({
+        name: formData.sectionName.trim(),
+      });
+
+      // Invalidate sections query to refetch the list
+      queryClient.invalidateQueries({ queryKey: ["sections"] });
+
+      toast.success("تم إنشاء المقطع بنجاح");
+      
+      // Redirect to sections list
+      router.push("/sales/sections");
+    } catch (error) {
+      console.error("Failed to create section:", error);
+      toast.error("فشل إنشاء المقطع. يرجى المحاولة مرة أخرى");
+    }
   };
 
   return (
@@ -51,7 +77,7 @@ export default function CreateSectionPage() {
       </div>
 
       {/* Section Status */}
-      <div className="space-y-2 w-1/3">
+      {/* <div className="space-y-2 w-1/3">
         <Label htmlFor="status">حالة المقطع</Label>
         <Select
           value={formData.status}
@@ -65,21 +91,23 @@ export default function CreateSectionPage() {
             <SelectItem value="inactive">غير مفعل</SelectItem>
           </SelectContent>
         </Select>
-      </div>
+      </div> */}
 
       {/* Submit Button */}
       <div className="flex justify-start pt-4 gap-2">
         <Button
           type="submit"
           className="bg-[#0A3158] text-white hover:bg-[#0A3158]/90 px-8"
+          disabled={createSectionMutation.isPending}
         >
-          حفظ
+          {createSectionMutation.isPending ? "جاري الحفظ..." : "حفظ"}
         </Button>
         <Button
           type="button"
           variant="outline"
           onClick={() => router.back()}
           className="px-8"
+          disabled={createSectionMutation.isPending}
         >
           الغاء
         </Button>

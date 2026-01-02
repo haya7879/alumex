@@ -65,15 +65,15 @@ export const routeHeaderLinks: Record<string, HeaderLink[]> = {
         exact: true,
       },
     ],
-    "section-options": [
+    "sections": [
       {
         label: "إضافة مقطع",
-        href: "/sales/section-options/create",
+        href: "/sales/sections/create",
         icon: Plus,
       },
       {
         label: "المقاطع المتاحة",
-        href: "/sales/section-options",
+        href: "/sales/sections",
         icon: FolderKanban,
         exact: true,
       },
@@ -90,7 +90,7 @@ export const pathLabels: Record<string, string> = {
     "daily-movement": "الحركة اليومية",
     "daily-visits": "الزيارات اليومية",
     companies: "الشركات المعتمدة",
-    "section-options": "خيارات المقاطع",
+    "sections": "المقاطع",
     create: "إضافة",
   };
   
@@ -101,5 +101,5 @@ export const pathLabels: Record<string, string> = {
     "daily-movement": "الحركة اليومية",
     "daily-visits": "الزيارات اليومية",
     companies: "الشركات المعتمدة",
-    "section-options": "خيارات المقاطع",
+    "sections": "المقاطع",
   };

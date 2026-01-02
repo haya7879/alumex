@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +17,7 @@ import {
 import { ChevronRight, Plus, Trash2, Loader2, Check } from "lucide-react";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useCreateFollowUp } from "@/services/sales/sales-hooks";
 
 export interface NoteRow {
   id: number;
@@ -26,25 +28,43 @@ export interface NoteRow {
 }
 
 interface StepTwoProps {
-  formId: number;
+  formId?: number;
   notes: NoteRow[];
   onNotesChange: (notes: NoteRow[]) => void;
-  onSave: () => Promise<void>;
+  onSave?: () => Promise<void>;
   onNext: () => void;
   onPrev: () => void;
 }
 
 export default function StepTwo({
-  formId,
+  formId: propFormId,
   notes,
   onNotesChange,
   onSave,
   onNext,
   onPrev,
 }: StepTwoProps) {
+  const searchParams = useSearchParams();
+  const [formId, setFormId] = useState<number | null>(propFormId || null);
   const [newNote, setNewNote] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [showMeasurementsDialog, setShowMeasurementsDialog] = useState(false);
+  
+  // Create follow-up mutation
+  const createFollowUpMutation = useCreateFollowUp();
+
+  // Read form_id from URL if not provided as prop
+  useEffect(() => {
+    if (!formId) {
+      const formIdParam = searchParams.get("form_id");
+      if (formIdParam) {
+        const id = parseInt(formIdParam, 10);
+        if (!isNaN(id)) {
+          setFormId(id);
+        }
+      }
+    }
+  }, [searchParams, formId]);
 
   const handleAddNote = () => {
     if (!newNote.trim()) {
@@ -82,12 +102,35 @@ export default function StepTwo({
   };
 
   const handleSave = async () => {
+    if (!formId) {
+      toast.error("خطأ: لم يتم العثور على معرف النموذج");
+      return;
+    }
+
+    if (notes.length === 0) {
+      toast.error("يرجى إضافة ملاحظة واحدة على الأقل");
+      return;
+    }
+
     setIsSaving(true);
     try {
-      // Dummy API call - send notes and formId
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      await onSave();
+      // Prepare request body - extract just the note text
+      const notesText = notes.map((note) => note.note);
+      
+      const requestBody = {
+        form_id: formId,
+        notes: notesText,
+      };
+
+      await createFollowUpMutation.mutateAsync(requestBody);
+      
+      // Call optional onSave callback if provided
+      if (onSave) {
+        await onSave();
+      }
+      
       setShowMeasurementsDialog(true);
+      toast.success("تم حفظ الملاحظات بنجاح");
     } catch (error) {
       toast.error("حدث خطأ أثناء حفظ الملاحظات");
       console.error(error);
@@ -201,10 +244,10 @@ export default function StepTwo({
         </Button>
         <Button
           onClick={handleSave}
-          disabled={isSaving}
+          disabled={isSaving || createFollowUpMutation.isPending}
           className="min-w-[100px]"
         >
-          {isSaving ? (
+          {isSaving || createFollowUpMutation.isPending ? (
             <>
               <Loader2 className="size-4 mr-2 animate-spin" />
               جاري الحفظ...

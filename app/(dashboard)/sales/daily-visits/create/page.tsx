@@ -12,49 +12,160 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Calendar } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
 import { useRouter } from "next/navigation";
+import { useCreateShowroomVisit } from "@/services/sales/sales-hooks";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 export interface DailyVisitFormData {
   customerName: string;
   phone: string;
   location: string;
+  visitDate: string;
   status: string;
-  postponementDate: string;
   notes: string;
 }
 
 export default function CreateDailyVisitPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const createShowroomVisitMutation = useCreateShowroomVisit();
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  
   const [formData, setFormData] = useState<DailyVisitFormData>({
     customerName: "",
     phone: "",
     location: "",
+    visitDate: "",
     status: "",
-    postponementDate: "",
     notes: "",
   });
+
+  // Helper function to format date from Date object to DD/MM/YYYY
+  const formatDateToDisplay = (date: Date | undefined): string => {
+    if (!date) return "";
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+  // Helper function to parse date from DD/MM/YYYY string to Date object
+  const parseDateFromString = (dateString: string): Date | undefined => {
+    if (!dateString) return undefined;
+    const parts = dateString.split("/");
+    if (parts.length === 3) {
+      const [day, month, year] = parts;
+      const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+      if (!isNaN(date.getTime())) {
+        return date;
+      }
+    }
+    return undefined;
+  };
 
   const handleInputChange = (
     field: keyof DailyVisitFormData,
     value: string
   ) => {
-    setFormData((prev) => {
-      const updated = { ...prev, [field]: value };
-      // Clear postponement date if status is not "postponed"
-      if (field === "status" && value !== "postponed") {
-        updated.postponementDate = "";
-      }
-      return updated;
-    });
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    
+    // If visitDate is being changed, update selectedDate
+    if (field === "visitDate") {
+      const parsedDate = parseDateFromString(value);
+      setSelectedDate(parsedDate);
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Handle date selection from calendar
+  const handleDateSelect = (date: Date | undefined) => {
+    if (date) {
+      setSelectedDate(date);
+      const formattedDate = formatDateToDisplay(date);
+      setFormData((prev) => ({ ...prev, visitDate: formattedDate }));
+      setCalendarOpen(false);
+    }
+  };
+
+  // Helper function to convert date from DD/MM/YYYY to YYYY-MM-DD
+  const convertDateToAPIFormat = (dateString: string): string => {
+    if (!dateString) return "";
+    const parts = dateString.split("/");
+    if (parts.length === 3) {
+      const [day, month, year] = parts;
+      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+    }
+    return dateString;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form Data:", formData);
-    // Handle form submission here
-    // After successful submission, you might want to redirect
-    // router.push("/sales/daily-visits");
+    
+    // Validate form
+    if (!formData.customerName.trim()) {
+      toast.error("يرجى إدخال اسم الزبون");
+      return;
+    }
+    if (!formData.phone.trim()) {
+      toast.error("يرجى إدخال رقم الهاتف");
+      return;
+    }
+    if (!formData.location.trim()) {
+      toast.error("يرجى إدخال الموقع");
+      return;
+    }
+    if (!formData.visitDate.trim()) {
+      toast.error("يرجى إدخال تاريخ الزيارة");
+      return;
+    }
+    if (!formData.status) {
+      toast.error("يرجى اختيار الحالة");
+      return;
+    }
+
+    try {
+      // Prepare request body
+      const requestBody: {
+        customer_name: string;
+        location: string;
+        phone: string;
+        visit_date: string;
+        status: string;
+        notes?: string;
+      } = {
+        customer_name: formData.customerName.trim(),
+        location: formData.location.trim(),
+        phone: formData.phone.trim(),
+        visit_date: convertDateToAPIFormat(formData.visitDate),
+        status: formData.status,
+      };
+
+      // Add notes if provided
+      if (formData.notes.trim()) {
+        requestBody.notes = formData.notes.trim();
+      }
+
+      await createShowroomVisitMutation.mutateAsync(requestBody);
+
+      // Invalidate showroom visits query to refetch the list
+      queryClient.invalidateQueries({ queryKey: ["showroom-visits"] });
+
+      toast.success("تم إنشاء الزيارة بنجاح");
+      
+      // Redirect to showroom visits list
+      router.push("/sales/daily-visits");
+    } catch (error) {
+      console.error("Failed to create showroom visit:", error);
+      toast.error("فشل إنشاء الزيارة. يرجى المحاولة مرة أخرى");
+    }
   };
 
   return (
@@ -93,37 +204,45 @@ export default function CreateDailyVisitPage() {
         </div>
 
         <div className="space-y-2">
+          <Label htmlFor="visitDate">تاريخ الزيارة</Label>
+          <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+            <PopoverTrigger asChild>
+              <div className="relative">
+                <Input
+                  id="visitDate"
+                  type="text"
+                  placeholder="----/--/--"
+                  value={formData.visitDate}
+                  onChange={(e) => handleInputChange("visitDate", e.target.value)}
+                />
+              </div>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={handleDateSelect}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+
+        <div className="space-y-2">
           <Label htmlFor="status">الحالة</Label>
           <Select
             value={formData.status}
             onValueChange={(value) => handleInputChange("status", value)}
           >
             <SelectTrigger id="status">
-              <SelectValue placeholder="حدد هل تم أخذ القياس" />
+              <SelectValue placeholder="اختر الحالة" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="completed">تم أخذ القياس</SelectItem>
-              <SelectItem value="not-completed">لم يتم أخذ القياس</SelectItem>
-              <SelectItem value="postponed">مؤجل</SelectItem>
+              <SelectItem value="sections_explained">تم شرح المقاطع</SelectItem>
+              {/* Add more status options as needed based on API */}
             </SelectContent>
           </Select>
         </div>
-
-        {formData.status === "postponed" && (
-          <div className="space-y-2">
-            <Label htmlFor="postponementDate">تاريخ التأجيل</Label>
-            <Input
-              id="postponementDate"
-              type="text"
-              placeholder="____/__/__"
-              icon={Calendar}
-              value={formData.postponementDate}
-              onChange={(e) =>
-                handleInputChange("postponementDate", e.target.value)
-              }
-            />
-          </div>
-        )}
       </div>
 
       {/* Notes - Full Width */}
@@ -143,14 +262,16 @@ export default function CreateDailyVisitPage() {
         <Button
           type="submit"
           className="bg-[#0A3158] text-white hover:bg-[#0A3158]/90 px-8"
+          disabled={createShowroomVisitMutation.isPending}
         >
-          حفظ
+          {createShowroomVisitMutation.isPending ? "جاري الحفظ..." : "حفظ"}
         </Button>
         <Button
           type="button"
           variant="outline"
           onClick={() => router.back()}
           className="px-8"
+          disabled={createShowroomVisitMutation.isPending}
         >
           الغاء
         </Button>

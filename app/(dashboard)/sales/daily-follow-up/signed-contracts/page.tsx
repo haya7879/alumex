@@ -8,7 +8,7 @@ import { Calendar, MoreVertical } from "lucide-react";
 import {
   SignedContractRowData,
   signedContractsColumns,
-} from "@/modules/sales/components/columns";
+} from "@/app/(dashboard)/sales/_components/columns";
 
 // Sample data based on the image
 const tableData: SignedContractRowData[] = [

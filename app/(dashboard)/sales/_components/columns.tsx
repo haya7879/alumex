@@ -3,8 +3,10 @@ import { Column } from "@/components/table/data-table";
 import { Button } from "@/components/ui/button";
 
 export interface TableRowData {
+  id?: number;
   customerName: string;
   phone: string;
+  serialNumber: string;
   lastOfferDate: string;
   lastOfferPrice: string;
   receivedOffer: string;
@@ -13,6 +15,7 @@ export interface TableRowData {
     origin: "blue" | "green";
     branch: string;
   };
+  formData?: any; // Store full form data for use in dialogs
 }
 
 export const columns: Column<TableRowData>[] = [

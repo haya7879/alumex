@@ -24,7 +24,7 @@ const navItems: NavItem[] = [
       { label: "الزيارات اليومية", href: "/sales/daily-visits" },
       { label: "الحركة اليومية", href: "/sales/daily-movement" },
       { label: "الشركات المعتمدة", href: "/sales/companies" },
-      { label: "خيارات المقاطع", href: "/sales/section-options" },
+      { label: "المقاطع", href: "/sales/sections" },
     ],
   },
   {
@@ -73,7 +73,7 @@ export const Navbar = () => {
       style={{ width: "calc(100vw - 100px)", direction: "ltr" }}
     >
       <div className="h-full w-full p-3 rounded-full flex gap-4 items-center justify-between bg-white/30 dark:bg-[#0C111D4D]">
-        <Logo />
+        <Logo variant="vertical" />
         <ul className="flex items-center gap-2 text-sm relative" dir="rtl">
           {navItems.map((item) => (
             <li key={item.label} className="relative">

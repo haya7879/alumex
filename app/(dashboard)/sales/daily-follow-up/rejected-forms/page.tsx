@@ -1,7 +1,7 @@
 "use client";
 
 import { DataTable, Column } from "@/components/table/data-table";
-import { TableRowData } from "@/modules/sales/components/columns";
+import { TableRowData } from "@/app/(dashboard)/sales/_components/columns";
 import { FilterField } from "@/components/shared/filter-sheet";
 import { TablePagination } from "@/components/table";
 import { useState } from "react";
@@ -68,6 +68,7 @@ const tableData: TableRowData[] = [
   {
     customerName: "شركة الرفض 1",
     phone: "07 123456789",
+    serialNumber: "2302-2897",
     lastOfferDate: "15/8/2525",
     lastOfferPrice: "300,000",
     receivedOffer: "نعم",
@@ -77,6 +78,7 @@ const tableData: TableRowData[] = [
   {
     customerName: "شركة الرفض 2",
     phone: "07 987654321",
+    serialNumber: "3427-9169",
     lastOfferDate: "20/8/2525",
     lastOfferPrice: "250,000",
     receivedOffer: "لا",

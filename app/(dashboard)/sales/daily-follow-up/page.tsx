@@ -1,19 +1,16 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { TableRowData } from "../../../../modules/sales/components/columns";
-import FilterSheet, {
-  FilterField,
-} from "../../../../components/shared/filter-sheet";
+import { TableRowData } from "../_components/columns";
+import { useForms } from "@/services/sales/sales-hooks";
 import { TablePagination } from "@/components/table";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
-  Search,
-  Menu,
   FileText,
   CheckCircle2,
   MoreVerticalIcon,
+  Copy,
 } from "lucide-react";
 import { FaFileAlt, FaCopy } from "react-icons/fa";
 import {
@@ -42,146 +39,27 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 import jsPDF from "jspdf";
 
-// Sample data based on the image
-const tableData: TableRowData[] = [
-  {
-    customerName: "شركة اليد البناء م. عباس المحترم",
-    phone: "07 705582933",
-    lastOfferDate: "23/8/2525",
-    lastOfferPrice: "450,000",
-    receivedOffer: "نعم",
-    response: "طلب خصم",
-    followUp: { origin: "blue" as const, branch: "blue" },
-  },
-  {
-    customerName: "شركة اليد البناء م. عباس المحترم",
-    phone: "07 705582933",
-    lastOfferDate: "23/8/2525",
-    lastOfferPrice: "450,000",
-    receivedOffer: "نعم",
-    response: "طلب خصم",
-    followUp: { origin: "blue" as const, branch: "blue" },
-  },
-  {
-    customerName: "شركة اليد البناء م. عباس المحترم",
-    phone: "07 705582933",
-    lastOfferDate: "23/8/2525",
-    lastOfferPrice: "450,000",
-    receivedOffer: "نعم",
-    response: "طلب خصم",
-    followUp: { origin: "blue" as const, branch: "blue" },
-  },
-  {
-    customerName: "شركة اليد البناء م. عباس المحترم",
-    phone: "07 705582933",
-    lastOfferDate: "23/8/2525",
-    lastOfferPrice: "450,000",
-    receivedOffer: "نعم",
-    response: "طلب خصم",
-    followUp: { origin: "blue" as const, branch: "blue" },
-  },
-  {
-    customerName: "شركة اليد البناء م. عباس المحترم",
-    phone: "07 705582933",
-    lastOfferDate: "23/8/2525",
-    lastOfferPrice: "450,000",
-    receivedOffer: "نعم",
-    response: "طلب خصم",
-    followUp: { origin: "blue" as const, branch: "blue" },
-  },
-  {
-    customerName: "شركة اليد البناء م. عباس المحترم",
-    phone: "07 705582933",
-    lastOfferDate: "23/8/2525",
-    lastOfferPrice: "450,000",
-    receivedOffer: "نعم",
-    response: "طلب خصم",
-    followUp: { origin: "blue" as const, branch: "blue" },
-  },
-  {
-    customerName: "شركة اليد البناء م. عباس المحترم",
-    phone: "07 705582933",
-    lastOfferDate: "23/8/2525",
-    lastOfferPrice: "450,000",
-    receivedOffer: "نعم",
-    response: "طلب خصم",
-    followUp: { origin: "blue" as const, branch: "blue" },
-  },
-  {
-    customerName: "شركة اليد البناء م. عباس المحترم",
-    phone: "07 705582933",
-    lastOfferDate: "23/8/2525",
-    lastOfferPrice: "",
-    receivedOffer: "لا",
-    response: "",
-    followUp: { origin: "green" as const, branch: "blue" },
-  },
-  {
-    customerName: "شركة اليد البناء م. عباس المحترم",
-    phone: "07 705582933",
-    lastOfferDate: "23/8/2525",
-    lastOfferPrice: "450,000",
-    receivedOffer: "نعم",
-    response: "طلب خصم",
-    followUp: { origin: "blue" as const, branch: "blue" },
-  },
-  {
-    customerName: "شركة اليد البناء م. عباس المحترم",
-    phone: "07 705582933",
-    lastOfferDate: "23/8/2525",
-    lastOfferPrice: "",
-    receivedOffer: "لا",
-    response: "",
-    followUp: { origin: "green" as const, branch: "blue" },
-  },
-  {
-    customerName: "شركة اليد البناء م. عباس المحترم",
-    phone: "07 705582933",
-    lastOfferDate: "23/8/2525",
-    lastOfferPrice: "450,000",
-    receivedOffer: "نعم",
-    response: "طلب خصم",
-    followUp: { origin: "blue" as const, branch: "blue" },
-  },
-];
-
-// Sample follow-up notes data
-interface FollowUpNote {
-  text: string;
-  date: string;
-  employeeName: string;
-}
-
-// Sample data for follow-up notes (in real app, this would come from API)
-const sampleFollowUpNotes: Record<number, FollowUpNote[]> = {
-  0: [
-    {
-      text: "تم التواصل مع العميل وطلب خصم إضافي",
-      date: "25/8/2025",
-      employeeName: "أحمد محمد",
-    },
-    {
-      text: "سيتم إرسال عرض سعر محدث خلال 3 أيام",
-      date: "26/8/2025",
-      employeeName: "سارة علي",
-    },
-  ],
-  1: [
-    {
-      text: "العميل ينتظر الموافقة من الإدارة",
-      date: "24/8/2025",
-      employeeName: "محمد خالد",
-    },
-  ],
+// Helper function to format date from API format (YYYY-MM-DD) to display format
+const formatDate = (dateString: string): string => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  const day = date.getDate();
+  const month = date.getMonth() + 1;
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
 };
 
 export default function DailyFollowUpPage() {
-  const [appliedFilters, setAppliedFilters] = useState<Record<string, string>>(
-    {}
-  );
-  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Fetch forms from API
+  const { data: formsData, isLoading, error } = useForms({
+    page: currentPage,
+    per_page: 10,
+  });
 
   // Dialog states
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
@@ -198,12 +76,6 @@ export default function DailyFollowUpPage() {
   const [hoveredPopoverIndex, setHoveredPopoverIndex] = useState<number | null>(
     null
   );
-
-  const handleApplyFilters = (filters: Record<string, string>) => {
-    setAppliedFilters(filters);
-    console.log("Applied Filters:", filters);
-    // Apply filters logic here
-  };
 
   const handleReject = (index: number) => {
     setSelectedItemIndex(index);
@@ -274,128 +146,66 @@ export default function DailyFollowUpPage() {
     console.log("Edit", section, "for item:", index);
   };
 
-  // Filter and search data
-  const filteredData = useMemo(() => {
-    let filtered = [...tableData];
+  const handleCopySerialNumber = (serialNumber: string) => {
+    navigator.clipboard.writeText(serialNumber);
+    toast.success("تم نسخ الرقم التسلسلي");
+  };
 
-    // Apply search
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (item) =>
-          item.customerName.toLowerCase().includes(query) ||
-          item.phone.includes(query) ||
-          item.lastOfferDate.includes(query) ||
-          item.lastOfferPrice.includes(query) ||
-          item.receivedOffer.includes(query) ||
-          item.response.toLowerCase().includes(query)
-      );
-    }
+  // Convert API data to TableRowData format
+  const tableData = useMemo(() => {
+    if (!formsData?.data) return [];
 
-    // Apply filters
-    if (appliedFilters.customerName) {
-      filtered = filtered.filter((item) =>
-        item.customerName
-          .toLowerCase()
-          .includes(appliedFilters.customerName.toLowerCase())
-      );
-    }
+    return formsData.data.map((form) => {
+      // Determine if it's original or duplicate based on parent serial
+      const isOriginal = form.serials.parent === null;
+      
+      // Format quotation price if exists
+      const lastOfferPrice = form.quotation
+        ? form.quotation.total_value.toLocaleString("en-US")
+        : "";
 
-    if (appliedFilters.hasPriceOffer) {
-      const hasOffer = appliedFilters.hasPriceOffer === "yes";
-      filtered = filtered.filter(
-        (item) => (item.lastOfferPrice !== "") === hasOffer
-      );
-    }
+      // Determine received offer status
+      const receivedOffer = form.quotation ? "نعم" : "لا";
 
-    // Add more filter logic as needed
+      // Get response from last follow-up note if exists
+      const lastFollowUp = form.follow_ups.length > 0
+        ? form.follow_ups[form.follow_ups.length - 1].note
+        : "";
 
-    return filtered;
-  }, [searchQuery, appliedFilters]);
+      return {
+        id: form.id,
+        customerName: form.form_name,
+        phone: "", // Phone not in API response, will need to be added or fetched separately
+        serialNumber: form.serials.current,
+        lastOfferDate: formatDate(form.entry_date),
+        lastOfferPrice,
+        receivedOffer,
+        response: lastFollowUp,
+        followUp: {
+          origin: isOriginal ? ("blue" as const) : ("green" as const),
+          branch: "blue",
+        },
+        // Store additional data for use in dialogs
+        formData: form,
+      };
+    });
+  }, [formsData]);
 
-  // Define filter fields for daily follow-up
-  const filterFields: FilterField[] = [
-    {
-      key: "customerName",
-      label: "اسم الزبون",
-      type: "input",
-      placeholder: "ابحث باسم الزبون",
-    },
-    {
-      key: "hasPriceOffer",
-      label: "هل يوجد عرض سعر ؟",
-      type: "select",
-      placeholder: "اختار اجابة من القائمة",
-      options: [
-        { value: "yes", label: "نعم" },
-        { value: "no", label: "لا" },
-      ],
-    },
-    {
-      key: "approvedCompanies",
-      label: "الشركات المعتمدة",
-      type: "select",
-      placeholder: "أختر الشركة من القائمة",
-      options: [
-        { value: "company1", label: "شركة 1" },
-        { value: "company2", label: "شركة 2" },
-      ],
-    },
-    {
-      key: "serialNumber",
-      label: "الرقم التسلسلي",
-      type: "input",
-      defaultValue: "7895-5645",
-    },
-    {
-      key: "originBranch",
-      label: "الاصل / الفرع",
-      type: "select",
-      placeholder: "اختار اجابة من القائمة",
-      options: [
-        { value: "origin", label: "أصل" },
-        { value: "branch", label: "فرع" },
-      ],
-    },
-    {
-      key: "representative",
-      label: "المندوب",
-      type: "select",
-      placeholder: "اختار اجابة من القائمة",
-      options: [
-        { value: "rep1", label: "مندوب 1" },
-        { value: "rep2", label: "مندوب 2" },
-      ],
-    },
-  ];
+  // Use tableData directly without filtering
+  const filteredData = tableData;
 
   return (
     <div className="space-y-6">
-      {/* Toolbar with Search and Filter */}
-      <div className="flex items-center gap-3 justify-between border-b dark:border-gray-700 pb-4">
-        <div className="flex items-center gap-3 flex-1">
-          <div style={{ width: "250px" }}>
-            <Input
-              type="text"
-              placeholder="البحث"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              icon={Search}
-              className="max-w-md"
-            />
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <FilterSheet
-            fields={filterFields}
-            initialFilters={appliedFilters}
-            onApplyFilters={handleApplyFilters}
-          />
-        </div>
-      </div>
-
       {/* Cards Grid */}
-      {filteredData.length === 0 ? (
+      {isLoading ? (
+        <div className="text-center py-12 text-muted-foreground">
+          جاري التحميل...
+        </div>
+      ) : error ? (
+        <div className="text-center py-12 text-muted-foreground">
+          حدث خطأ أثناء تحميل البيانات
+        </div>
+      ) : filteredData.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground">
           لا توجد بيانات للعرض
         </div>
@@ -407,9 +217,23 @@ export default function DailyFollowUpPage() {
                 <div className="flex flex-col gap-3">
                   {/* Customer Name */}
                   <div className="flex items-center justify-between border-b pb-2">
-                    <h3 className="text-xs font-semibold">
-                      {item.customerName}
-                    </h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-xs font-semibold">
+                        {item.customerName}
+                      </h3>
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs text-muted-foreground">
+                          ({item.serialNumber})
+                        </span>
+                        <button
+                          onClick={() => handleCopySerialNumber(item.serialNumber)}
+                          className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors"
+                          title="نسخ الرقم التسلسلي"
+                        >
+                          <Copy className="size-3 text-muted-foreground hover:text-foreground" />
+                        </button>
+                      </div>
+                    </div>
                     <div className="flex items-center gap-2">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -533,19 +357,20 @@ export default function DailyFollowUpPage() {
                               ملاحظات المتابعة
                             </h4>
                             <div className="space-y-2 max-h-60 overflow-y-auto">
-                              {(sampleFollowUpNotes[index] || []).length > 0 ? (
-                                sampleFollowUpNotes[index].map(
-                                  (note, noteIndex) => (
+                              {item.formData?.follow_ups &&
+                              item.formData.follow_ups.length > 0 ? (
+                                item.formData.follow_ups.map(
+                                  (note: { note: string; user: string; date: string }, noteIndex: number) => (
                                     <div
                                       key={noteIndex}
                                       className="border-b pb-2 last:border-0"
                                     >
                                       <p className="text-sm mb-3">
-                                        {note.text}
+                                        {note.note}
                                       </p>
                                       <div className="flex items-center justify-between text-xs text-muted-foreground">
-                                        <span>{note.employeeName}</span>
-                                        <span>{note.date}</span>
+                                        <span>{note.user}</span>
+                                        <span>{formatDate(note.date)}</span>
                                       </div>
                                     </div>
                                   )
@@ -591,13 +416,15 @@ export default function DailyFollowUpPage() {
       )}
 
       {/* Pagination */}
-      <TablePagination
-        currentPage={1}
-        totalPages={1}
-        pageSize={10}
-        totalItems={filteredData.length}
-        onPageChange={() => {}}
-      />
+      {formsData && (
+        <TablePagination
+          currentPage={formsData.meta.current_page}
+          totalPages={formsData.meta.last_page}
+          pageSize={formsData.meta.per_page}
+          totalItems={formsData.meta.total}
+          onPageChange={(page) => setCurrentPage(page)}
+        />
+      )}
 
       {/* Reject Dialog */}
       <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>

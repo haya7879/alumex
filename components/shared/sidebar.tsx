@@ -1,24 +1,22 @@
 "use client";
 import * as React from "react";
-import { DashSvg } from "@/assets/icons";
-import { Calendar, LogOut, Settings } from "lucide-react";
+import { LogOut, Settings } from "lucide-react";
 import { useModalStore } from "@/store/use-modal-store";
 import { EModalType } from "@/config/enums";
 import { LogoutModal } from "./logout-modal";
-import { useLocalStorageStore } from "@/store/use-local-storage-store";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 import { ModeToggle } from "../ui/mode-toggle";
+import { StorageService } from "@/services/token/storage-service";
 const UserAvatar = () => {
-  const { user } = useLocalStorageStore();
-
+  const user = StorageService.getUser();
   return (
     <div className="flex items-center w-full">
       <Avatar className="size-12">
-        <AvatarImage src="" />
-        <AvatarFallback className="bg-slate-600 dark:bg-gray-800 text-white">
-          {user?.full_name
+        {/* <AvatarImage src="" /> */}
+        <AvatarFallback className="text-white bg-[#3675AF] dark:bg-[#0A3E5E]">
+          {user?.name
             ?.split(" ")
             .map((name: string) => name.charAt(0))
             .slice(0, 2)
@@ -26,9 +24,7 @@ const UserAvatar = () => {
             .toUpperCase()}
         </AvatarFallback>
       </Avatar>
-      <p className="text-xs font-medium text-[#7B8495] sr-only">
-        {user?.full_name}
-      </p>
+      <p className="text-xs font-medium text-[#7B8495] sr-only">{user?.name}</p>
     </div>
   );
 };

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { DataTable, Column } from "@/components/table/data-table";
 import { TablePagination } from "@/components/table";
 import { MoreVertical, Calendar } from "lucide-react";
@@ -8,147 +8,212 @@ import { Badge } from "@/components/ui/badge";
 import {
   FilterField,
 } from "../../../../components/shared/filter-sheet";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useShowroomVisits, useUpdateShowroomVisitStatus } from "@/services/sales/sales-hooks";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 // Data interface
 export interface DailyVisitRowData {
+  id: number;
   customerName: string;
   location: string;
   phone: string;
   date: string;
-  status: "completed" | "not-completed" | "postponed";
-  followUp?: string;
-  governorates?: string;
+  status: string;
+  notes: string | null;
+  salesUser?: string;
+  hasForm?: boolean;
 }
 
-// Sample data based on the image
-const tableData: DailyVisitRowData[] = [
-  {
-    customerName: "حي اللجار",
-    location: "أحمد فادي",
-    phone: "0963698745",
-    date: "1/01/2025",
-    status: "completed",
-  },
-  {
-    customerName: "حي اللجار",
-    location: "أحمد فادي",
-    phone: "0963698745",
-    date: "1/01/2025",
-    status: "completed",
-  },
-  {
-    customerName: "حي اللجار",
-    location: "أحمد فادي",
-    phone: "0963698745",
-    date: "1/01/2025",
-    status: "completed",
-  },
-  {
-    customerName: "حي اللجار",
-    location: "أحمد فادي",
-    phone: "0963698745",
-    date: "1/01/2025",
-    status: "not-completed",
-  },
-  {
-    customerName: "حي اللجار",
-    location: "أحمد فادي",
-    phone: "0963698745",
-    date: "1/01/2025",
-    status: "completed",
-  },
-  {
-    customerName: "حي اللجار",
-    location: "أحمد فادي",
-    phone: "0963698745",
-    date: "1/01/2025",
-    status: "postponed",
-  },
-  {
-    customerName: "حي اللجار",
-    location: "أحمد فادي",
-    phone: "0963698745",
-    date: "1/01/2025",
-    status: "postponed",
-  },
-];
+// Helper function to format date from API format (YYYY-MM-DD) to display format
+const formatDate = (dateString: string | null): string => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  const day = date.getDate();
+  const month = date.getMonth() + 1;
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+};
 
-// Table columns
-const columns: Column<DailyVisitRowData>[] = [
-  {
-    key: "customerName",
-    header: "اسم الزبون",
-  },
-  {
-    key: "location",
-    header: "الموقع",
-  },
-  {
-    key: "phone",
-    header: "رقم الهاتف",
-  },
-  {
-    key: "date",
-    header: "التاريخ",
-  },
-  {
-    key: "status",
-    header: "الحالة",
-    render: (row) => {
-      const statusConfig = {
-        completed: {
-          label: "تم أخذ القياس",
-          variant: "success" as const,
-        },
-        "not-completed": {
-          label: "لم يتم أخذ القياس",
-          variant: "destructive" as const,
-        },
-        postponed: {
-          label: "مؤجل",
-          variant: "warning" as const,
-        },
-      };
-
-      const config = statusConfig[row.status];
-
-      return (
-        <Badge variant={config.variant} className="px-3 py-1">
-          {config.label}
-        </Badge>
-      );
-    },
-  },
-  {
-    key: "followUp",
-    header: "المتابعة",
-    render: () => (
-      <MoreVertical className="size-4 cursor-pointer text-gray-500 hover:text-gray-700" />
-    ),
-  },
-  {
-    key: "governorates",
-    header: "المحافظات",
-    render: () => (
-      <MoreVertical className="size-4 cursor-pointer text-gray-500 hover:text-gray-700" />
-    ),
-  },
-  {
-    key: "options",
-    header: "الخيارات",
-    render: () => (
-      <MoreVertical className="size-4 cursor-pointer text-gray-500 hover:text-gray-700" />
-    ),
-  },
-];
 
 export default function DailyVisitsPage() {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(15);
   const [appliedFilters, setAppliedFilters] = useState<Record<string, string>>({});
+  const [statusDialogOpen, setStatusDialogOpen] = useState(false);
+  const [selectedVisitId, setSelectedVisitId] = useState<number | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<string>("");
+  const [notes, setNotes] = useState<string>("");
+
+  const queryClient = useQueryClient();
+  const updateStatusMutation = useUpdateShowroomVisitStatus();
+
+  // Fetch showroom visits from API
+  const { data: visitsData, isLoading, error } = useShowroomVisits({
+    page: currentPage,
+    per_page: pageSize,
+  });
+
+  // Convert API data to TableRowData format
+  const tableData = useMemo(() => {
+    if (!visitsData?.data) return [];
+
+    return visitsData.data.map((visit) => ({
+      id: visit.id,
+      customerName: visit.customer_name,
+      location: visit.location,
+      phone: visit.phone,
+      date: formatDate(visit.visit_date),
+      status: visit.status,
+      notes: visit.notes,
+      salesUser: visit.sales_user?.name || "",
+      hasForm: visit.has_form,
+    }));
+  }, [visitsData]);
+
+  // Table columns
+  const columns: Column<DailyVisitRowData>[] = useMemo(() => [
+    {
+      key: "customerName",
+      header: "اسم الزبون",
+    },
+    {
+      key: "location",
+      header: "الموقع",
+    },
+    {
+      key: "phone",
+      header: "رقم الهاتف",
+    },
+    {
+      key: "salesUser",
+      header: "المندوب",
+      render: (row) => row.salesUser || "-",
+    },
+    {
+      key: "date",
+      header: "التاريخ",
+    },
+    {
+      key: "status",
+      header: "الحالة",
+      render: (row) => {
+        // Map API status to display labels
+        const statusConfig: Record<string, { label: string; variant: "success" | "destructive" | "warning" }> = {
+          sections_explained: {
+            label: "تم شرح المقاطع",
+            variant: "success",
+          },
+          // Add more status mappings as needed
+        };
+
+        const config = statusConfig[row.status] || {
+          label: row.status,
+          variant: "success" as const,
+        };
+
+        return (
+          <button 
+            className="cursor-pointer"
+            onClick={() => handleStatusClick(row.id, row.status, row.notes)}
+          >
+            <Badge variant={config.variant} className="px-3 py-1">
+              {config.label}
+            </Badge>
+          </button>
+        );
+      },
+    },
+    {
+      key: "notes",
+      header: "الملاحظات",
+      render: (row) => row.notes || "-",
+    },
+    // {
+    //   key: "options",
+    //   header: "الخيارات",
+    //   render: () => (
+    //     <MoreVertical className="size-4 cursor-pointer text-gray-500 hover:text-gray-700" />
+    //   ),
+    // },
+  ], []);
 
   const handleApplyFilters = (filters: Record<string, string>) => {
     setAppliedFilters(filters);
     console.log("Applied Filters:", filters);
     // Apply filters logic here
+  };
+
+  // Handle status click
+  const handleStatusClick = (visitId: number, currentStatus: string, currentNotes: string | null) => {
+    setSelectedVisitId(visitId);
+    setSelectedStatus(currentStatus);
+    setNotes(currentNotes || "");
+    setStatusDialogOpen(true);
+  };
+
+  // Handle status update submit
+  const handleStatusUpdate = async () => {
+    if (!selectedVisitId || !selectedStatus) return;
+
+    try {
+      const requestBody: {
+        status: string;
+        notes?: string;
+      } = {
+        status: selectedStatus,
+      };
+
+      if (notes.trim()) {
+        requestBody.notes = notes.trim();
+      }
+
+      await updateStatusMutation.mutateAsync({
+        id: selectedVisitId,
+        data: requestBody,
+      });
+
+      // Invalidate showroom visits query to refetch the list
+      queryClient.invalidateQueries({ queryKey: ["showroom-visits"] });
+
+      toast.success("تم تحديث الحالة بنجاح");
+      
+      // Close dialog
+      setStatusDialogOpen(false);
+      setSelectedVisitId(null);
+      setSelectedStatus("");
+      setNotes("");
+    } catch (error) {
+      console.error("Failed to update status:", error);
+      toast.error("فشل تحديث الحالة. يرجى المحاولة مرة أخرى");
+    }
+  };
+
+  // Handle dialog close
+  const handleStatusDialogClose = () => {
+    setStatusDialogOpen(false);
+    setSelectedVisitId(null);
+    setSelectedStatus("");
+    setNotes("");
   };
 
   // Define filter fields for daily visits
@@ -191,24 +256,108 @@ export default function DailyVisitsPage() {
 
   return (
     <div className="space-y-4">
-      <DataTable
-        data={tableData}
-        columns={columns}
-        emptyMessage="لا توجد بيانات للعرض"
-        enableFilter
-        filterFields={filterFields}
-        initialFilters={appliedFilters}
-        onApplyFilters={handleApplyFilters}
-      />
+      {/* Loading State */}
+      {isLoading && (
+        <div className="text-center py-12 text-muted-foreground">
+          جاري التحميل...
+        </div>
+      )}
 
-      {/* Pagination */}
-      <TablePagination
-        currentPage={1}
-        totalPages={1}
-        pageSize={10}
-        totalItems={tableData.length}
-        onPageChange={() => {}}
-      />
+      {/* Error State */}
+      {error && (
+        <div className="text-center py-12 text-muted-foreground">
+          حدث خطأ أثناء تحميل البيانات
+        </div>
+      )}
+
+      {/* Table Section */}
+      {!isLoading && !error && (
+        <>
+          <DataTable
+            data={tableData}
+            columns={columns}
+            emptyMessage="لا توجد بيانات للعرض"
+            enableFilter
+            filterFields={filterFields}
+            initialFilters={appliedFilters}
+            onApplyFilters={handleApplyFilters}
+          />
+
+          {/* Pagination */}
+          {visitsData?.meta && (
+            <TablePagination
+              currentPage={visitsData.meta.current_page}
+              totalPages={visitsData.meta.last_page}
+              pageSize={visitsData.meta.per_page}
+              totalItems={visitsData.meta.total}
+              onPageChange={setCurrentPage}
+              onPageSizeChange={setPageSize}
+            />
+          )}
+        </>
+      )}
+
+      {/* Status Update Dialog */}
+      <Dialog open={statusDialogOpen} onOpenChange={setStatusDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>تغيير الحالة</DialogTitle>
+            <DialogDescription>
+              قم بتحديث حالة وملاحظات زيارة المعرض
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-5">
+            {/* Status Selection */}
+            <div className="space-y-2">
+              <Label htmlFor="status-select">الحالة</Label>
+              <Select
+                value={selectedStatus}
+                onValueChange={setSelectedStatus}
+              >
+                <SelectTrigger id="status-select">
+                  <SelectValue placeholder="اختر الحالة" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="sections_explained">تم شرح المقاطع</SelectItem>
+                  {/* Add more status options as needed */}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Notes */}
+            <div className="space-y-2">
+              <Label htmlFor="notes">الملاحظات</Label>
+              <Textarea
+                id="notes"
+                placeholder="ادخل الملاحظات هنا"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                className="min-h-[120px]"
+              />
+            </div>
+
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleStatusDialogClose}
+                disabled={updateStatusMutation.isPending}
+              >
+                الغاء
+              </Button>
+              <Button
+                type="button"
+                className="bg-[#0A3158] text-white hover:bg-[#0A3158]/90"
+                onClick={handleStatusUpdate}
+                disabled={updateStatusMutation.isPending || !selectedStatus}
+              >
+                {updateStatusMutation.isPending ? "جاري الحفظ..." : "حفظ"}
+              </Button>
+            </DialogFooter>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

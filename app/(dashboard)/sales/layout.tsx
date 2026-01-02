@@ -7,7 +7,7 @@ import {
   pathLabels,
   routeDefaultTitles,
   routeHeaderLinks,
-} from "@/modules/sales/components/constants";
+} from "@/app/(dashboard)/sales/_components/constants";
 
 export default function SalesLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();

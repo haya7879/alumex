@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import StepOne, { BasicInfoFormData } from "./(steps)/step-one";
 import StepTwo, { NoteRow } from "./(steps)/step-two";
 import StepThree, { Section } from "./(steps)/step-three";
@@ -8,6 +9,7 @@ import StepsIndicator from "@/components/shared/steps-indicator";
 import { toast } from "sonner";
 
 export default function AddNewFormPage() {
+  const searchParams = useSearchParams();
   const [currentStep, setCurrentStep] = useState(1);
   const [formId, setFormId] = useState<number | null>(null);
   const [basicInfo, setBasicInfo] = useState<BasicInfoFormData>({
@@ -24,6 +26,26 @@ export default function AddNewFormPage() {
   });
   const [notes, setNotes] = useState<NoteRow[]>([]);
   const [sections, setSections] = useState<Section[]>([]);
+
+  // Read form_id and step from URL
+  useEffect(() => {
+    const formIdParam = searchParams.get("form_id");
+    const stepParam = searchParams.get("step");
+    
+    if (formIdParam) {
+      const id = parseInt(formIdParam, 10);
+      if (!isNaN(id)) {
+        setFormId(id);
+      }
+    }
+    
+    if (stepParam) {
+      const step = parseInt(stepParam, 10);
+      if (!isNaN(step) && step >= 1 && step <= 3) {
+        setCurrentStep(step);
+      }
+    }
+  }, [searchParams]);
 
   const handleBasicInfoChange = (
     field: keyof BasicInfoFormData,
@@ -116,6 +138,7 @@ export default function AddNewFormPage() {
           formData={basicInfo}
           onInputChange={handleBasicInfoChange}
           onSave={handleSaveForm}
+          onFormIdChange={setFormId}
           onNext={nextStep}
         />
       )}

@@ -7,7 +7,7 @@ import {
   pathLabels,
   routeDefaultTitles,
   routeHeaderLinks,
-} from "@/modules/projects/components/constants";
+} from "@/app/(dashboard)/projects/_components/constants";
 
 export default function ProjectsLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
