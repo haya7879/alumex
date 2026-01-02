@@ -63,7 +63,6 @@ const sampleFollowUpNotes: Record<number, FollowUpNote[]> = {
   ],
 };
 
-// Sample data for rejected forms
 const tableData: TableRowData[] = [
   {
     customerName: "شركة الرفض 1",
