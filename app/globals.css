@@ -129,8 +129,8 @@ body {
   }
 }
 
-.bg-breadcrumb {
-  background-image: url("/breadcrumb.svg");
+/* .bg-auth {
+  background-image: url("/bg-auth.png");
   background-size: cover;
   background-repeat: no-repeat;
-}
+} */

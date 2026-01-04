@@ -59,7 +59,7 @@ export default function Page() {
   }
 
   return (
-    <div className="rounded-lg mr-[90px]">
+    <div className="rounded-lg md:mr-[90px] mr-0">
       <ContainerContent className="rounded-2xl!">
         <div className="space-y-3">
           <div className="mb-6">

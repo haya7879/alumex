@@ -271,7 +271,7 @@ export default function StepOne({
 
   return (
     <>
-      <div className="grid grid-cols-4 gap-4 mt-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
         <div className="space-y-2">
           <Label htmlFor="approvedCompany">الشركة المعتمدة</Label>
           <Select
@@ -501,7 +501,7 @@ export default function StepOne({
             انتبه لا يمكن تعديل التاريخ بعد انشاؤه الا بموافقة المدير
           </p>
         </div>
-        <div className="space-y-2 col-span-4">
+        <div className="space-y-2 col-span-1 md:col-span-2 lg:col-span-4">
           <Label htmlFor="address">العنوان</Label>
           <Textarea
             id="address"

@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useState, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { Button } from "../ui/button";
+import { Menu } from "lucide-react";
 
 interface NavItem {
   label: string;
@@ -73,12 +75,15 @@ export const Navbar = () => {
 
   return (
     <div
-      className="absolute left-0 top-0 p-3 z-10"
-      style={{ width: "calc(100vw - 100px)", direction: "ltr" }}
+      className="absolute md:left-0 top-0 lg:px-3 lg:py-3 py-2 z-10 md:w-[calc(100vw-100px)]! w-[96vw] left-1/2 -translate-x-1/2 md:translate-x-0"
+      style={{ direction: "ltr" }}
     >
       <div className="h-full w-full p-3 rounded-full flex gap-4 items-center justify-between bg-white/30 dark:bg-[#0C111D4D]">
         <Logo variant="vertical" />
-        <ul className="flex items-center gap-2 text-sm relative" dir="rtl">
+        <ul
+          className="items-center gap-2 text-sm relative hidden lg:flex"
+          dir="rtl"
+        >
           {navItems.map((item) => (
             <li key={item.label} className="relative">
               <div
@@ -145,6 +150,13 @@ export const Navbar = () => {
             </li>
           ))}
         </ul>
+        <Button
+          variant="outline"
+          size="icon"
+          className="size-10 rounded-full bg-white/40 dark:bg-[#0C111DB2] lg:hidden"
+        >
+          <Menu className="size-4" />
+        </Button>
       </div>
     </div>
   );

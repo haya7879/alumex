@@ -37,7 +37,7 @@ export const Sidebar = () => {
 
   return (
     <>
-      <div className="fixed right-0 top-0 h-full px-[15px] py-6">
+      <div className="fixed right-0 top-0 h-full px-[15px] py-6 hidden md:block">
         <div className="h-full p-3 rounded-full w-18 flex flex-col gap-4 items-center bg-white/30 dark:bg-[#0C111D4D]">
           {/* User Button */}
           <UserAvatar />

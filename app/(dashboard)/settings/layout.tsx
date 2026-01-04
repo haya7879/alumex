@@ -21,7 +21,7 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
   ];
 
   return (
-    <div className="rounded-lg mr-[90px]">
+    <div className="rounded-lg md:mr-[90px] mr-0">
       <ContainerContent className="rounded-2xl!">
         <div className="min-h-screen mt-5 flex items-start justify-between gap-10">
           <div className="max-w-[200px] w-full border-l pl-4">

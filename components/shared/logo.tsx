@@ -12,7 +12,7 @@ export const Logo = ({
       {variant === "vertical" && (
         <Link href={"/"} className="flex items-center gap-2">
           <img src="/logo-mini.svg" alt="" />
-          <h2 className="text-2xl font-bold text-[#0A3E5E] dark:text-[#B5B8BC]">
+          <h2 className="text-2xl font-bold text-[#0A3E5E] dark:text-[#B5B8BC] hidden lg:block">
             ALUM<span className="text-[#D32829]">EX</span>
           </h2>
         </Link>

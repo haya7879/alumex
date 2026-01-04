@@ -237,7 +237,7 @@ export default function CreateDailyMovementPage() {
   return (
     <form onSubmit={handleSubmit} className="space-y-3 mt-5">
       {/* Two Column Layout */}
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
         {/* Right Column */}
         <div className="space-y-2">
           <Label htmlFor="customerName">اسم الزبون</Label>

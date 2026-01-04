@@ -75,7 +75,7 @@ export default function DynamicLayout({
   );
 
   return (
-    <div className={cn("rounded-lg mr-[90px]", className)}>
+    <div className={cn("rounded-lg md:mr-[90px] mr-0", className)}>
       {headerLinksComponent}
       <ContainerContent>
         {pageHeaderComponent}

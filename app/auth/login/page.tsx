@@ -66,7 +66,12 @@ export default function LoginPage() {
   };
 
   return (
-    <Card className="w-full max-w-md py-6">
+  // <div className="h-screen w-full flex">
+  //   <div className="bg-auth h-full w-1/2">
+
+  //   </div>
+  // <div className="w-1/2 flex items-center justify-center">
+  <Card className="py-6 max-w-md w-full">
       <CardHeader className="space-y-4 text-center">
         <div className="flex justify-center">
           <Logo variant="horizontal" />
@@ -131,5 +136,7 @@ export default function LoginPage() {
         </Form>
       </CardContent>
     </Card>
+  // </div>
+  // </div>
   );
 }

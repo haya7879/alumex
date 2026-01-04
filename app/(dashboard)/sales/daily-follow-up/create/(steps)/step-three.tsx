@@ -481,7 +481,7 @@ export default function StepThree({
               لا توجد مقاطع متاحة
             </div>
           ) : (
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {availableSections.map((section) => (
                 <div key={section} className="flex items-center gap-2">
                   <Checkbox
@@ -693,19 +693,20 @@ export default function StepThree({
       </div>
 
       {/* Action Buttons */}
-      <div className="flex items-center gap-2 justify-between mb-4">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:justify-between mb-4">
         <Button
           variant="outline"
           onClick={() => setAddRowsDialog(true)}
           size="sm"
+          className="w-full sm:w-auto"
         >
           <Plus className="size-4 ml-2" /> إضافة أسطر
         </Button>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={handleDeleteSelected}>
+          <Button variant="outline" size="sm" onClick={handleDeleteSelected} className="flex-1 sm:flex-initial">
             <Trash2 className="size-4 ml-2" /> حذف
           </Button>
-          <Button variant="outline" size="sm" onClick={handleExportPDF}>
+          <Button variant="outline" size="sm" onClick={handleExportPDF} className="flex-1 sm:flex-initial">
             <Download className="size-4 ml-2" /> تصدير PDF
           </Button>
         </div>
@@ -738,14 +739,14 @@ export default function StepThree({
         )}
       </div>
 
-      <div className="flex justify-between gap-4 pt-4">
-        <Button onClick={onPrev} variant="outline" className="min-w-[100px]">
+      <div className="flex flex-col sm:flex-row justify-between gap-4 pt-4">
+        <Button onClick={onPrev} variant="outline" className="min-w-[100px] w-full sm:w-auto">
           <ChevronRight className="size-4 ml-2" /> السابق
         </Button>
         <Button
           onClick={handleSave}
           disabled={isSaving || createMeasurementsMutation.isPending}
-          className="min-w-[100px]"
+          className="min-w-[100px] w-full sm:w-auto"
         >
           {isSaving || createMeasurementsMutation.isPending ? (
             <>
