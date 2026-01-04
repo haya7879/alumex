@@ -271,22 +271,15 @@ export default function SectionOptionsPage() {
       {/* Edit Dialog */}
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>تعديل المقطع</DialogTitle>
-            <DialogDescription>
-              قم بتعديل معلومات المقطع
-            </DialogDescription>
-          </DialogHeader>
-          
           {isLoadingSection ? (
             <div className="py-8 text-center text-muted-foreground">
-              جاري تحميل البيانات...
+              يرجى الانتظار...
             </div>
           ) : (
             <form onSubmit={handleUpdateSubmit} className="space-y-5">
               {/* Section Name */}
               <div className="space-y-2">
-                <Label htmlFor="edit-sectionName">اسم المقطع</Label>
+                <Label htmlFor="edit-sectionName">تعديل اسم المقطع</Label>
                 <Input
                   id="edit-sectionName"
                   placeholder="ادخل اسم المقطع هنا"
@@ -294,24 +287,6 @@ export default function SectionOptionsPage() {
                   onChange={(e) => handleInputChange("sectionName", e.target.value)}
                 />
               </div>
-
-              {/* Section Status */}
-              <div className="space-y-2">
-                <Label htmlFor="edit-status">حالة المقطع</Label>
-                <Select
-                  value={formData.status}
-                  onValueChange={(value) => handleInputChange("status", value)}
-                >
-                  <SelectTrigger id="edit-status">
-                    <SelectValue placeholder="اختار اذا تريد تفعيل المقطع" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="active">مفعل</SelectItem>
-                    <SelectItem value="inactive">غير مفعل</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
               <DialogFooter>
                 <Button
                   type="button"

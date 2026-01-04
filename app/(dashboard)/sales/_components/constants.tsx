@@ -59,7 +59,7 @@ export const routeHeaderLinks: Record<string, HeaderLink[]> = {
         icon: Plus,
       },
       {
-        label: "جدول الشركات",
+        label: "الشركات المعتمدة",
         href: "/sales/companies",
         icon: Calendar,
         exact: true,

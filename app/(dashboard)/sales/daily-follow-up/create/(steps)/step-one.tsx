@@ -133,6 +133,21 @@ export default function StepOne({
     return undefined;
   };
 
+  // Helper function to convert date from DD/MM/YYYY to YYYY-MM-DD
+  const convertDateToAPIFormat = (dateString: string): string => {
+    if (!dateString) return "";
+    const parts = dateString.split("/");
+    if (parts.length === 3) {
+      const [day, month, year] = parts;
+      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+    }
+    // If already in YYYY-MM-DD format, return as is
+    if (dateString.includes("-") && dateString.split("-").length === 3) {
+      return dateString;
+    }
+    return dateString;
+  };
+
   // Handle date selection from calendar
   const handleDateSelect = (date: Date | undefined) => {
     if (date) {
@@ -211,7 +226,7 @@ export default function StepOne({
         phone2: formData.phoneNumber2 || undefined,
         project_type: formData.projectCategory,
         project_stage: formData.projectStage,
-        entry_date: formData.date,
+        entry_date: convertDateToAPIFormat(formData.date),
         address: formData.address,
         ...(formData.parentId && formData.parentId > 0
           ? { parent_id: formData.parentId }
@@ -498,7 +513,7 @@ export default function StepOne({
         </div>
       </div>
 
-      <div className="flex justify-end gap-4 pt-4">
+      <div className="flex justify-start gap-4 pt-4">
         <Button
           onClick={handleSave}
           disabled={isSaving || createFormMutation.isPending}

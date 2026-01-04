@@ -6,12 +6,8 @@ import { useForms } from "@/services/sales/sales-hooks";
 import { TablePagination } from "@/components/table";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-  FileText,
-  CheckCircle2,
-  MoreVerticalIcon,
-  Copy,
-} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { FileText, CheckCircle2, MoreVerticalIcon, Copy } from "lucide-react";
 import { FaFileAlt, FaCopy } from "react-icons/fa";
 import {
   Popover,
@@ -56,7 +52,11 @@ export default function DailyFollowUpPage() {
   const [currentPage, setCurrentPage] = useState(1);
 
   // Fetch forms from API
-  const { data: formsData, isLoading, error } = useForms({
+  const {
+    data: formsData,
+    isLoading,
+    error,
+  } = useForms({
     page: currentPage,
     per_page: 10,
   });
@@ -126,9 +126,6 @@ export default function DailyFollowUpPage() {
     doc.text("عرض سعر", 14, 20);
     doc.setFontSize(12);
     doc.text(`اسم العميل: ${item.customerName}`, 14, 30);
-    doc.text(`رقم الهاتف: ${item.phone}`, 14, 40);
-    doc.text(`تاريخ آخر عرض: ${item.lastOfferDate}`, 14, 50);
-    doc.text(`سعر آخر عرض: ${item.lastOfferPrice || "غير محدد"}`, 14, 60);
     // TODO: Add more details as designed by Osama
     doc.save(`عرض_سعر_${item.customerName}_${Date.now()}.pdf`);
   };
@@ -158,7 +155,7 @@ export default function DailyFollowUpPage() {
     return formsData.data.map((form) => {
       // Determine if it's original or duplicate based on parent serial
       const isOriginal = form.serials.parent === null;
-      
+
       // Format quotation price if exists
       const lastOfferPrice = form.quotation
         ? form.quotation.total_value.toLocaleString("en-US")
@@ -168,19 +165,16 @@ export default function DailyFollowUpPage() {
       const receivedOffer = form.quotation ? "نعم" : "لا";
 
       // Get response from last follow-up note if exists
-      const lastFollowUp = form.follow_ups.length > 0
-        ? form.follow_ups[form.follow_ups.length - 1].note
-        : "";
+      const lastFollowUp =
+        form.follow_ups.length > 0
+          ? form.follow_ups[form.follow_ups.length - 1].note
+          : "";
 
       return {
         id: form.id,
         customerName: form.form_name,
-        phone: "", // Phone not in API response, will need to be added or fetched separately
         serialNumber: form.serials.current,
-        lastOfferDate: formatDate(form.entry_date),
-        lastOfferPrice,
-        receivedOffer,
-        response: lastFollowUp,
+        entry_date: formatDate(form.entry_date),
         followUp: {
           origin: isOriginal ? ("blue" as const) : ("green" as const),
           branch: "blue",
@@ -226,7 +220,9 @@ export default function DailyFollowUpPage() {
                           ({item.serialNumber})
                         </span>
                         <button
-                          onClick={() => handleCopySerialNumber(item.serialNumber)}
+                          onClick={() =>
+                            handleCopySerialNumber(item.serialNumber)
+                          }
                           className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors"
                           title="نسخ الرقم التسلسلي"
                         >
@@ -290,45 +286,68 @@ export default function DailyFollowUpPage() {
                   </div>
 
                   {/* Information Grid - Compact Layout */}
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-x-4 gap-y-2">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-3">
+                    {/* التاريخ */}
                     <div>
-                      <p className="text-xs text-muted-foreground mb-3">
-                        رقم الهاتف
-                      </p>
-                      <p className="text-sm font-medium">{item.phone}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-3">
-                        آخر عرض سعر
+                      <p className="text-xs text-muted-foreground mb-2">
+                        التاريخ
                       </p>
                       <p className="text-sm font-medium">
-                        {item.lastOfferDate}
+                        {item.entry_date}
                       </p>
                     </div>
+
+                    {/* الحالة */}
                     <div>
-                      <p className="text-xs text-muted-foreground mb-3">
-                        سعر آخر عرض
+                      <p className="text-xs text-muted-foreground mb-2">
+                        الحالة
                       </p>
-                      <p className="text-sm font-medium">
-                        {item.lastOfferPrice || "-"}
-                      </p>
+                      {item.formData?.status === "new" ? (
+                        <Badge variant="default" className="px-3 py-1">
+                          {item.formData?.status}
+                        </Badge>
+                      ) : item.formData?.status === "in_progress" ? (
+                        <Badge variant="warning" className="px-3 py-1">
+                          {item.formData?.status}
+                        </Badge>
+                      ) : item.formData?.status === "completed" ? (
+                        <Badge variant="success" className="px-3 py-1">
+                          {item.formData?.status}
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="px-3 py-1">
+                          {item.formData?.status}
+                        </Badge>
+                      )}
                     </div>
+
+                    {/* أصل / فرع */}
                     <div>
-                      <p className="text-xs text-muted-foreground mb-3">
-                        هل استلم العرض
+                      <p className="text-xs text-muted-foreground mb-2">
+                        أصل / فرع
                       </p>
-                      <p className="text-sm font-medium">
-                        {item.receivedOffer}
-                      </p>
+                      <div
+                        className="flex items-center gap-1"
+                        title={
+                          item.followUp.origin === "blue"
+                            ? "نسخة أصلية"
+                            : "نسخة مكررة"
+                        }
+                      >
+                        {item.followUp.origin === "blue" ? (
+                          <FaFileAlt className="text-base text-blue-500" />
+                        ) : (
+                          <FaCopy className="text-base text-green-500" />
+                        )}
+                        <span className="text-sm font-medium">
+                          {item.followUp.origin === "blue" ? "أصل" : "مكرر"}
+                        </span>
+                      </div>
                     </div>
+
+                    {/* المتابعة */}
                     <div>
-                      <p className="text-xs text-muted-foreground mb-3">الرد</p>
-                      <p className="text-sm font-medium">
-                        {item.response || "-"}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-3">
+                      <p className="text-xs text-muted-foreground mb-2">
                         المتابعة
                       </p>
                       <Popover
@@ -360,7 +379,14 @@ export default function DailyFollowUpPage() {
                               {item.formData?.follow_ups &&
                               item.formData.follow_ups.length > 0 ? (
                                 item.formData.follow_ups.map(
-                                  (note: { note: string; user: string; date: string }, noteIndex: number) => (
+                                  (
+                                    note: {
+                                      note: string;
+                                      user: string;
+                                      date: string;
+                                    },
+                                    noteIndex: number
+                                  ) => (
                                     <div
                                       key={noteIndex}
                                       className="border-b pb-2 last:border-0"
@@ -384,28 +410,6 @@ export default function DailyFollowUpPage() {
                           </div>
                         </PopoverContent>
                       </Popover>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-3">
-                        أصل / فرع
-                      </p>
-                      <div
-                        className="flex items-center gap-1"
-                        title={
-                          item.followUp.origin === "blue"
-                            ? "نسخة أصلية"
-                            : "نسخة مكررة"
-                        }
-                      >
-                        {item.followUp.origin === "blue" ? (
-                          <FaFileAlt className="text-base text-blue-500" />
-                        ) : (
-                          <FaCopy className="text-base text-green-500" />
-                        )}
-                        <span className="text-sm font-medium">
-                          {item.followUp.origin === "blue" ? "أصل" : "مكرر"}
-                        </span>
-                      </div>
                     </div>
                   </div>
                 </div>

@@ -457,7 +457,6 @@ export default function StepThree({
       }
 
       toast.success("تم حفظ جميع القياسات بنجاح");
-      // Return to step one
       router.push(`/sales/daily-follow-up/create`);
     } catch (error) {
       toast.error("حدث خطأ أثناء حفظ القياسات");

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -110,6 +110,7 @@ export default function CreateDailyMovementPage() {
   // Helper function to parse date from DD/MM/YYYY string to Date object
   const parseDateFromString = (dateString: string): Date | undefined => {
     if (!dateString) return undefined;
+    // Try DD/MM/YYYY format first
     const parts = dateString.split("/");
     if (parts.length === 3) {
       const [day, month, year] = parts;
@@ -118,8 +119,33 @@ export default function CreateDailyMovementPage() {
         return date;
       }
     }
+    // Try YYYY-MM-DD format (from HTML date input)
+    const parts2 = dateString.split("-");
+    if (parts2.length === 3) {
+      const [year, month, day] = parts2;
+      const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+      if (!isNaN(date.getTime())) {
+        return date;
+      }
+    }
     return undefined;
   };
+
+  // Update selectedMovementDate when formData.movementDate changes
+  useEffect(() => {
+    if (formData.movementDate) {
+      const parsedDate = parseDateFromString(formData.movementDate);
+      setSelectedMovementDate(parsedDate);
+    }
+  }, [formData.movementDate]);
+
+  // Update selectedPostponementDate when formData.postponementDate changes
+  useEffect(() => {
+    if (formData.postponementDate) {
+      const parsedDate = parseDateFromString(formData.postponementDate);
+      setSelectedPostponementDate(parsedDate);
+    }
+  }, [formData.postponementDate]);
 
   // Helper function to convert date from DD/MM/YYYY to YYYY-MM-DD
   const convertDateToAPIFormat = (dateString: string): string => {
@@ -128,6 +154,10 @@ export default function CreateDailyMovementPage() {
     if (parts.length === 3) {
       const [day, month, year] = parts;
       return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+    }
+    // If already in YYYY-MM-DD format, return as is
+    if (dateString.includes("-") && dateString.split("-").length === 3) {
+      return dateString;
     }
     return dateString;
   };
@@ -178,17 +208,23 @@ export default function CreateDailyMovementPage() {
         status: formData.status as "completed" | "not-completed" | "postponed",
       };
 
-      // Add follow_up_date only if status is postponed
-      if (formData.status === "postponed" && formData.postponementDate.trim()) {
-        requestBody.follow_up_date = convertDateToAPIFormat(formData.postponementDate);
+      // Add follow_up_date only if status is postponed (set to today's date)
+      if (formData.status === "postponed") {
+        const today = new Date();
+        const todayFormatted = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+        requestBody.follow_up_date = todayFormatted;
       }
 
-      await createDailyMovementMutation.mutateAsync(requestBody);
+      // Log request body for debugging
+      console.log("Request Body:", requestBody);
+
+      const response = await createDailyMovementMutation.mutateAsync(requestBody);
 
       // Invalidate daily movements query to refetch the list
       queryClient.invalidateQueries({ queryKey: ["daily-movements"] });
 
-      toast.success("تم إنشاء الحركة اليومية بنجاح");
+      // Show success message from API response or default message
+      toast.success(response.message || "تم إنشاء الحركة اليومية بنجاح");
       
       // Redirect to daily movements list
       router.push("/sales/daily-movement");
@@ -274,47 +310,6 @@ export default function CreateDailyMovementPage() {
             </SelectContent>
           </Select>
         </div>
-
-        {formData.status === "postponed" && (
-          <div className="space-y-2">
-            <Label htmlFor="postponementDate">تاريخ التأجيل</Label>
-            <Popover open={postponementCalendarOpen} onOpenChange={setPostponementCalendarOpen}>
-              <PopoverTrigger asChild>
-                <div className="relative">
-                  <Input
-                    id="postponementDate"
-                    type="text"
-                    placeholder="----/--/--"
-                    value={formData.postponementDate}
-                    onChange={(e) =>
-                      handleInputChange("postponementDate", e.target.value)
-                    }
-                  />
-                </div>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={selectedPostponementDate}
-                  onSelect={handlePostponementDateSelect}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-        )}
-      </div>
-
-      {/* Notes - Full Width */}
-      <div className="space-y-2">
-        <Label htmlFor="notes">الملاحظات</Label>
-        <Textarea
-          id="notes"
-          placeholder="ادخل الملاحظات هنا"
-          value={formData.notes}
-          onChange={(e) => handleInputChange("notes", e.target.value)}
-          className="min-h-[120px]"
-        />
       </div>
 
       {/* Submit Button */}

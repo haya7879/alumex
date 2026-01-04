@@ -15,6 +15,8 @@ const badgeVariants = cva(
           "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
         success:
           "border-green-200 text-green-700 bg-[#ECFDF3] dark:border-green-700 dark:bg-transparent [&>svg]:text-green-500",
+          purple:
+          "border-purple-200 text-purple-700 bg-purple-50 dark:border-purple-700 dark:bg-transparent [&>svg]:text-purple-500",
         destructive:
           "border-[#FECDCA] bg-[#FEF3F2] dark:bg-transparent dark:border-[#B42318] text-[#B42318] [&>svg]:text-[#B42318]",
         error:

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -61,6 +61,7 @@ export default function CreateDailyVisitPage() {
   // Helper function to parse date from DD/MM/YYYY string to Date object
   const parseDateFromString = (dateString: string): Date | undefined => {
     if (!dateString) return undefined;
+    // Try DD/MM/YYYY format first
     const parts = dateString.split("/");
     if (parts.length === 3) {
       const [day, month, year] = parts;
@@ -69,8 +70,25 @@ export default function CreateDailyVisitPage() {
         return date;
       }
     }
+    // Try YYYY-MM-DD format (from HTML date input)
+    const parts2 = dateString.split("-");
+    if (parts2.length === 3) {
+      const [year, month, day] = parts2;
+      const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+      if (!isNaN(date.getTime())) {
+        return date;
+      }
+    }
     return undefined;
   };
+
+  // Update selectedDate when formData.visitDate changes
+  useEffect(() => {
+    if (formData.visitDate) {
+      const parsedDate = parseDateFromString(formData.visitDate);
+      setSelectedDate(parsedDate);
+    }
+  }, [formData.visitDate]);
 
   const handleInputChange = (
     field: keyof DailyVisitFormData,
@@ -239,7 +257,7 @@ export default function CreateDailyVisitPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="sections_explained">تم شرح المقاطع</SelectItem>
-              {/* Add more status options as needed based on API */}
+              <SelectItem value="contract_signed">تم توقيع العقد</SelectItem>
             </SelectContent>
           </Select>
         </div>

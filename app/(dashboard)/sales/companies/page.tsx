@@ -1,72 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { DataTable, Column } from "@/components/table/data-table";
 import { TablePagination } from "@/components/table";
-import { MoreVertical, Calendar } from "lucide-react";
-import {
-  FilterField,
-} from "../../../../components/shared/filter-sheet";
+import { MoreVertical, Calendar, Edit, Trash2 } from "lucide-react";
+import { FilterField } from "../../../../components/shared/filter-sheet";
+import { useAuthorizedCompanies } from "@/services/sales/sales-hooks";
+import { Button } from "@/components/ui/button";
 
 // Data interface
 export interface CompanyRowData {
+  id: number;
   companyName: string;
   location: string;
   phone: string;
   date: string;
 }
-
-// Sample data based on the image
-const tableData: CompanyRowData[] = [
-  {
-    companyName: "حي اللجار",
-    location: "أحمد فادي",
-    phone: "0963698745",
-    date: "1/01/2025",
-  },
-  {
-    companyName: "حي اللجار",
-    location: "أحمد فادي",
-    phone: "0963698745",
-    date: "1/01/2025",
-  },
-  {
-    companyName: "حي اللجار",
-    location: "أحمد فادي",
-    phone: "0963698745",
-    date: "1/01/2025",
-  },
-  {
-    companyName: "حي اللجار",
-    location: "أحمد فادي",
-    phone: "0963698745",
-    date: "1/01/2025",
-  },
-  {
-    companyName: "حي اللجار",
-    location: "أحمد فادي",
-    phone: "0963698745",
-    date: "1/01/2025",
-  },
-  {
-    companyName: "حي اللجار",
-    location: "أحمد فادي",
-    phone: "0963698745",
-    date: "1/01/2025",
-  },
-  {
-    companyName: "حي اللجار",
-    location: "أحمد فادي",
-    phone: "0963698745",
-    date: "1/01/2025",
-  },
-  {
-    companyName: "حي اللجار",
-    location: "أحمد فادي",
-    phone: "0963698745",
-    date: "1/01/2025",
-  },
-];
 
 // Table columns
 const columns: Column<CompanyRowData>[] = [
@@ -77,26 +26,85 @@ const columns: Column<CompanyRowData>[] = [
   {
     key: "location",
     header: "الموقع",
+    render: (row) => row.location || "-",
   },
   {
     key: "phone",
     header: "رقم الهاتف",
+    render: (row) => row.phone || "-",
   },
   {
     key: "date",
     header: "التاريخ",
+    render: (row) => row.date || "-",
   },
   {
     key: "options",
     header: "الخيارات",
-    render: () => (
-      <MoreVertical className="size-4 cursor-pointer text-gray-500 hover:text-gray-700" />
+    render: (row) => (
+      <div className="flex items-center gap-2">
+        <Button
+          // onClick={() => handleEdit(row.id)}
+          variant="outline"
+          size="icon"
+          title="تعديل"
+          className="bg-white hover:bg-[#3675AF]/10"
+        >
+          <Edit className="size-4 text-[#3675AF] hover:text-[#3675AF]/80 cursor-pointer" />
+        </Button>
+        <Button
+          // onClick={() => handleDelete(row.id)}
+          variant="outline"
+          size="icon"
+          title="حذف"
+          className="bg-white hover:bg-[#D32829]/10"
+        >
+          <Trash2 className="size-4 text-[#D32829] hover:text-[#D32829]/80 cursor-pointer" />
+        </Button>
+      </div>
     ),
   },
 ];
 
+// Helper function to format date from API format (YYYY-MM-DD) to display format
+const formatDate = (dateString: string | null | undefined): string => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  const day = date.getDate();
+  const month = date.getMonth() + 1;
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+};
+
 export default function CompaniesPage() {
-  const [appliedFilters, setAppliedFilters] = useState<Record<string, string>>({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [appliedFilters, setAppliedFilters] = useState<Record<string, string>>(
+    {}
+  );
+
+  // Fetch companies from API
+  const { data: companiesData, isLoading, error } = useAuthorizedCompanies();
+
+  // Convert API data to TableRowData format
+  const tableData = useMemo(() => {
+    if (!companiesData) return [];
+
+    return companiesData.map((company) => ({
+      id: company.id,
+      companyName: company.name,
+      location: "", // Not available in API response
+      phone: "", // Not available in API response
+      date: "", // Not available in API response
+    }));
+  }, [companiesData]);
+
+  // Calculate pagination
+  const totalItems = tableData.length;
+  const totalPages = Math.ceil(totalItems / pageSize);
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const paginatedData = tableData.slice(startIndex, endIndex);
 
   const handleApplyFilters = (filters: Record<string, string>) => {
     setAppliedFilters(filters);
@@ -144,24 +152,44 @@ export default function CompaniesPage() {
 
   return (
     <div className="space-y-4">
-      <DataTable
-        data={tableData}
-        columns={columns}
-        emptyMessage="لا توجد بيانات للعرض"
-        enableFilter
-        filterFields={filterFields}
-        initialFilters={appliedFilters}
-        onApplyFilters={handleApplyFilters}
-      />
+      {/* Loading State */}
+      {isLoading && (
+        <div className="text-center py-12 text-muted-foreground">
+          جاري التحميل...
+        </div>
+      )}
 
-      {/* Pagination */}
-      <TablePagination
-        currentPage={1}
-        totalPages={1}
-        pageSize={10}
-        totalItems={tableData.length}
-        onPageChange={() => {}}
-      />
+      {/* Error State */}
+      {error && (
+        <div className="text-center py-12 text-muted-foreground">
+          حدث خطأ أثناء تحميل البيانات
+        </div>
+      )}
+
+      {/* Table Section */}
+      {!isLoading && !error && (
+        <>
+          <DataTable
+            data={paginatedData}
+            columns={columns}
+            emptyMessage="لا توجد بيانات للعرض"
+            enableFilter
+            filterFields={filterFields}
+            initialFilters={appliedFilters}
+            onApplyFilters={handleApplyFilters}
+          />
+
+          {/* Pagination */}
+          <TablePagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            pageSize={pageSize}
+            totalItems={totalItems}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={setPageSize}
+          />
+        </>
+      )}
     </div>
   );
 }

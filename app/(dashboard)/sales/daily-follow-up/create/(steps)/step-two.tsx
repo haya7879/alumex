@@ -82,7 +82,6 @@ export default function StepTwo({
 
     onNotesChange([...notes, noteRow]);
     setNewNote("");
-    toast.success("تم إضافة الملاحظة");
   };
 
   const handleDeleteSelected = () => {
@@ -238,10 +237,7 @@ export default function StepTwo({
         </div>
       </div>
 
-      <div className="flex justify-between gap-4 pt-4">
-        <Button onClick={onPrev} variant="outline" className="min-w-[100px]">
-          <ChevronRight className="size-4 ml-2" /> السابق
-        </Button>
+      <div className="flex justify-start gap-4 pt-4">
         <Button
           onClick={handleSave}
           disabled={isSaving || createFollowUpMutation.isPending}

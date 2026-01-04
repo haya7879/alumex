@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { DataTable, Column } from "@/components/table/data-table";
 import { TablePagination } from "@/components/table";
 import { MoreVertical, Calendar } from "lucide-react";
@@ -90,6 +90,14 @@ export default function DailyVisitsPage() {
     }));
   }, [visitsData]);
 
+  // Handle status click
+  const handleStatusClick = useCallback((visitId: number, currentStatus: string, currentNotes: string | null) => {
+    setSelectedVisitId(visitId);
+    setSelectedStatus(currentStatus);
+    setNotes(currentNotes || "");
+    setStatusDialogOpen(true);
+  }, []);
+
   // Table columns
   const columns: Column<DailyVisitRowData>[] = useMemo(() => [
     {
@@ -118,9 +126,13 @@ export default function DailyVisitsPage() {
       header: "الحالة",
       render: (row) => {
         // Map API status to display labels
-        const statusConfig: Record<string, { label: string; variant: "success" | "destructive" | "warning" }> = {
+        const statusConfig: Record<string, { label: string; variant: "success" | "destructive" | "warning" | "default" | "outline" }> = {
           sections_explained: {
             label: "تم شرح المقاطع",
+            variant: "default",
+          },
+          contract_signed: {
+            label: "تم توقيع العقد",
             variant: "success",
           },
           // Add more status mappings as needed
@@ -128,7 +140,7 @@ export default function DailyVisitsPage() {
 
         const config = statusConfig[row.status] || {
           label: row.status,
-          variant: "success" as const,
+          variant: "outline" as const,
         };
 
         return (
@@ -148,27 +160,12 @@ export default function DailyVisitsPage() {
       header: "الملاحظات",
       render: (row) => row.notes || "-",
     },
-    // {
-    //   key: "options",
-    //   header: "الخيارات",
-    //   render: () => (
-    //     <MoreVertical className="size-4 cursor-pointer text-gray-500 hover:text-gray-700" />
-    //   ),
-    // },
-  ], []);
+  ], [handleStatusClick]);
 
   const handleApplyFilters = (filters: Record<string, string>) => {
     setAppliedFilters(filters);
     console.log("Applied Filters:", filters);
     // Apply filters logic here
-  };
-
-  // Handle status click
-  const handleStatusClick = (visitId: number, currentStatus: string, currentNotes: string | null) => {
-    setSelectedVisitId(visitId);
-    setSelectedStatus(currentStatus);
-    setNotes(currentNotes || "");
-    setStatusDialogOpen(true);
   };
 
   // Handle status update submit
@@ -320,7 +317,7 @@ export default function DailyVisitsPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="sections_explained">تم شرح المقاطع</SelectItem>
-                  {/* Add more status options as needed */}
+                  <SelectItem value="contract_signed">تم توقيع العقد</SelectItem>
                 </SelectContent>
               </Select>
             </div>
