@@ -35,7 +35,7 @@ export default function PrivateRouteGuard({ children }: PrivateRouteGuardProps) 
     // If not authenticated, redirect to login
     if (!authenticated) {
       // Store the current path to redirect back after login
-      const returnUrl = pathname !== "/auth/login" ? pathname : "/sales/daily-follow-up";
+      const returnUrl = pathname !== "/auth/login" ? pathname : "/";
       localStorage.setItem("returnUrl", returnUrl);
       router.replace("/auth/login");
     }

@@ -5,7 +5,7 @@ import { DataTable, Column } from "@/components/table/data-table";
 import { TablePagination } from "@/components/table";
 import { MoreVertical, Calendar, Edit, Trash2 } from "lucide-react";
 import { FilterField } from "../../../../components/shared/filter-sheet";
-import { useAuthorizedCompanies } from "@/services/sales/sales-hooks";
+import { useAuthorizedCompanies } from "@/services/kpis/kpis-hooks";
 import { Button } from "@/components/ui/button";
 
 // Data interface

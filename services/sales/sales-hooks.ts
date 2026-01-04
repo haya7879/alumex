@@ -3,8 +3,6 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import {
   salesServices,
-  SalesDashboardKPIs,
-  AuthorizedCompany,
   CheckProjectNameResponse,
   SalesAgent,
   Section,
@@ -31,25 +29,6 @@ import {
   UpdateShowroomVisitStatusResponse,
 } from "./sales-services";
 
-/**
- * Hook for fetching Sales Dashboard KPIs
- */
-export const useSalesDashboardKPIs = () => {
-  return useQuery<SalesDashboardKPIs>({
-    queryKey: ["sales-dashboard-kpis"],
-    queryFn: salesServices.getDashboardKPIs,
-  });
-};
-
-/**
- * Hook for fetching Authorized Companies
- */
-export const useAuthorizedCompanies = () => {
-  return useQuery<AuthorizedCompany[]>({
-    queryKey: ["authorized-companies"],
-    queryFn: salesServices.getAuthorizedCompanies,
-  });
-};
 
 /**
  * Hook for checking project name

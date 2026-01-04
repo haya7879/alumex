@@ -38,7 +38,7 @@ export default function PublicRouteGuard({ children }: PublicRouteGuardProps) {
         localStorage.removeItem("returnUrl");
         router.replace(returnUrl);
       } else {
-        router.replace("/sales/daily-follow-up");
+        router.replace("/");
       }
     } else {
       setIsAuthenticated(false);

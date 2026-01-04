@@ -25,6 +25,7 @@ export const LogoutModal = () => {
 
   const handleLogout = () => {
     logoutMutation.mutate();
+    onClose();
   };
 
   const handleCancel = () => {

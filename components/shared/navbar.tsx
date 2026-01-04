@@ -17,6 +17,10 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   {
+    label: "لوحة التحكم",
+    href: "/",
+  },
+  {
     label: "المبيعات",
     href: "/sales/daily-follow-up",
     subRoutes: [

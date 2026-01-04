@@ -37,8 +37,8 @@ import {
   Check,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useAuthorizedCompanies } from "@/services/kpis/kpis-hooks";
 import {
-  useAuthorizedCompanies,
   useCheckProjectName,
   useSalesAgents,
   useCreateForm,
