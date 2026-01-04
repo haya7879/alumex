@@ -5,12 +5,6 @@ import { DataTable, Column } from "@/components/table/data-table";
 import { TablePagination } from "@/components/table";
 import { Badge } from "@/components/ui/badge";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -28,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MoreVertical, FileText, Edit, Trash2 } from "lucide-react";
+import { FileText, Edit, Trash2 } from "lucide-react";
 import { useSections, useSection, useUpdateSection, useDeleteSection } from "@/services/sales/sales-hooks";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
@@ -213,28 +207,26 @@ export default function SectionOptionsPage() {
       key: "options",
       header: "الخيارات",
       render: (row) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="flex items-center justify-center">
-              <MoreVertical className="size-4 cursor-pointer text-gray-500 hover:text-gray-700" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onClick={() => handleEdit(row.id)}
-            >
-              <Edit className="size-4 ml-2" />
-              تعديل
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              variant="destructive"
-              onClick={() => handleDelete(row.id)}
-            >
-              <Trash2 className="size-4 ml-2" />
-              حذف
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={() => handleEdit(row.id)}
+            variant="outline"
+            size="icon"
+            title="تعديل"
+            className="bg-white hover:bg-[#3675AF]/10"
+          >
+            <Edit className="size-4 text-[#3675AF] hover:text-[#3675AF]/80 cursor-pointer" />
+          </Button>
+          <Button
+            onClick={() => handleDelete(row.id)}
+            variant="outline"
+            size="icon"
+            title="حذف"
+            className="bg-white hover:bg-[#D32829]/10"
+          >
+            <Trash2 className="size-4 text-[#D32829] hover:text-[#D32829]/80 cursor-pointer" />
+          </Button>
+        </div>
       ),
     },
   ], []);
