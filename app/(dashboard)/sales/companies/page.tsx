@@ -66,7 +66,6 @@ const columns: Column<CompanyRowData>[] = [
   },
 ];
 
-// Helper function to format date from API format (YYYY-MM-DD) to display format
 const formatDate = (dateString: string | null | undefined): string => {
   if (!dateString) return "";
   const date = new Date(dateString);
