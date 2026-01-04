@@ -183,7 +183,6 @@ export default function SectionOptionsPage() {
       header: "اسم المقطع",
       render: (row) => (
         <div className="flex items-center gap-2">
-          <FileText className="size-4 text-gray-500" />
           <span>{row.sectionName}</span>
         </div>
       ),
