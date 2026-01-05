@@ -66,7 +66,7 @@ export default function CreateSectionPage() {
   return (
     <form onSubmit={handleSubmit} className="space-y-5 mt-5">
       {/* Section Name */}
-      <div className="space-y-2 w-1/3">
+      <div className="space-y-2 md:w-1/3 w-full">
         <Label htmlFor="sectionName">اسم المقطع</Label>
         <Input
           id="sectionName"

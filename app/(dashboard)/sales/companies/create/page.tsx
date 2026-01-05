@@ -51,8 +51,8 @@ export default function CreateCompanyPage() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3 mt-5">
-      {/* Three Column Layout */}
-      <div className="grid grid-cols-3 gap-3">
+      {/* Responsive Grid Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         <div className="space-y-2">
           <Label htmlFor="companyName">اسم الشركة</Label>
           <Input

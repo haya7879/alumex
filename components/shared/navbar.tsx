@@ -6,7 +6,7 @@ import { useState, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
-import { Menu } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
 
 interface NavItem {
   label: string;
@@ -59,6 +59,8 @@ const navItems: NavItem[] = [
 export const Navbar = () => {
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [expandedMobileItem, setExpandedMobileItem] = useState<string | null>(null);
   const pathname = usePathname();
 
   const isActiveRoute = (href: string) => {
@@ -81,7 +83,7 @@ export const Navbar = () => {
       <div className="h-full w-full p-3 rounded-full flex gap-4 items-center justify-between bg-white/30 dark:bg-[#0C111D4D]">
         <Logo variant="vertical" />
         <ul
-          className="items-center gap-2 text-sm relative hidden lg:flex"
+          className="items-center gap-1 text-sm relative hidden lg:flex"
           dir="rtl"
         >
           {navItems.map((item) => (
@@ -154,10 +156,84 @@ export const Navbar = () => {
           variant="outline"
           size="icon"
           className="size-10 rounded-full bg-white/40 dark:bg-[#0C111DB2] lg:hidden"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
-          <Menu className="size-4" />
+          {isMobileMenuOpen ? (
+            <X className="size-4" />
+          ) : (
+            <Menu className="size-4" />
+          )}
         </Button>
       </div>
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden mt-2 rounded-2xl bg-white/30 dark:bg-[#0C111D4D] backdrop-blur-md border border-white/20 dark:border-gray-800 p-4" dir="rtl">
+          <ul className="space-y-2">
+            {navItems.map((item) => (
+              <li key={item.label}>
+                {item.subRoutes ? (
+                  <div>
+                    <button
+                      onClick={() =>
+                        setExpandedMobileItem(
+                          expandedMobileItem === item.label ? null : item.label
+                        )
+                      }
+                      className={cn(
+                        "w-full flex items-center justify-between px-4 py-1.5 rounded-full transition-colors text-sm",
+                        isMainItemActive(item)
+                          ? "bg-white/60 dark:bg-white/10 text-brand-primary font-medium"
+                          : "hover:bg-white/20 dark:hover:bg-white/10"
+                      )}
+                    >
+                      <span>{item.label}</span>
+                      <ChevronDown
+                        className={cn(
+                          "size-4 transition-transform",
+                          expandedMobileItem === item.label && "rotate-180"
+                        )}
+                      />
+                    </button>
+                    {expandedMobileItem === item.label && (
+                      <ul className="mt-2 pr-4">
+                        {item.subRoutes.map((subRoute) => (
+                          <li key={subRoute.href}>
+                            <Link
+                              href={subRoute.href}
+                              onClick={() => setIsMobileMenuOpen(false)}
+                              className={cn(
+                                "block px-4 py-1.5 rounded-full text-xs transition-colors",
+                                isActiveRoute(subRoute.href)
+                                  ? "bg-white/60 dark:bg-white/10 text-brand-primary font-medium"
+                                  : "hover:bg-white/20 dark:hover:bg-white/10"
+                              )}
+                            >
+                              -  {subRoute.label}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                ) : (
+                  <Link
+                    href={item.href}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={cn(
+                      "block px-4 py-2 rounded-full transition-colors text-sm",
+                      isActiveRoute(item.href)
+                        ? "bg-white/60 dark:bg-white/10 text-brand-primary font-medium"
+                        : "hover:bg-white/20 dark:hover:bg-white/10"
+                    )}
+                  >
+                    {item.label}
+                  </Link>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };
