@@ -4,13 +4,6 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useRouter } from "next/navigation";
 import { useCreateSection } from "@/services/sales/sales-hooks";
 import { toast } from "sonner";
@@ -25,7 +18,6 @@ export default function CreateSectionPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const createSectionMutation = useCreateSection();
-  
   const [formData, setFormData] = useState<SectionFormData>({
     sectionName: "",
     status: "",
@@ -37,25 +29,17 @@ export default function CreateSectionPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Validate form
     if (!formData.sectionName.trim()) {
       toast.error("يرجى إدخال اسم المقطع");
       return;
     }
-
     try {
-      // Send only name to API (as per API requirements)
       await createSectionMutation.mutateAsync({
         name: formData.sectionName.trim(),
       });
 
-      // Invalidate sections query to refetch the list
       queryClient.invalidateQueries({ queryKey: ["sections"] });
-
       toast.success("تم إنشاء المقطع بنجاح");
-      
-      // Redirect to sections list
       router.push("/sales/sections");
     } catch (error) {
       console.error("Failed to create section:", error);
@@ -75,25 +59,6 @@ export default function CreateSectionPage() {
           onChange={(e) => handleInputChange("sectionName", e.target.value)}
         />
       </div>
-
-      {/* Section Status */}
-      {/* <div className="space-y-2 w-1/3">
-        <Label htmlFor="status">حالة المقطع</Label>
-        <Select
-          value={formData.status}
-          onValueChange={(value) => handleInputChange("status", value)}
-        >
-          <SelectTrigger id="status">
-            <SelectValue placeholder="اختار اذا تريد تفعيل المقطع" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="active">مفعل</SelectItem>
-            <SelectItem value="inactive">غير مفعل</SelectItem>
-          </SelectContent>
-        </Select>
-      </div> */}
-
-      {/* Submit Button */}
       <div className="flex justify-start pt-4 gap-2">
         <Button
           type="submit"

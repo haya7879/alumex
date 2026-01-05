@@ -55,21 +55,9 @@ export default function AddNewFormPage() {
   };
 
   const handleSaveForm = async (formData: BasicInfoFormData): Promise<number> => {
-    // Dummy API call - replace with actual API
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    
-    // Simulate API response with form ID
     const newFormId = Math.floor(Math.random() * 10000);
     setFormId(newFormId);
-    
-    // In real implementation:
-    // const response = await fetch('/api/daily-follow-up', {
-    //   method: 'POST',
-    //   body: JSON.stringify(formData)
-    // });
-    // const data = await response.json();
-    // return data.id;
-    
     toast.success("تم حفظ النموذج بنجاح");
     return newFormId;
   };
@@ -80,15 +68,7 @@ export default function AddNewFormPage() {
       return;
     }
 
-    // Dummy API call - replace with actual API
     await new Promise((resolve) => setTimeout(resolve, 500));
-    
-    // In real implementation:
-    // await fetch(`/api/daily-follow-up/${formId}/notes`, {
-    //   method: 'POST',
-    //   body: JSON.stringify(notes)
-    // });
-    
     toast.success("تم حفظ الملاحظات بنجاح");
   };
 
@@ -97,16 +77,7 @@ export default function AddNewFormPage() {
       toast.error("خطأ: لم يتم حفظ النموذج");
       return;
     }
-
-    // Dummy API call - replace with actual API
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    
-    // In real implementation:
-    // await fetch(`/api/daily-follow-up/${formId}/measurements`, {
-    //   method: 'POST',
-    //   body: JSON.stringify(sections)
-    // });
-    
     toast.success("تم حفظ جميع القياسات بنجاح");
   };
 

@@ -1,32 +1,17 @@
 "use client";
-
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { DataTable, Column } from "@/components/table";
+import { DataTable } from "@/components/table";
 import {
   useSections,
   useCreateMeasurements,
 } from "@/services/sales/sales-hooks";
+import { DeleteConfirmationDialog } from "../../../_components/dialogs/delete-confirmation-dialog";
+import { AddRowsDialog } from "../../../_components/dialogs/add-rows-dialog";
+import { createMeasurementColumns } from "../../../_components/columns/measurement-columns";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  ChevronLeft,
   Plus,
   Trash2,
   Download,
@@ -35,6 +20,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
+import { floors } from "@/constants";
 
 export interface MeasurementRow {
   id: number;
@@ -66,26 +52,6 @@ interface StepThreeProps {
 }
 
 
-const floors = [
-  "GF",
-  "F1",
-  "F2",
-  "F3",
-  "F4",
-  "F5",
-  "F6",
-  "F7",
-  "F8",
-  "F9",
-  "F10",
-  "F11",
-  "F12",
-  "F13",
-  "F14",
-  "F15",
-  "F16",
-  "F17",
-];
 
 export default function StepThree({
   formId,
@@ -113,8 +79,6 @@ export default function StepThree({
   const [rowsToDelete, setRowsToDelete] = useState<MeasurementRow[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [addRowsDialog, setAddRowsDialog] = useState(false);
-  const [selectedFloor, setSelectedFloor] = useState("GF");
-  const [rowsToAdd, setRowsToAdd] = useState(1);
 
   // Convert API sections to array of names for selection
   const availableSections = availableSectionsData?.map((section) => section.name) || [];
@@ -224,7 +188,7 @@ export default function StepThree({
     onSectionsChange(updatedSections);
   };
 
-  const handleAddRows = () => {
+  const handleAddRows = (floor: string, rowsCount: number) => {
     if (!selectedSectionId) return;
 
     const currentSection = getCurrentSection();
@@ -236,14 +200,14 @@ export default function StepThree({
         : 0;
 
     const newRows: MeasurementRow[] = Array.from(
-      { length: rowsToAdd },
+      { length: rowsCount },
       (_, i) => {
         const id = maxId + i + 1;
         const number = currentSection.measurements.length + i + 1;
         return {
           id,
           number,
-          floor: selectedFloor,
+          floor: floor,
           location: "",
           width: "",
           length: "",
@@ -268,9 +232,7 @@ export default function StepThree({
     });
 
     onSectionsChange(updatedSections);
-    setAddRowsDialog(false);
-    setRowsToAdd(1);
-    toast.success(`تم إضافة ${rowsToAdd} سطر`);
+    toast.success(`تم إضافة ${rowsCount} سطر`);
   };
 
   const handleDeleteSelected = () => {
@@ -520,160 +482,14 @@ export default function StepThree({
 
   const totals = calculateSectionTotals(currentSection.measurements);
 
-  const measurementColumns: Column<MeasurementRow>[] = [
-    {
-      key: "checkbox",
-      header: "",
-      className: "w-12",
-      render: (row) => (
-        <Checkbox
-          checked={row.checked}
-          onCheckedChange={(checked) =>
-            handleCheckboxChange(selectedSectionId!, row.id, checked as boolean)
-          }
-        />
-      ),
-    },
-    {
-      key: "number",
-      header: "الرقم",
-      className: "w-16",
-      render: (row) => <span>{row.number}</span>,
-    },
-    {
-      key: "floor",
-      header: "الطابق",
-      className: "w-24",
-      render: (row) => (
-        <Select
-          value={row.floor}
-          onValueChange={(value) =>
-            handleRowChange(selectedSectionId!, row.id, "floor", value)
-          }
-        >
-          <SelectTrigger className="h-8 w-20">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {floors.map((floor) => (
-              <SelectItem key={floor} value={floor}>
-                {floor}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      ),
-    },
-    {
-      key: "location",
-      header: "الموقع",
-      className: "w-48",
-      render: (row) => (
-        <Input
-          value={row.location}
-          onChange={(e) =>
-            handleRowChange(
-              selectedSectionId!,
-              row.id,
-              "location",
-              e.target.value
-            )
-          }
-          className="h-8 text-xs"
-        />
-      ),
-    },
-    {
-      key: "width",
-      header: "العرض",
-      className: "w-24",
-      render: (row) => (
-        <Input
-          value={row.width}
-          onChange={(e) =>
-            handleRowChange(selectedSectionId!, row.id, "width", e.target.value)
-          }
-          className="h-8 text-xs"
-        />
-      ),
-    },
-    {
-      key: "length",
-      header: "الطول",
-      className: "w-24",
-      render: (row) => (
-        <Input
-          value={row.length}
-          onChange={(e) =>
-            handleRowChange(
-              selectedSectionId!,
-              row.id,
-              "length",
-              e.target.value
-            )
-          }
-          className="h-8 text-xs"
-        />
-      ),
-    },
-    {
-      key: "count",
-      header: "العدد",
-      className: "w-16",
-      render: (row) => (
-        <Input
-          value={row.count}
-          onChange={(e) =>
-            handleRowChange(selectedSectionId!, row.id, "count", e.target.value)
-          }
-          className="h-8 text-xs"
-        />
-      ),
-    },
-    {
-      key: "areaCm2",
-      header: "المساحة سم²",
-      className: "w-28",
-      render: (row) => (
-        <Input value={row.areaCm2} readOnly className="h-8 text-xs" />
-      ),
-    },
-    {
-      key: "areaM2",
-      header: "المساحة م²",
-      className: "w-24",
-      render: (row) => (
-        <Input value={row.areaM2} readOnly className="h-8 text-xs" />
-      ),
-    },
-    {
-      key: "pricePerMeter",
-      header: "سعر المتر",
-      className: "w-32",
-      render: (row) => (
-        <Input
-          value={row.pricePerMeter}
-          onChange={(e) =>
-            handleRowChange(
-              selectedSectionId!,
-              row.id,
-              "pricePerMeter",
-              e.target.value
-            )
-          }
-          className="h-8 text-xs"
-        />
-      ),
-    },
-    {
-      key: "total",
-      header: "الإجمالي",
-      className: "w-32",
-      render: (row) => (
-        <Input value={row.total} readOnly className="h-8 text-xs" />
-      ),
-    },
-  ];
+  // Create measurement columns with handlers
+  const measurementColumns = createMeasurementColumns({
+    selectedSectionId,
+    handleCheckboxChange,
+    handleRowChange,
+    floors,
+  });
+
 
   return (
     <div className="mt-6">
@@ -760,86 +576,28 @@ export default function StepThree({
       </div>
 
       {/* Add Rows Dialog */}
-      <Dialog open={addRowsDialog} onOpenChange={setAddRowsDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>إضافة أسطر جديدة</DialogTitle>
-            <DialogDescription>
-              اختر الطابق وعدد الأسطر المراد إضافتها (من 1 إلى 17)
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">الطابق</label>
-              <Select value={selectedFloor} onValueChange={setSelectedFloor}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {floors.map((floor) => (
-                    <SelectItem key={floor} value={floor}>
-                      {floor}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">عدد الأسطر</label>
-              <Input
-                type="number"
-                min="1"
-                max="17"
-                value={rowsToAdd}
-                onChange={(e) =>
-                  setRowsToAdd(
-                    Math.min(17, Math.max(1, parseInt(e.target.value) || 1))
-                  )
-                }
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setAddRowsDialog(false)}>
-              إلغاء
-            </Button>
-            <Button onClick={handleAddRows}>إضافة</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <AddRowsDialog
+        open={addRowsDialog}
+        onOpenChange={setAddRowsDialog}
+        onConfirm={(floor, rowsCount) => {
+          handleAddRows(floor, rowsCount);
+        }}
+        floors={floors}
+      />
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>تأكيد الحذف</DialogTitle>
-            <DialogDescription>
-              هل أنت متأكد من حذف {rowsToDelete.length} سطر؟ سيتم حذف:
-            </DialogDescription>
-          </DialogHeader>
-          <div className="max-h-60 overflow-y-auto space-y-1">
-            {rowsToDelete.map((row) => (
-              <div key={row.id} className="text-sm p-2 rounded">
-                <div>
-                  الرقم: {row.number} | الطابق: {row.floor} | الموقع:{" "}
-                  {row.location}
-                </div>
-              </div>
-            ))}
+      <DeleteConfirmationDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        items={rowsToDelete}
+        onConfirm={confirmDelete}
+        description={`هل أنت متأكد من حذف ${rowsToDelete.length} سطر؟ سيتم حذف:`}
+        renderItem={(row) => (
+          <div>
+            الرقم: {row.number} | الطابق: {row.floor} | الموقع: {row.location}
           </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowDeleteDialog(false)}
-            >
-              إلغاء
-            </Button>
-            <Button variant="destructive" onClick={confirmDelete}>
-              حذف
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        )}
+      />
     </div>
   );
 }

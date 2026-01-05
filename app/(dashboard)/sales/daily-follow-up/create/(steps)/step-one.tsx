@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,14 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { ConfirmationDialog } from "../../../_components/dialogs/confirmation-dialog";
 import {
   Popover,
   PopoverContent,
@@ -28,10 +21,7 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import {
-  Calendar as CalendarIcon,
-  ChevronLeft,
   CheckCircle2,
-  AlertCircle,
   Loader2,
   Copy,
   Check,
@@ -43,6 +33,9 @@ import {
   useSalesAgents,
   useCreateForm,
 } from "@/services/sales/sales-hooks";
+import { useDateConverter } from "@/hooks/use-date-converter";
+import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
+import { useDateSync } from "@/hooks/use-date-sync";
 
 export interface BasicInfoFormData {
   approvedCompany: string;
@@ -73,8 +66,6 @@ interface StepOneProps {
 export default function StepOne({
   formData,
   onInputChange,
-  onSave,
-  onFormIdChange,
   onNext,
 }: StepOneProps) {
   const router = useRouter();
@@ -83,72 +74,17 @@ export default function StepOne({
   const [isSaving, setIsSaving] = useState(false);
   const [savedFormId, setSavedFormId] = useState<number | null>(null);
   const [serialNumber, setSerialNumber] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
   const [dateCalendarOpen, setDateCalendarOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-  
-  // Fetch authorized companies
+
+  const { formatDateToDisplay, parseDateFromString, convertDateToAPIFormat } =
+    useDateConverter();
+  const { selectedDate, setSelectedDate } = useDateSync(formData.date);
+  const { copyToClipboard, copied } = useCopyToClipboard();
   const { data: authorizedCompanies, isLoading: isLoadingCompanies } =
     useAuthorizedCompanies();
-
-  // Fetch sales agents
   const { data: salesAgents, isLoading: isLoadingAgents } = useSalesAgents();
-
-  // Check project name mutation
   const checkProjectNameMutation = useCheckProjectName();
-
-  // Create form mutation
   const createFormMutation = useCreateForm();
-
-  // Helper function to format date from Date object to DD/MM/YYYY
-  const formatDateToDisplay = (date: Date | undefined): string => {
-    if (!date) return "";
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  };
-
-  // Helper function to parse date from DD/MM/YYYY string to Date object
-  const parseDateFromString = (dateString: string): Date | undefined => {
-    if (!dateString) return undefined;
-    // Try DD/MM/YYYY format first
-    const parts = dateString.split("/");
-    if (parts.length === 3) {
-      const [day, month, year] = parts;
-      const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-      if (!isNaN(date.getTime())) {
-        return date;
-      }
-    }
-    // Try YYYY-MM-DD format (from HTML date input)
-    const parts2 = dateString.split("-");
-    if (parts2.length === 3) {
-      const [year, month, day] = parts2;
-      const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-      if (!isNaN(date.getTime())) {
-        return date;
-      }
-    }
-    return undefined;
-  };
-
-  // Helper function to convert date from DD/MM/YYYY to YYYY-MM-DD
-  const convertDateToAPIFormat = (dateString: string): string => {
-    if (!dateString) return "";
-    const parts = dateString.split("/");
-    if (parts.length === 3) {
-      const [day, month, year] = parts;
-      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
-    }
-    // If already in YYYY-MM-DD format, return as is
-    if (dateString.includes("-") && dateString.split("-").length === 3) {
-      return dateString;
-    }
-    return dateString;
-  };
-
-  // Handle date selection from calendar
   const handleDateSelect = (date: Date | undefined) => {
     if (date) {
       setSelectedDate(date);
@@ -157,14 +93,6 @@ export default function StepOne({
       setDateCalendarOpen(false);
     }
   };
-
-  // Update selectedDate when formData.date changes
-  useEffect(() => {
-    if (formData.date) {
-      const parsedDate = parseDateFromString(formData.date);
-      setSelectedDate(parsedDate);
-    }
-  }, [formData.date]);
 
   const checkProjectName = async () => {
     if (!formData.projectName.trim()) {
@@ -250,23 +178,16 @@ export default function StepOne({
     setShowSaveDialog(false);
     if (addNotes && savedFormId) {
       // Update URL with form_id
-      router.push(`/sales/daily-follow-up/create?form_id=${savedFormId}&step=2`);
+      router.push(
+        `/sales/daily-follow-up/create?form_id=${savedFormId}&step=2`
+      );
       onNext();
     }
   };
 
   const handleCopySerialNumber = async () => {
     if (!serialNumber) return;
-
-    try {
-      await navigator.clipboard.writeText(serialNumber);
-      setCopied(true);
-      toast.success("تم نسخ الرقم التسلسلي");
-      setTimeout(() => setCopied(false), 2000);
-    } catch (error) {
-      toast.error("فشل نسخ الرقم التسلسلي");
-      console.error(error);
-    }
+    await copyToClipboard(serialNumber, "تم نسخ الرقم التسلسلي", 2000);
   };
 
   return (
@@ -387,7 +308,10 @@ export default function StepOne({
                   <div className="text-xs">
                     <div className="mb-1">
                       <span>
-                        يبدو أن الاسم موجود سابقا برقم تسلسلي :{" "} <span className="text-gray-600 dark:text-gray-100">{serialNumber}</span>
+                        يبدو أن الاسم موجود سابقا برقم تسلسلي :{" "}
+                        <span className="text-gray-600 dark:text-gray-100">
+                          {serialNumber}
+                        </span>
                       </span>
                       <Button
                         type="button"
@@ -533,31 +457,14 @@ export default function StepOne({
       </div>
 
       {/* Save Dialog - Ask about notes */}
-      <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>تم حفظ النموذج بنجاح</DialogTitle>
-            <DialogDescription>
-              هل تريد إدخال الملاحظات المرتبطة بهذا المشروع؟
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              className="w-11! h-11"
-              onClick={() => handleSaveDialogResponse(false)}
-            >
-              لا
-            </Button>
-            <Button
-              className="w-11 h-11"
-              onClick={() => handleSaveDialogResponse(true)}
-            >
-              نعم
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ConfirmationDialog
+        open={showSaveDialog}
+        onOpenChange={setShowSaveDialog}
+        title="تم حفظ النموذج بنجاح"
+        description="هل تريد إدخال الملاحظات المرتبطة بهذا المشروع؟"
+        onConfirm={() => handleSaveDialogResponse(true)}
+        onCancel={() => handleSaveDialogResponse(false)}
+      />
     </>
   );
 }

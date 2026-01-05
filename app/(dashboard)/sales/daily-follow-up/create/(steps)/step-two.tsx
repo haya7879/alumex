@@ -6,14 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DataTable, Column } from "@/components/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { ConfirmationDialog } from "../../../_components/dialogs/confirmation-dialog";
 import { ChevronRight, Plus, Trash2, Loader2, Check } from "lucide-react";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -255,28 +248,14 @@ export default function StepTwo({
       </div>
 
       {/* Measurements Dialog */}
-      <Dialog open={showMeasurementsDialog} onOpenChange={setShowMeasurementsDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>تم حفظ الملاحظات بنجاح</DialogTitle>
-            <DialogDescription>
-              هل سوف تدخل القياسات؟
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              className="w-11! h-11"
-              onClick={() => handleMeasurementsDialogResponse(false)}
-            >
-              لا
-            </Button>
-            <Button className="w-11 h-11" onClick={() => handleMeasurementsDialogResponse(true)}>
-              نعم
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ConfirmationDialog
+        open={showMeasurementsDialog}
+        onOpenChange={setShowMeasurementsDialog}
+        title="تم حفظ الملاحظات بنجاح"
+        description="هل سوف تدخل القياسات؟"
+        onConfirm={() => handleMeasurementsDialogResponse(true)}
+        onCancel={() => handleMeasurementsDialogResponse(false)}
+      />
     </div>
   );
 }

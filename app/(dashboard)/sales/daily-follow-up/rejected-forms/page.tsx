@@ -1,7 +1,7 @@
 "use client";
 
 import { DataTable, Column } from "@/components/table/data-table";
-import { TableRowData } from "@/app/(dashboard)/sales/_components/columns";
+import { TableRowData } from "@/app/(dashboard)/sales/_components/columns/columns";
 import { FilterField } from "@/components/shared/filter-sheet";
 import { TablePagination } from "@/components/table";
 import { useState } from "react";

@@ -1,28 +1,11 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { DataTable, Column } from "@/components/table/data-table";
+import { DataTable } from "@/components/table/data-table";
 import { TablePagination } from "@/components/table";
-import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { FileText, Edit, Trash2 } from "lucide-react";
+import { EditSectionDialog } from "../_components/dialogs/edit-section-dialog";
+import { DeleteConfirmationDialog } from "../_components/dialogs/delete-confirmation-dialog";
+import { createSectionColumns } from "../_components/columns/section-columns";
 import { useSections, useSection, useUpdateSection, useDeleteSection } from "@/services/sales/sales-hooks";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
@@ -46,37 +29,26 @@ export default function SectionOptionsPage() {
   });
   
   const queryClient = useQueryClient();
-  
-  // Fetch sections from API
   const { data: sectionsData, isLoading, error } = useSections();
-  
-  // Fetch selected section data when dialog opens
   const { data: sectionData, isLoading: isLoadingSection } = useSection(selectedSectionId);
-  
-  // Update section mutation
   const updateSectionMutation = useUpdateSection();
-  
-  // Delete section mutation
   const deleteSectionMutation = useDeleteSection();
   
-  // Load section data into form when sectionData is fetched
   useEffect(() => {
     if (sectionData) {
       setFormData({
         sectionName: sectionData.name,
-        status: "active", // API doesn't provide status, defaulting to active
+        status: "active",
       });
     }
   }, [sectionData]);
 
-  // Convert API data to TableRowData format
   const tableData = useMemo(() => {
     if (!sectionsData) return [];
-
     return sectionsData.map((section) => ({
       id: section.id,
       sectionName: section.name,
-      status: "active" as const, // API doesn't provide status, defaulting to active
+      status: "active" as const,
     }));
   }, [sectionsData]);
 
@@ -105,14 +77,8 @@ export default function SectionOptionsPage() {
 
     try {
       await deleteSectionMutation.mutateAsync(selectedSectionId);
-
-      // Invalidate sections query to refetch the list
       queryClient.invalidateQueries({ queryKey: ["sections"] });
-
       toast.success("تم حذف المقطع بنجاح");
-      
-      // Close dialog
-      setDeleteDialogOpen(false);
       setSelectedSectionId(null);
     } catch (error) {
       console.error("Failed to delete section:", error);
@@ -120,11 +86,11 @@ export default function SectionOptionsPage() {
     }
   };
 
-  // Handle delete dialog close
-  const handleDeleteDialogClose = () => {
-    setDeleteDialogOpen(false);
-    setSelectedSectionId(null);
-  };
+  // Get selected section data for delete dialog
+  const selectedSection = useMemo(() => {
+    if (!selectedSectionId) return null;
+    return tableData.find((section) => section.id === selectedSectionId);
+  }, [selectedSectionId, tableData]);
 
   // Handle dialog close
   const handleDialogClose = () => {
@@ -146,15 +112,12 @@ export default function SectionOptionsPage() {
     e.preventDefault();
     
     if (!selectedSectionId) return;
-    
-    // Validate form
     if (!formData.sectionName.trim()) {
       toast.error("يرجى إدخال اسم المقطع");
       return;
     }
 
     try {
-      // Send only name to API (as per API requirements)
       await updateSectionMutation.mutateAsync({
         id: selectedSectionId,
         data: {
@@ -162,13 +125,10 @@ export default function SectionOptionsPage() {
         },
       });
 
-      // Invalidate sections queries to refetch the list
       queryClient.invalidateQueries({ queryKey: ["sections"] });
       queryClient.invalidateQueries({ queryKey: ["section", selectedSectionId] });
-
       toast.success("تم تحديث المقطع بنجاح");
       
-      // Close dialog
       handleDialogClose();
     } catch (error) {
       console.error("Failed to update section:", error);
@@ -176,59 +136,15 @@ export default function SectionOptionsPage() {
     }
   };
 
-  // Table columns (defined inside component to access handleEdit)
-  const columns: Column<SectionRowData>[] = useMemo(() => [
-    {
-      key: "sectionName",
-      header: "اسم المقطع",
-      render: (row) => (
-        <div className="flex items-center gap-2">
-          <span>{row.sectionName}</span>
-        </div>
-      ),
-    },
-    // {
-    //   key: "status",
-    //   header: "الحالة",
-    //   render: (row) => {
-    //     return row.status === "active" ? (
-    //       <Badge variant="success" className="px-3 py-1">
-    //         مفعل
-    //       </Badge>
-    //     ) : (
-    //       <Badge variant="destructive" className="px-3 py-1">
-    //         غير مفعل
-    //       </Badge>
-    //     );
-    //   },
-    // },
-    {
-      key: "options",
-      header: "الخيارات",
-      render: (row) => (
-        <div className="flex items-center gap-2">
-          <Button
-            onClick={() => handleEdit(row.id)}
-            variant="outline"
-            size="icon"
-            title="تعديل"
-            className="bg-white hover:bg-[#3675AF]/10"
-          >
-            <Edit className="size-4 text-[#3675AF] hover:text-[#3675AF]/80 cursor-pointer" />
-          </Button>
-          <Button
-            onClick={() => handleDelete(row.id)}
-            variant="outline"
-            size="icon"
-            title="حذف"
-            className="bg-white hover:bg-[#D32829]/10"
-          >
-            <Trash2 className="size-4 text-[#D32829] hover:text-[#D32829]/80 cursor-pointer" />
-          </Button>
-        </div>
-      ),
-    },
-  ], []);
+  // Table columns
+  const columns = useMemo(
+    () =>
+      createSectionColumns({
+        onEdit: handleEdit,
+        onDelete: handleDelete,
+      }),
+    []
+  );
 
   return (
     <div className="space-y-4">
@@ -268,76 +184,40 @@ export default function SectionOptionsPage() {
       )}
 
       {/* Edit Dialog */}
-      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          {isLoadingSection ? (
-            <div className="py-8 text-center text-muted-foreground">
-              يرجى الانتظار...
-            </div>
-          ) : (
-            <form onSubmit={handleUpdateSubmit} className="space-y-5">
-              {/* Section Name */}
-              <div className="space-y-2">
-                <Label htmlFor="edit-sectionName">تعديل اسم المقطع</Label>
-                <Input
-                  id="edit-sectionName"
-                  placeholder="ادخل اسم المقطع هنا"
-                  value={formData.sectionName}
-                  onChange={(e) => handleInputChange("sectionName", e.target.value)}
-                />
-              </div>
-              <DialogFooter>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleDialogClose}
-                  disabled={updateSectionMutation.isPending}
-                >
-                  الغاء
-                </Button>
-                <Button
-                  type="submit"
-                  className="bg-[#0A3158] text-white hover:bg-[#0A3158]/90"
-                  disabled={updateSectionMutation.isPending}
-                >
-                  {updateSectionMutation.isPending ? "جاري الحفظ..." : "حفظ"}
-                </Button>
-              </DialogFooter>
-            </form>
-          )}
-        </DialogContent>
-      </Dialog>
+      <EditSectionDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        sectionName={formData.sectionName}
+        onSectionNameChange={(value) => handleInputChange("sectionName", value)}
+        onSubmit={handleUpdateSubmit}
+        onCancel={handleDialogClose}
+        isLoading={isLoadingSection}
+        isPending={updateSectionMutation.isPending}
+      />
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>تأكيد الحذف</DialogTitle>
-            <DialogDescription>
-              هل أنت متأكد من حذف هذا المقطع؟ لا يمكن التراجع عن هذا الإجراء.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleDeleteDialogClose}
-              disabled={deleteSectionMutation.isPending}
-            >
-              إلغاء
-            </Button>
-            <Button
-              type="button"
-              variant="destructive"
-              onClick={handleConfirmDelete}
-              disabled={deleteSectionMutation.isPending}
-            >
-              {deleteSectionMutation.isPending ? "جاري الحذف..." : "حذف"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {selectedSection && (
+        <DeleteConfirmationDialog
+          open={deleteDialogOpen}
+          onOpenChange={(open) => {
+            setDeleteDialogOpen(open);
+            if (!open) {
+              setSelectedSectionId(null);
+            }
+          }}
+          items={[selectedSection]}
+          onConfirm={handleConfirmDelete}
+          description="هل أنت متأكد من حذف هذا المقطع؟ لا يمكن التراجع عن هذا الإجراء."
+          itemLabel="مقطع"
+          renderItem={(section) => (
+            <div>اسم المقطع: {section.sectionName}</div>
+          )}
+          confirmLabel={
+            deleteSectionMutation.isPending ? "جاري الحذف..." : "حذف"
+          }
+          isPending={deleteSectionMutation.isPending}
+        />
+      )}
     </div>
   );
 }

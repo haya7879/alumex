@@ -44,9 +44,6 @@ export default function CreateCompanyPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Form Data:", formData);
-    // Handle form submission here
-    // After successful submission, you might want to redirect
-    // router.push("/sales/companies");
   };
 
   return (

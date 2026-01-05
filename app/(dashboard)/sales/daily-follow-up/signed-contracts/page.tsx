@@ -8,7 +8,7 @@ import { Calendar, MoreVertical } from "lucide-react";
 import {
   SignedContractRowData,
   signedContractsColumns,
-} from "@/app/(dashboard)/sales/_components/columns";
+} from "@/app/(dashboard)/sales/_components/columns/columns";
 
 // Sample data based on the image
 const tableData: SignedContractRowData[] = [
@@ -164,24 +164,6 @@ export default function SignedContractsPage() {
 
   return (
     <>
-      {/* Summary Statistics */}
-      {/* <div className="bg-white rounded-xl p-3 shadow-sm">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-gray-700">
-              القيمة الكلية للعقود:
-            </h3>
-            <p className="text-lg font-bold text-primary">
-              {totalContractValue}
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-gray-700">المساحة الاجمالية:</h3>
-            <p className="text-lg font-bold text-primary">{totalArea}</p>
-          </div>
-        </div>
-      </div> */}
-      {/* Table Section */}
       <DataTable
         data={tableData}
         columns={signedContractsColumns}
