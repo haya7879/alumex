@@ -310,6 +310,34 @@ export interface UpdateDailyMovementStatusResponse {
   data?: DailyMovementData;
 }
 
+// Types for Create Contract
+export interface CreateContractRequest {
+  form_id: number;
+  contract_date: string;
+}
+
+export interface CreateContractResponse {
+  message?: string;
+  data?: any;
+}
+
+// Types for Create Quotation
+export interface SectionPrice {
+  section_id: number;
+  price_per_meter: number;
+}
+
+export interface CreateQuotationRequest {
+  form_id: number;
+  confirmed: boolean;
+  sections_prices: SectionPrice[];
+}
+
+export interface CreateQuotationResponse {
+  message?: string;
+  data?: any;
+}
+
 // Sales Services
 export const salesServices = {
   /**
@@ -609,6 +637,42 @@ export const salesServices = {
       return response.data;
     } catch (error) {
       console.error("Failed to update showroom visit status:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Create Contract
+   */
+  createContract: async (
+    data: CreateContractRequest
+  ): Promise<CreateContractResponse> => {
+    try {
+      const response = await apiClient.post<CreateContractResponse>(
+        "/sales/contracts",
+        data
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Failed to create contract:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Create Quotation
+   */
+  createQuotation: async (
+    data: CreateQuotationRequest
+  ): Promise<CreateQuotationResponse> => {
+    try {
+      const response = await apiClient.post<CreateQuotationResponse>(
+        "/sales/quotations",
+        data
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Failed to create quotation:", error);
       throw error;
     }
   },

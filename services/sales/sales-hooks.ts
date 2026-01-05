@@ -27,6 +27,10 @@ import {
   CreateShowroomVisitResponse,
   UpdateShowroomVisitStatusRequest,
   UpdateShowroomVisitStatusResponse,
+  CreateContractRequest,
+  CreateContractResponse,
+  CreateQuotationRequest,
+  CreateQuotationResponse,
 } from "./sales-services";
 
 
@@ -203,6 +207,24 @@ export const useUpdateShowroomVisitStatus = () => {
     { id: number; data: UpdateShowroomVisitStatusRequest }
   >({
     mutationFn: ({ id, data }) => salesServices.updateShowroomVisitStatus(id, data),
+  });
+};
+
+/**
+ * Hook for creating a contract
+ */
+export const useCreateContract = () => {
+  return useMutation<CreateContractResponse, Error, CreateContractRequest>({
+    mutationFn: salesServices.createContract,
+  });
+};
+
+/**
+ * Hook for creating a quotation
+ */
+export const useCreateQuotation = () => {
+  return useMutation<CreateQuotationResponse, Error, CreateQuotationRequest>({
+    mutationFn: salesServices.createQuotation,
   });
 };
 

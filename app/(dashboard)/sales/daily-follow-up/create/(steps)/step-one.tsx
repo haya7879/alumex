@@ -451,6 +451,7 @@ export default function StepOne({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="منزل">منزل</SelectItem>
+              <SelectItem value="بناية">بناية</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -466,6 +467,7 @@ export default function StepOne({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="جاهز">جاهز</SelectItem>
+              <SelectItem value="هيكل">هيكل</SelectItem>
             </SelectContent>
           </Select>
         </div>

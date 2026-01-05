@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { TableRowData } from "../_components/columns";
-import { useForms } from "@/services/sales/sales-hooks";
+import { useForms, useCreateContract, useCreateQuotation, useSections } from "@/services/sales/sales-hooks";
 import { TablePagination } from "@/components/table";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,7 +37,8 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import jsPDF from "jspdf";
+import { useQueryClient } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 
 // Helper function to format date from API format (YYYY-MM-DD) to display format
 const formatDate = (dateString: string): string => {
@@ -61,21 +63,104 @@ export default function DailyFollowUpPage() {
     per_page: 10,
   });
 
+  // Create contract mutation
+  const createContractMutation = useCreateContract();
+  const createQuotationMutation = useCreateQuotation();
+  const queryClient = useQueryClient();
+  
+  // Fetch sections for quotation dialog
+  const { data: sectionsData } = useSections();
+
   // Dialog states
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [contractDialogOpen, setContractDialogOpen] = useState(false);
+  const [quotationDialogOpen, setQuotationDialogOpen] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
-  const [contractData, setContractData] = useState({
-    offerNumber: "",
-    offerDate: "",
-    contractDuration: "",
-  });
+  const [contractDate, setContractDate] = useState("");
+  const [contractCalendarOpen, setContractCalendarOpen] = useState(false);
+  const [selectedContractDate, setSelectedContractDate] = useState<Date | undefined>(undefined);
   const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(
     null
   );
   const [hoveredPopoverIndex, setHoveredPopoverIndex] = useState<number | null>(
     null
   );
+  const [sectionPrices, setSectionPrices] = useState<Record<number, number>>({});
+
+  // Helper function to format date from Date object to DD/MM/YYYY
+  const formatDateToDisplay = (date: Date | undefined): string => {
+    if (!date) return "";
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+  // Helper function to parse date from DD/MM/YYYY string to Date object
+  const parseDateFromString = (dateString: string): Date | undefined => {
+    if (!dateString) return undefined;
+    // Try DD/MM/YYYY format first
+    const parts = dateString.split("/");
+    if (parts.length === 3) {
+      const [day, month, year] = parts;
+      const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+      if (!isNaN(date.getTime())) {
+        return date;
+      }
+    }
+    // Try YYYY-MM-DD format (from HTML date input)
+    const parts2 = dateString.split("-");
+    if (parts2.length === 3) {
+      const [year, month, day] = parts2;
+      const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+      if (!isNaN(date.getTime())) {
+        return date;
+      }
+    }
+    return undefined;
+  };
+
+  // Helper function to convert date from DD/MM/YYYY to YYYY-MM-DD
+  const convertDateToAPIFormat = (dateString: string): string => {
+    if (!dateString) return "";
+    
+    // If already in YYYY-MM-DD format, return as is
+    if (dateString.includes("-") && dateString.split("-").length === 3) {
+      const [year, month, day] = dateString.split("-");
+      // Validate and ensure proper format
+      if (year && month && day && year.length === 4) {
+        return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+      }
+      return dateString;
+    }
+    
+    // Convert from DD/MM/YYYY to YYYY-MM-DD
+    const parts = dateString.split("/");
+    if (parts.length === 3) {
+      const [day, month, year] = parts;
+      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+    }
+    
+    return dateString;
+  };
+
+  // Handle contract date selection from calendar
+  const handleContractDateSelect = (date: Date | undefined) => {
+    if (date) {
+      setSelectedContractDate(date);
+      const formattedDate = formatDateToDisplay(date);
+      setContractDate(formattedDate);
+      setContractCalendarOpen(false);
+    }
+  };
+
+  // Update selectedContractDate when contractDate changes
+  useEffect(() => {
+    if (contractDate) {
+      const parsedDate = parseDateFromString(contractDate);
+      setSelectedContractDate(parsedDate);
+    }
+  }, [contractDate]);
 
   const handleReject = (index: number) => {
     setSelectedItemIndex(index);
@@ -98,36 +183,111 @@ export default function DailyFollowUpPage() {
     setContractDialogOpen(true);
   };
 
-  const handleConfirmContract = () => {
-    if (
-      !contractData.offerNumber ||
-      !contractData.offerDate ||
-      !contractData.contractDuration
-    ) {
+  const handleConfirmContract = async () => {
+    if (!contractDate.trim()) {
+      toast.error("يرجى إدخال تاريخ التوقيع");
       return;
     }
-    console.log(
-      "Contract signed for item:",
-      selectedItemIndex,
-      "Data:",
-      contractData
-    );
-    // TODO: Add API call to mark as signed
-    setContractDialogOpen(false);
-    setContractData({ offerNumber: "", offerDate: "", contractDuration: "" });
-    setSelectedItemIndex(null);
+
+    if (selectedItemIndex === null) {
+      toast.error("خطأ: لم يتم تحديد النموذج");
+      return;
+    }
+
+    const formId = filteredData[selectedItemIndex]?.id;
+    if (!formId) {
+      toast.error("خطأ: لم يتم العثور على معرف النموذج");
+      return;
+    }
+
+    try {
+      const requestBody = {
+        form_id: formId,
+        contract_date: convertDateToAPIFormat(contractDate),
+      };
+
+      await createContractMutation.mutateAsync(requestBody);
+      
+      // Invalidate forms query to refetch the list
+      queryClient.invalidateQueries({ queryKey: ["forms"] });
+      
+      toast.success("تم إنشاء العقد بنجاح");
+      setContractDialogOpen(false);
+      setContractDate("");
+      setSelectedContractDate(undefined);
+      setSelectedItemIndex(null);
+    } catch (error: unknown) {
+      const errorMessage = 
+        error instanceof AxiosError && error.response?.data?.message
+          ? error.response.data.message
+          : "حدث خطأ أثناء إنشاء العقد";
+      toast.error(errorMessage);
+      console.error(error);
+    }
   };
 
   const handleCreatePriceOffer = (index: number) => {
-    const item = filteredData[index];
-    // Create PDF
-    const doc = new jsPDF();
-    doc.setFontSize(16);
-    doc.text("عرض سعر", 14, 20);
-    doc.setFontSize(12);
-    doc.text(`اسم العميل: ${item.customerName}`, 14, 30);
-    // TODO: Add more details as designed by Osama
-    doc.save(`عرض_سعر_${item.customerName}_${Date.now()}.pdf`);
+    setSelectedItemIndex(index);
+    // Initialize section prices with empty values
+    const initialPrices: Record<number, number> = {};
+    if (sectionsData) {
+      sectionsData.forEach((section) => {
+        initialPrices[section.id] = 0;
+      });
+    }
+    setSectionPrices(initialPrices);
+    setQuotationDialogOpen(true);
+  };
+
+  const handleConfirmQuotation = async () => {
+    if (selectedItemIndex === null) {
+      toast.error("خطأ: لم يتم تحديد النموذج");
+      return;
+    }
+
+    const formId = filteredData[selectedItemIndex]?.id;
+    if (!formId) {
+      toast.error("خطأ: لم يتم العثور على معرف النموذج");
+      return;
+    }
+
+    // Validate that at least one section has a price
+    const sectionsWithPrices = Object.entries(sectionPrices)
+      .filter(([_, price]) => price > 0)
+      .map(([sectionId, price]) => ({
+        section_id: parseInt(sectionId),
+        price_per_meter: price,
+      }));
+
+    if (sectionsWithPrices.length === 0) {
+      toast.error("يرجى إدخال سعر لقطاع واحد على الأقل");
+      return;
+    }
+
+    try {
+      const requestBody = {
+        form_id: formId,
+        confirmed: true,
+        sections_prices: sectionsWithPrices,
+      };
+
+      await createQuotationMutation.mutateAsync(requestBody);
+      
+      // Invalidate forms query to refetch the list
+      queryClient.invalidateQueries({ queryKey: ["forms"] });
+      
+      toast.success("تم إنشاء عرض السعر بنجاح");
+      setQuotationDialogOpen(false);
+      setSectionPrices({});
+      setSelectedItemIndex(null);
+    } catch (error: unknown) {
+      const errorMessage = 
+        error instanceof AxiosError && error.response?.data?.message
+          ? error.response.data.message
+          : "حدث خطأ أثناء إنشاء عرض السعر";
+      toast.error(errorMessage);
+      console.error(error);
+    }
   };
 
   const handleView = (index: number) => {
@@ -157,7 +317,7 @@ export default function DailyFollowUpPage() {
       const isOriginal = form.serials.parent === null;
 
       // Format quotation price if exists
-      const lastOfferPrice = form.quotation
+      const lastOfferPrice = form.quotation && form.quotation.total_value != null
         ? form.quotation.total_value.toLocaleString("en-US")
         : "";
 
@@ -292,9 +452,7 @@ export default function DailyFollowUpPage() {
                       <p className="text-xs text-muted-foreground mb-2">
                         التاريخ
                       </p>
-                      <p className="text-sm font-medium">
-                        {item.entry_date}
-                      </p>
+                      <p className="text-sm font-medium">{item.entry_date}</p>
                     </div>
 
                     {/* الحالة */}
@@ -304,20 +462,22 @@ export default function DailyFollowUpPage() {
                       </p>
                       {item.formData?.status === "new" ? (
                         <Badge variant="default" className="px-3 py-1">
-                          {item.formData?.status}
+                          جديد
                         </Badge>
-                      ) : item.formData?.status === "in_progress" ? (
+                      ) : item.formData?.status === "quoted" ? (
                         <Badge variant="warning" className="px-3 py-1">
-                          {item.formData?.status}
+                          تحول لعرض سعر
                         </Badge>
-                      ) : item.formData?.status === "completed" ? (
+                      ) : item.formData?.status === "contracted" ? (
                         <Badge variant="success" className="px-3 py-1">
-                          {item.formData?.status}
+                          تم توقيع العقد
+                        </Badge>
+                      ) : item.formData?.status === "rejected" ? (
+                        <Badge variant="destructive" className="px-3 py-1">
+                          مرفوض
                         </Badge>
                       ) : (
-                        <Badge variant="outline" className="px-3 py-1">
-                          {item.formData?.status}
-                        </Badge>
+                        <Badge variant="outline" className="px-3 py-1"></Badge>
                       )}
                     </div>
 
@@ -469,56 +629,103 @@ export default function DailyFollowUpPage() {
         </DialogContent>
       </Dialog>
 
+      {/* Create Quotation Dialog */}
+      <Dialog open={quotationDialogOpen} onOpenChange={setQuotationDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>إنشاء عرض سعر</DialogTitle>
+            <DialogDescription>
+              يرجى إدخال سعر المتر لكل قطاع
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            {sectionsData && sectionsData.length > 0 ? (
+              <div className="space-y-3">
+                {sectionsData.map((section) => (
+                  <div key={section.id} className="space-y-2">
+                    <Label htmlFor={`section-${section.id}`}>
+                      {section.name}
+                    </Label>
+                    <Input
+                      id={`section-${section.id}`}
+                      type="number"
+                      placeholder="أدخل سعر المتر"
+                      value={sectionPrices[section.id] || ""}
+                      onChange={(e) => {
+                        const value = parseFloat(e.target.value) || 0;
+                        setSectionPrices((prev) => ({
+                          ...prev,
+                          [section.id]: value,
+                        }));
+                      }}
+                      min="0"
+                      step="0.01"
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                جاري تحميل القطاعات...
+              </p>
+            )}
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setQuotationDialogOpen(false);
+                setSectionPrices({});
+                setSelectedItemIndex(null);
+              }}
+            >
+              إلغاء
+            </Button>
+            <Button
+              onClick={handleConfirmQuotation}
+              disabled={createQuotationMutation.isPending || !sectionsData || sectionsData.length === 0}
+            >
+              {createQuotationMutation.isPending ? "جاري الحفظ..." : "إنشاء عرض السعر"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Contract Signed Dialog */}
       <Dialog open={contractDialogOpen} onOpenChange={setContractDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>تم توقيع العقد</DialogTitle>
-            <DialogDescription>يرجى إدخال معلومات العقد</DialogDescription>
+            <DialogDescription>يرجى إدخال تاريخ التوقيع</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="offer-number">رقم العرض</Label>
-              <Input
-                id="offer-number"
-                placeholder="أدخل رقم العرض"
-                value={contractData.offerNumber}
-                onChange={(e) =>
-                  setContractData({
-                    ...contractData,
-                    offerNumber: e.target.value,
-                  })
-                }
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="offer-date">تاريخ العرض</Label>
-              <Input
-                id="offer-date"
-                type="date"
-                value={contractData.offerDate}
-                onChange={(e) =>
-                  setContractData({
-                    ...contractData,
-                    offerDate: e.target.value,
-                  })
-                }
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="contract-duration">مدة العقد (بالأيام)</Label>
-              <Input
-                id="contract-duration"
-                type="number"
-                placeholder="أدخل مدة العقد"
-                value={contractData.contractDuration}
-                onChange={(e) =>
-                  setContractData({
-                    ...contractData,
-                    contractDuration: e.target.value,
-                  })
-                }
-              />
+              <Label htmlFor="contract-date">تاريخ التوقيع</Label>
+              <Popover open={contractCalendarOpen} onOpenChange={setContractCalendarOpen}>
+                <PopoverTrigger asChild>
+                  <div className="relative">
+                    <Input
+                      id="contract-date"
+                      type="text"
+                      placeholder="----/--/--"
+                      value={contractDate}
+                      onChange={(e) => {
+                        setContractDate(e.target.value);
+                        const parsedDate = parseDateFromString(e.target.value);
+                        setSelectedContractDate(parsedDate);
+                      }}
+                    />
+                  </div>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={selectedContractDate}
+                    onSelect={handleContractDateSelect}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
           <DialogFooter>
@@ -526,24 +733,17 @@ export default function DailyFollowUpPage() {
               variant="outline"
               onClick={() => {
                 setContractDialogOpen(false);
-                setContractData({
-                  offerNumber: "",
-                  offerDate: "",
-                  contractDuration: "",
-                });
+                setContractDate("");
+                setSelectedContractDate(undefined);
               }}
             >
               إلغاء
             </Button>
             <Button
               onClick={handleConfirmContract}
-              disabled={
-                !contractData.offerNumber ||
-                !contractData.offerDate ||
-                !contractData.contractDuration
-              }
+              disabled={!contractDate.trim() || createContractMutation.isPending}
             >
-              تأكيد
+              {createContractMutation.isPending ? "جاري الحفظ..." : "تأكيد"}
             </Button>
           </DialogFooter>
         </DialogContent>
