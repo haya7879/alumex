@@ -8,28 +8,11 @@ import { Badge } from "@/components/ui/badge";
 import {
   FilterField,
 } from "../../../../components/shared/filter-sheet";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useShowroomVisits, useUpdateShowroomVisitStatus } from "@/services/sales/sales-hooks";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
+import { UpdateStatusDialog } from "../_components/dialogs/update-status-dialog";
+import { useDateConverter } from "@/hooks/use-date-converter";
 
 // Data interface
 export interface DailyVisitRowData {
@@ -44,16 +27,6 @@ export interface DailyVisitRowData {
   hasForm?: boolean;
 }
 
-// Helper function to format date from API format (YYYY-MM-DD) to display format
-const formatDate = (dateString: string | null): string => {
-  if (!dateString) return "";
-  const date = new Date(dateString);
-  const day = date.getDate();
-  const month = date.getMonth() + 1;
-  const year = date.getFullYear();
-  return `${day}/${month}/${year}`;
-};
-
 
 export default function DailyVisitsPage() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -66,6 +39,7 @@ export default function DailyVisitsPage() {
 
   const queryClient = useQueryClient();
   const updateStatusMutation = useUpdateShowroomVisitStatus();
+  const { formatDate } = useDateConverter();
 
   // Fetch showroom visits from API
   const { data: visitsData, isLoading, error } = useShowroomVisits({
@@ -88,7 +62,7 @@ export default function DailyVisitsPage() {
       salesUser: visit.sales_user?.name || "",
       hasForm: visit.has_form,
     }));
-  }, [visitsData]);
+  }, [visitsData, formatDate]);
 
   // Handle status click
   const handleStatusClick = useCallback((visitId: number, currentStatus: string, currentNotes: string | null) => {
@@ -295,66 +269,26 @@ export default function DailyVisitsPage() {
       )}
 
       {/* Status Update Dialog */}
-      <Dialog open={statusDialogOpen} onOpenChange={setStatusDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>تغيير الحالة</DialogTitle>
-            <DialogDescription>
-              قم بتحديث حالة وملاحظات زيارة المعرض
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-5">
-            {/* Status Selection */}
-            <div className="space-y-2">
-              <Label htmlFor="status-select">الحالة</Label>
-              <Select
-                value={selectedStatus}
-                onValueChange={setSelectedStatus}
-              >
-                <SelectTrigger id="status-select">
-                  <SelectValue placeholder="اختر الحالة" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="sections_explained">تم شرح المقاطع</SelectItem>
-                  <SelectItem value="contract_signed">تم توقيع العقد</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Notes */}
-            <div className="space-y-2">
-              <Label htmlFor="notes">الملاحظات</Label>
-              <Textarea
-                id="notes"
-                placeholder="ادخل الملاحظات هنا"
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                className="min-h-[120px]"
-              />
-            </div>
-
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleStatusDialogClose}
-                disabled={updateStatusMutation.isPending}
-              >
-                الغاء
-              </Button>
-              <Button
-                type="button"
-                className="bg-[#0A3158] text-white hover:bg-[#0A3158]/90"
-                onClick={handleStatusUpdate}
-                disabled={updateStatusMutation.isPending || !selectedStatus}
-              >
-                {updateStatusMutation.isPending ? "جاري الحفظ..." : "حفظ"}
-              </Button>
-            </DialogFooter>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <UpdateStatusDialog
+        open={statusDialogOpen}
+        onOpenChange={(open) => {
+          if (!open) handleStatusDialogClose();
+        }}
+        title="تغيير الحالة"
+        description="قم بتحديث حالة وملاحظات زيارة المعرض"
+        selectedStatus={selectedStatus}
+        statusOptions={[
+          { value: "sections_explained", label: "تم شرح المقاطع" },
+          { value: "contract_signed", label: "تم توقيع العقد" },
+        ]}
+        isPending={updateStatusMutation.isPending}
+        onStatusSelect={setSelectedStatus}
+        notes={notes}
+        onNotesChange={setNotes}
+        showNotes={true}
+        onConfirm={handleStatusUpdate}
+        onCancel={handleStatusDialogClose}
+      />
     </div>
   );
 }

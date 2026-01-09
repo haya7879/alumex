@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,8 @@ import { useRouter } from "next/navigation";
 import { useCreateDailyMovement } from "@/services/sales/sales-hooks";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
+import { useDateConverter } from "@/hooks/use-date-converter";
+import { useDateSync } from "@/hooks/use-date-sync";
 
 export interface DailyMovementFormData {
   customerName: string;
@@ -38,10 +40,9 @@ export default function CreateDailyMovementPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const createDailyMovementMutation = useCreateDailyMovement();
+  const { formatDateToDisplay, convertDateToAPIFormat } = useDateConverter();
   const [movementCalendarOpen, setMovementCalendarOpen] = useState(false);
   const [postponementCalendarOpen, setPostponementCalendarOpen] = useState(false);
-  const [selectedMovementDate, setSelectedMovementDate] = useState<Date | undefined>(undefined);
-  const [selectedPostponementDate, setSelectedPostponementDate] = useState<Date | undefined>(undefined);
   
   const [formData, setFormData] = useState<DailyMovementFormData>({
     customerName: "",
@@ -53,6 +54,10 @@ export default function CreateDailyMovementPage() {
     notes: "",
   });
 
+  // Sync dates with formData using useDateSync hook
+  const { selectedDate: selectedMovementDate, setSelectedDate: setSelectedMovementDate } = useDateSync(formData.movementDate);
+  const { selectedDate: selectedPostponementDate, setSelectedDate: setSelectedPostponementDate } = useDateSync(formData.postponementDate);
+
   const handleInputChange = (
     field: keyof DailyMovementFormData,
     value: string
@@ -63,16 +68,6 @@ export default function CreateDailyMovementPage() {
       if (field === "status" && value !== "postponed") {
         updated.postponementDate = "";
         setSelectedPostponementDate(undefined);
-      }
-      // If movementDate is being changed, update selectedMovementDate
-      if (field === "movementDate") {
-        const parsedDate = parseDateFromString(value);
-        setSelectedMovementDate(parsedDate);
-      }
-      // If postponementDate is being changed, update selectedPostponementDate
-      if (field === "postponementDate") {
-        const parsedDate = parseDateFromString(value);
-        setSelectedPostponementDate(parsedDate);
       }
       return updated;
     });
@@ -96,70 +91,6 @@ export default function CreateDailyMovementPage() {
       setFormData((prev) => ({ ...prev, postponementDate: formattedDate }));
       setPostponementCalendarOpen(false);
     }
-  };
-
-  // Helper function to format date from Date object to DD/MM/YYYY
-  const formatDateToDisplay = (date: Date | undefined): string => {
-    if (!date) return "";
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  };
-
-  // Helper function to parse date from DD/MM/YYYY string to Date object
-  const parseDateFromString = (dateString: string): Date | undefined => {
-    if (!dateString) return undefined;
-    // Try DD/MM/YYYY format first
-    const parts = dateString.split("/");
-    if (parts.length === 3) {
-      const [day, month, year] = parts;
-      const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-      if (!isNaN(date.getTime())) {
-        return date;
-      }
-    }
-    // Try YYYY-MM-DD format (from HTML date input)
-    const parts2 = dateString.split("-");
-    if (parts2.length === 3) {
-      const [year, month, day] = parts2;
-      const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-      if (!isNaN(date.getTime())) {
-        return date;
-      }
-    }
-    return undefined;
-  };
-
-  // Update selectedMovementDate when formData.movementDate changes
-  useEffect(() => {
-    if (formData.movementDate) {
-      const parsedDate = parseDateFromString(formData.movementDate);
-      setSelectedMovementDate(parsedDate);
-    }
-  }, [formData.movementDate]);
-
-  // Update selectedPostponementDate when formData.postponementDate changes
-  useEffect(() => {
-    if (formData.postponementDate) {
-      const parsedDate = parseDateFromString(formData.postponementDate);
-      setSelectedPostponementDate(parsedDate);
-    }
-  }, [formData.postponementDate]);
-
-  // Helper function to convert date from DD/MM/YYYY to YYYY-MM-DD
-  const convertDateToAPIFormat = (dateString: string): string => {
-    if (!dateString) return "";
-    const parts = dateString.split("/");
-    if (parts.length === 3) {
-      const [day, month, year] = parts;
-      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
-    }
-    // If already in YYYY-MM-DD format, return as is
-    if (dateString.includes("-") && dateString.split("-").length === 3) {
-      return dateString;
-    }
-    return dateString;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

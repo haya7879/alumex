@@ -33,10 +33,10 @@ export function useDateConverter() {
 
   /**
    * Formats date from API format (YYYY-MM-DD) to display format (DD/MM/YYYY)
-   * @param dateString - Date string in YYYY-MM-DD format
+   * @param dateString - Date string in YYYY-MM-DD format (can be null)
    * @returns Date string in DD/MM/YYYY format
    */
-  const formatDate = (dateString: string): string => {
+  const formatDate = (dateString: string | null): string => {
     if (!dateString) return "";
     const date = new Date(dateString);
     const day = date.getDate();

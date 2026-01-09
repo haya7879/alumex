@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,8 @@ import { useRouter } from "next/navigation";
 import { useCreateShowroomVisit } from "@/services/sales/sales-hooks";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
+import { useDateConverter } from "@/hooks/use-date-converter";
+import { useDateSync } from "@/hooks/use-date-sync";
 
 export interface DailyVisitFormData {
   customerName: string;
@@ -38,7 +40,7 @@ export default function CreateDailyVisitPage() {
   const queryClient = useQueryClient();
   const createShowroomVisitMutation = useCreateShowroomVisit();
   const [calendarOpen, setCalendarOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const { formatDateToDisplay, convertDateToAPIFormat } = useDateConverter();
   
   const [formData, setFormData] = useState<DailyVisitFormData>({
     customerName: "",
@@ -49,58 +51,14 @@ export default function CreateDailyVisitPage() {
     notes: "",
   });
 
-  // Helper function to format date from Date object to DD/MM/YYYY
-  const formatDateToDisplay = (date: Date | undefined): string => {
-    if (!date) return "";
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  };
-
-  // Helper function to parse date from DD/MM/YYYY string to Date object
-  const parseDateFromString = (dateString: string): Date | undefined => {
-    if (!dateString) return undefined;
-    // Try DD/MM/YYYY format first
-    const parts = dateString.split("/");
-    if (parts.length === 3) {
-      const [day, month, year] = parts;
-      const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-      if (!isNaN(date.getTime())) {
-        return date;
-      }
-    }
-    // Try YYYY-MM-DD format (from HTML date input)
-    const parts2 = dateString.split("-");
-    if (parts2.length === 3) {
-      const [year, month, day] = parts2;
-      const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-      if (!isNaN(date.getTime())) {
-        return date;
-      }
-    }
-    return undefined;
-  };
-
-  // Update selectedDate when formData.visitDate changes
-  useEffect(() => {
-    if (formData.visitDate) {
-      const parsedDate = parseDateFromString(formData.visitDate);
-      setSelectedDate(parsedDate);
-    }
-  }, [formData.visitDate]);
+  // Sync selectedDate with formData.visitDate using useDateSync hook
+  const { selectedDate, setSelectedDate } = useDateSync(formData.visitDate);
 
   const handleInputChange = (
     field: keyof DailyVisitFormData,
     value: string
   ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    
-    // If visitDate is being changed, update selectedDate
-    if (field === "visitDate") {
-      const parsedDate = parseDateFromString(value);
-      setSelectedDate(parsedDate);
-    }
   };
 
   // Handle date selection from calendar
@@ -111,17 +69,6 @@ export default function CreateDailyVisitPage() {
       setFormData((prev) => ({ ...prev, visitDate: formattedDate }));
       setCalendarOpen(false);
     }
-  };
-
-  // Helper function to convert date from DD/MM/YYYY to YYYY-MM-DD
-  const convertDateToAPIFormat = (dateString: string): string => {
-    if (!dateString) return "";
-    const parts = dateString.split("/");
-    if (parts.length === 3) {
-      const [day, month, year] = parts;
-      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
-    }
-    return dateString;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
