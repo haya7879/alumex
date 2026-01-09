@@ -52,19 +52,6 @@ export const routeHeaderLinks: Record<string, HeaderLink[]> = {
         exact: true,
       },
     ],
-    companies: [
-      {
-        label: "إضافة شركة",
-        href: "/sales/companies/create",
-        icon: Plus,
-      },
-      {
-        label: "الشركات المعتمدة",
-        href: "/sales/companies",
-        icon: Calendar,
-        exact: true,
-      },
-    ],
     "sections": [
       {
         label: "إضافة مقطع",

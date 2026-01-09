@@ -29,7 +29,6 @@ const navItems: NavItem[] = [
       { label: "المتابعة اليومية", href: "/sales/daily-follow-up" },
       { label: "الزيارات اليومية", href: "/sales/daily-visits" },
       { label: "الحركة اليومية", href: "/sales/daily-movement" },
-      { label: "الشركات المعتمدة", href: "/sales/companies" },
       { label: "المقاطع", href: "/sales/sections" },
     ],
   },
