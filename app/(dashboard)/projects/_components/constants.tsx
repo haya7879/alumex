@@ -1,5 +1,5 @@
 import { HeaderLink } from "@/components/shared/dynamic-layout";
-import { FileText, List, Plus } from "lucide-react";
+import { Calendar, FileText, List, Plus } from "lucide-react";
 
 // Map path segments to Arabic labels
 export const pathLabels: Record<string, string> = {
@@ -13,6 +13,14 @@ export const pathLabels: Record<string, string> = {
 
 // Map routes to their header links
 export const routeHeaderLinks: Record<string, HeaderLink[]> = {
+  followups: [
+    {
+      label: "برنامج المتابعة",
+      href: "/projects",
+      icon: Calendar,
+      exact: true,
+    },
+  ],
   descriptions: [
     {
       label: "إضافة وصف",
@@ -51,6 +59,7 @@ export const routeHeaderLinks: Record<string, HeaderLink[]> = {
 
 // Map routes to their default titles
 export const routeDefaultTitles: Record<string, string> = {
+  followups: "برنامج المتابعة",
   descriptions: "الوصوف",
   contracts: "قائمة العقود",
   "production-orders": "طلبات الانتاج",

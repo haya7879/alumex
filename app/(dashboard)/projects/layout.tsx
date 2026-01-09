@@ -19,6 +19,10 @@ export default function ProjectsLayout({ children }: { children: ReactNode }) {
     if (projectsIndex !== -1 && segments.length > projectsIndex + 1) {
       return segments[projectsIndex + 1];
     }
+    // If pathname is exactly "/projects", use "followups" route
+    if (pathname === "/projects") {
+      return "followups";
+    }
     return null;
   }, [pathname]);
 

@@ -1,8 +1,20 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { useForms, useCreateContract, useCreateQuotation, useSections, useForm, useUpdateFormBasicInfo, useUpdateFormMeasurements, useRejectForm } from "@/services/sales/sales-hooks";
-import { UpdateFormBasicInfoRequest, UpdateFormMeasurementsRequest } from "@/services/sales/sales-services";
+import {
+  useForms,
+  useCreateContract,
+  useCreateQuotation,
+  useSections,
+  useForm,
+  useUpdateFormBasicInfo,
+  useUpdateFormMeasurements,
+  useRejectForm,
+} from "@/services/sales/sales-hooks";
+import {
+  UpdateFormBasicInfoRequest,
+  UpdateFormMeasurementsRequest,
+} from "@/services/sales/sales-services";
 import { TablePagination } from "@/components/table";
 import { FormCard } from "@/components/shared/form-card";
 import { toast } from "sonner";
@@ -43,7 +55,8 @@ export default function DailyFollowUpPage() {
   const [quotationDialogOpen, setQuotationDialogOpen] = useState(false);
   const [showSheetOpen, setShowSheetOpen] = useState(false);
   const [editBasicInfoSheetOpen, setEditBasicInfoSheetOpen] = useState(false);
-  const [editMeasurementsSheetOpen, setEditMeasurementsSheetOpen] = useState(false);
+  const [editMeasurementsSheetOpen, setEditMeasurementsSheetOpen] =
+    useState(false);
   const [selectedFormId, setSelectedFormId] = useState<number | null>(null);
   const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(
     null
@@ -53,7 +66,9 @@ export default function DailyFollowUpPage() {
   );
 
   // Fetch form details when selectedFormId is set (for show or edit)
-  const shouldFetchFormDetails = selectedFormId && (showSheetOpen || editBasicInfoSheetOpen || editMeasurementsSheetOpen);
+  const shouldFetchFormDetails =
+    selectedFormId &&
+    (showSheetOpen || editBasicInfoSheetOpen || editMeasurementsSheetOpen);
   const { data: formDetails, isLoading: isLoadingFormDetails } = useForm(
     shouldFetchFormDetails ? selectedFormId : null
   );
@@ -122,7 +137,7 @@ export default function DailyFollowUpPage() {
       setContractDialogOpen(false);
       setSelectedItemIndex(null);
     } catch (error: unknown) {
-      const errorMessage = 
+      const errorMessage =
         error instanceof AxiosError && error.response?.data?.message
           ? error.response.data.message
           : "حدث خطأ أثناء إنشاء العقد";
@@ -136,7 +151,9 @@ export default function DailyFollowUpPage() {
     setQuotationDialogOpen(true);
   };
 
-  const handleConfirmQuotation = async (sectionPrices: Record<number, number>) => {
+  const handleConfirmQuotation = async (
+    sectionPrices: Record<number, number>
+  ) => {
     if (selectedItemIndex === null) {
       toast.error("خطأ: لم يتم تحديد النموذج");
       return;
@@ -171,12 +188,12 @@ export default function DailyFollowUpPage() {
       await createQuotationMutation.mutateAsync(requestBody);
       queryClient.invalidateQueries({ queryKey: ["forms"] });
       queryClient.invalidateQueries({ queryKey: ["form", formId] });
-      
+
       toast.success("تم إنشاء عرض السعر بنجاح");
       setQuotationDialogOpen(false);
       setSelectedItemIndex(null);
     } catch (error: unknown) {
-      const errorMessage = 
+      const errorMessage =
         error instanceof AxiosError && error.response?.data?.message
           ? error.response.data.message
           : "حدث خطأ أثناء إنشاء عرض السعر";
@@ -198,17 +215,15 @@ export default function DailyFollowUpPage() {
     setSelectedFormId(formId);
 
     if (section === "basic") {
-      // Wait for form data to load before opening sheet
       setEditBasicInfoSheetOpen(true);
     } else if (section === "measurements") {
       setEditMeasurementsSheetOpen(true);
-    } else if (section === "followup") {
-      // TODO: Handle follow-up edit (create dialog if needed)
-      toast.info("تعديل برنامج المتابعة قريباً");
     }
   };
 
-  const handleConfirmEditBasicInfo = async (data: UpdateFormBasicInfoRequest) => {
+  const handleConfirmEditBasicInfo = async (
+    data: UpdateFormBasicInfoRequest
+  ) => {
     if (!selectedFormId) {
       toast.error("خطأ: لم يتم تحديد النموذج");
       return;
@@ -235,7 +250,9 @@ export default function DailyFollowUpPage() {
     }
   };
 
-  const handleConfirmEditMeasurements = async (data: UpdateFormMeasurementsRequest) => {
+  const handleConfirmEditMeasurements = async (
+    data: UpdateFormMeasurementsRequest
+  ) => {
     if (!selectedFormId) {
       toast.error("خطأ: لم يتم تحديد النموذج");
       return;
@@ -323,7 +340,9 @@ export default function DailyFollowUpPage() {
               formatDate={formatDate}
               hoveredPopoverIndex={hoveredPopoverIndex}
               setHoveredPopoverIndex={setHoveredPopoverIndex}
-              onCopySerial={(serialNumber) => copyToClipboard(serialNumber, "تم نسخ الرقم التسلسلي")}
+              onCopySerial={(serialNumber) =>
+                copyToClipboard(serialNumber, "تم نسخ الرقم التسلسلي")
+              }
               onEdit={handleEdit}
               onReject={handleReject}
               onCreatePriceOffer={handleCreatePriceOffer}

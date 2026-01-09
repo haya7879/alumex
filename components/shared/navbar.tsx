@@ -36,6 +36,7 @@ const navItems: NavItem[] = [
     label: "المشاريع",
     href: "/projects/descriptions",
     subRoutes: [
+      { label: "برنامج المتابعة", href: "/projects" },
       { label: "الوصوف", href: "/projects/descriptions" },
       { label: "قائمة العقود", href: "/projects/contracts" },
       { label: "طلبات الانتاج", href: "/projects/production-orders" },
