@@ -256,6 +256,8 @@ export default function CreateDailyVisitPage() {
               <SelectValue placeholder="اختر الحالة" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="quotation_received">استلم عرض سعر</SelectItem>
+              <SelectItem value="initial_measurements_requested">تم طلب القياسات</SelectItem>
               <SelectItem value="sections_explained">تم شرح المقاطع</SelectItem>
               <SelectItem value="contract_signed">تم توقيع العقد</SelectItem>
             </SelectContent>

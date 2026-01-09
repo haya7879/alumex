@@ -37,7 +37,7 @@ export interface DailyMovementRowData {
   phone: string;
   notes: string;
   date: string;
-  status: "completed" | "not-completed" | "postponed";
+  status: "measured" | "not_measured" | "postponed";
   salesUser?: string;
   followUpDate?: string | null;
   isPostponed?: boolean;
@@ -65,7 +65,7 @@ export default function DailyMovementPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusDialogOpen, setStatusDialogOpen] = useState(false);
   const [selectedMovementId, setSelectedMovementId] = useState<number | null>(null);
-  const [selectedStatus, setSelectedStatus] = useState<"completed" | "not-completed" | "postponed" | "">("");
+  const [selectedStatus, setSelectedStatus] = useState<"measured" | "not_measured" | "postponed" | "">("");
   const [followUpDate, setFollowUpDate] = useState("");
 
   const queryClient = useQueryClient();
@@ -130,11 +130,11 @@ export default function DailyMovementPage() {
       header: "الحالة",
       render: (row) => {
         const statusConfig = {
-          completed: {
+          measured: {
             label: "تم أخذ القياس",
             variant: "success" as const,
           },
-          "not-completed": {
+          "not_measured": {
             label: "لم يتم أخذ القياس",
             variant: "destructive" as const,
           },
@@ -187,7 +187,7 @@ export default function DailyMovementPage() {
   };
 
   // Handle status click
-  const handleStatusClick = (movementId: number, currentStatus: "completed" | "not-completed" | "postponed") => {
+  const handleStatusClick = (movementId: number, currentStatus: "measured" | "not_measured" | "postponed") => {
     setSelectedMovementId(movementId);
     setSelectedStatus("");
     setFollowUpDate("");
@@ -195,7 +195,7 @@ export default function DailyMovementPage() {
   };
 
   // Handle status selection from dropdown
-  const handleStatusSelect = (status: "completed" | "not-completed" | "postponed") => {
+  const handleStatusSelect = (status: "measured" | "not_measured" | "postponed") => {
     setSelectedStatus(status);
     if (status !== "postponed") {
       setFollowUpDate("");
@@ -224,7 +224,7 @@ export default function DailyMovementPage() {
       };
 
       const requestBody: {
-        status: "completed" | "not-completed" | "postponed";
+        status: "measured" | "not_measured" | "postponed";
         follow_up_date?: string;
       } = {
         status: selectedStatus,
@@ -278,8 +278,8 @@ export default function DailyMovementPage() {
       type: "select",
       placeholder: "أختر المندوب من القائمة",
       options: [
-        { value: "completed", label: "تم أخذ القياس" },
-        { value: "not-completed", label: "لم يتم أخذ القياس" },
+        { value: "measured", label: "تم أخذ القياس" },
+        { value: "not_measured", label: "لم يتم أخذ القياس" },
         { value: "postponed", label: "مؤجل" },
       ],
     },
@@ -372,17 +372,17 @@ export default function DailyMovementPage() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="w-full justify-start">
-                    {selectedStatus === "completed" && "تم أخذ القياس"}
-                    {selectedStatus === "not-completed" && "لم يتم أخذ القياس"}
+                    {selectedStatus === "measured" && "تم أخذ القياس"}
+                    {selectedStatus === "not_measured" && "لم يتم أخذ القياس"}
                     {selectedStatus === "postponed" && "مؤجل"}
                     {!selectedStatus && "اختر الحالة"}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-full">
-                  <DropdownMenuItem onClick={() => handleStatusSelect("completed")}>
+                  <DropdownMenuItem onClick={() => handleStatusSelect("measured")}>
                     تم أخذ القياس
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleStatusSelect("not-completed")}>
+                  <DropdownMenuItem onClick={() => handleStatusSelect("not_measured")}>
                     لم يتم أخذ القياس
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => handleStatusSelect("postponed")}>

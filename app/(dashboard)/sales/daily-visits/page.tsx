@@ -227,8 +227,8 @@ export default function DailyVisitsPage() {
       type: "select",
       placeholder: "أختر المندوب من القائمة",
       options: [
-        { value: "completed", label: "تم أخذ القياس" },
-        { value: "not-completed", label: "لم يتم أخذ القياس" },
+        { value: "measured", label: "تم أخذ القياس" },
+        { value: "not_measured", label: "لم يتم أخذ القياس" },
         { value: "postponed", label: "مؤجل" },
       ],
     },

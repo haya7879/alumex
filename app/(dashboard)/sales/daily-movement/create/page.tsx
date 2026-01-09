@@ -198,14 +198,14 @@ export default function CreateDailyMovementPage() {
         customer_name: string;
         phone: string;
         movement_date: string;
-        status: "completed" | "not-completed" | "postponed";
+        status: "measured" | "not_measured" | "postponed";
         follow_up_date?: string;
       } = {
         location: formData.location.trim(),
         customer_name: formData.customerName.trim(),
         phone: formData.phone.trim(),
         movement_date: convertDateToAPIFormat(formData.movementDate),
-        status: formData.status as "completed" | "not-completed" | "postponed",
+        status: formData.status as "measured" | "not_measured" | "postponed",
       };
 
       // Add follow_up_date only if status is postponed (set to today's date)
@@ -304,8 +304,8 @@ export default function CreateDailyMovementPage() {
               <SelectValue placeholder="حدد هل تم أخذ القياس" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="completed">تم أخذ القياس</SelectItem>
-              <SelectItem value="not-completed">لم يتم أخذ القياس</SelectItem>
+              <SelectItem value="measured">تم أخذ القياس</SelectItem>
+              <SelectItem value="not_measured">لم يتم أخذ القياس</SelectItem>
               <SelectItem value="postponed">مؤجل</SelectItem>
             </SelectContent>
           </Select>

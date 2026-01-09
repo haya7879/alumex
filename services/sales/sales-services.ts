@@ -303,7 +303,7 @@ export interface DailyMovementData {
   phone: string;
   location: string;
   movement_date: string;
-  status: "completed" | "not-completed" | "postponed";
+  status: "measured" | "not_measured" | "postponed";
   follow_up_date: string | null;
   sales_user: {
     id: number;
@@ -411,7 +411,7 @@ export interface CreateDailyMovementRequest {
   customer_name: string;
   phone: string;
   movement_date: string;
-  status: "completed" | "not-completed" | "postponed";
+  status: "measured" | "not_measured" | "postponed";
   follow_up_date?: string;
 }
 
@@ -422,7 +422,7 @@ export interface CreateDailyMovementResponse {
 
 // Types for Update Daily Movement Status
 export interface UpdateDailyMovementStatusRequest {
-  status: "completed" | "not-completed" | "postponed";
+  status: "measured" | "not_measured" | "postponed";
   follow_up_date?: string;
 }
 
