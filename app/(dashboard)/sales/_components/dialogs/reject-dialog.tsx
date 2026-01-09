@@ -16,13 +16,15 @@ import { Textarea } from "@/components/ui/textarea";
 interface RejectDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onConfirm: (reason: string) => void;
+  onConfirm: (reason: string) => void | Promise<void>;
+  isPending?: boolean;
 }
 
 export function RejectDialog({
   open,
   onOpenChange,
   onConfirm,
+  isPending = false,
 }: RejectDialogProps) {
   const [rejectReason, setRejectReason] = useState("");
 
@@ -33,11 +35,11 @@ export function RejectDialog({
     }
   }, [open]);
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!rejectReason.trim()) {
       return;
     }
-    onConfirm(rejectReason);
+    await onConfirm(rejectReason);
     setRejectReason("");
   };
 
@@ -66,11 +68,11 @@ export function RejectDialog({
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={handleCancel}>
+          <Button variant="outline" onClick={handleCancel} disabled={isPending}>
             إلغاء
           </Button>
-          <Button onClick={handleConfirm} disabled={!rejectReason.trim()}>
-            تأكيد الرفض
+          <Button onClick={handleConfirm} disabled={!rejectReason.trim() || isPending}>
+            {isPending ? "جاري الرفض..." : "تأكيد الرفض"}
           </Button>
         </DialogFooter>
       </DialogContent>

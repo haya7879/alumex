@@ -13,6 +13,13 @@ import {
   CreateMeasurementsRequest,
   CreateMeasurementsResponse,
   FormsListResponse,
+  FormDetailsResponse,
+  UpdateFormBasicInfoRequest,
+  UpdateFormBasicInfoResponse,
+  UpdateFormMeasurementsRequest,
+  UpdateFormMeasurementsResponse,
+  RejectFormRequest,
+  RejectFormResponse,
   CreateSectionRequest,
   CreateSectionResponse,
   UpdateSectionRequest,
@@ -31,6 +38,7 @@ import {
   CreateContractResponse,
   CreateQuotationRequest,
   CreateQuotationResponse,
+  RejectedFormsListResponse,
 } from "./sales-services";
 
 
@@ -147,6 +155,17 @@ export const useForms = (params?: { page?: number; per_page?: number }) => {
 };
 
 /**
+ * Hook for fetching a single form by ID
+ */
+export const useForm = (id: number | null) => {
+  return useQuery<FormDetailsResponse>({
+    queryKey: ["form", id],
+    queryFn: () => salesServices.getForm(id!),
+    enabled: !!id,
+  });
+};
+
+/**
  * Hook for fetching daily movements list
  */
 export const useDailyMovements = (params?: { page?: number; per_page?: number }) => {
@@ -228,3 +247,51 @@ export const useCreateQuotation = () => {
   });
 };
 
+/**
+ * Hook for fetching rejected forms list
+ */
+export const useRejectedForms = (params?: { page?: number; per_page?: number }) => {
+  return useQuery<RejectedFormsListResponse>({
+    queryKey: ["rejected-forms", params],
+    queryFn: () => salesServices.getRejectedForms(params),
+  });
+};
+
+/**
+ * Hook for updating form basic info
+ */
+export const useUpdateFormBasicInfo = () => {
+  return useMutation<
+    UpdateFormBasicInfoResponse,
+    Error,
+    { id: number; data: UpdateFormBasicInfoRequest }
+  >({
+    mutationFn: ({ id, data }) => salesServices.updateFormBasicInfo(id, data),
+  });
+};
+
+/**
+ * Hook for updating form measurements
+ */
+export const useUpdateFormMeasurements = () => {
+  return useMutation<
+    UpdateFormMeasurementsResponse,
+    Error,
+    { id: number; data: UpdateFormMeasurementsRequest }
+  >({
+    mutationFn: ({ id, data }) => salesServices.updateFormMeasurements(id, data),
+  });
+};
+
+/**
+ * Hook for rejecting a form
+ */
+export const useRejectForm = () => {
+  return useMutation<
+    RejectFormResponse,
+    Error,
+    { id: number; data: RejectFormRequest }
+  >({
+    mutationFn: ({ id, data }) => salesServices.rejectForm(id, data),
+  });
+};

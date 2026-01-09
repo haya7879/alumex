@@ -4,16 +4,9 @@ import { DataTable, Column } from "@/components/table/data-table";
 import { TableRowData } from "@/app/(dashboard)/sales/_components/columns/columns";
 import { FilterField } from "@/components/shared/filter-sheet";
 import { TablePagination } from "@/components/table";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   FileText,
-  Menu,
-  Eye,
-  Edit,
-  X,
-  FileDown,
-  CheckCircle2,
-  MoreVerticalIcon,
 } from "lucide-react";
 import { FaFileAlt, FaCopy } from "react-icons/fa";
 import {
@@ -21,72 +14,21 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
+import { useRejectedForms } from "@/services/sales/sales-hooks";
+import { RejectedFormData } from "@/services/sales/sales-services";
+import { useDateConverter } from "@/hooks/use-date-converter";
 
-// Sample follow-up notes data
 interface FollowUpNote {
   text: string;
   date: string;
   employeeName: string;
 }
 
-// Sample data for follow-up notes (in real app, this would come from API)
-const sampleFollowUpNotes: Record<number, FollowUpNote[]> = {
-  0: [
-    {
-      text: "تم رفض العرض بسبب السعر المرتفع",
-      date: "16/8/2025",
-      employeeName: "أحمد محمد",
-    },
-    {
-      text: "العميل طلب عرض سعر جديد",
-      date: "17/8/2025",
-      employeeName: "سارة علي",
-    },
-  ],
-  1: [
-    {
-      text: "تم رفض العرض بسبب عدم توفر المنتج",
-      date: "21/8/2025",
-      employeeName: "محمد خالد",
-    },
-  ],
-};
-
-const tableData: TableRowData[] = [
-  {
-    customerName: "شركة الرفض 1",
-    phone: "07 123456789",
-    serialNumber: "2302-2897",
-    lastOfferDate: "15/8/2525",
-    lastOfferPrice: "300,000",
-    receivedOffer: "نعم",
-    response: "مرفوض",
-    followUp: { origin: "blue" as const, branch: "blue" },
-  },
-  {
-    customerName: "شركة الرفض 2",
-    phone: "07 987654321",
-    serialNumber: "3427-9169",
-    lastOfferDate: "20/8/2525",
-    lastOfferPrice: "250,000",
-    receivedOffer: "لا",
-    response: "مرفوض",
-    followUp: { origin: "green" as const, branch: "blue" },
-  },
-];
+const sampleFollowUpNotes: Record<number, FollowUpNote[]> = {};
 
 export default function RejectedFormsPage() {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(15);
   const [appliedFilters, setAppliedFilters] = useState<Record<string, string>>(
     {}
   );
@@ -94,9 +36,43 @@ export default function RejectedFormsPage() {
     null
   );
 
+  // Date converter hook
+  const { formatDate } = useDateConverter();
+
+  // Fetch rejected forms from API
+  const { data: rejectedFormsData, isLoading, error } = useRejectedForms({
+    page: currentPage,
+    per_page: pageSize,
+  });
+
+  // Convert API data to TableRowData format
+  const tableData = useMemo(() => {
+    if (!rejectedFormsData?.data) return [];
+
+    return rejectedFormsData.data.map((form: RejectedFormData) => ({
+      id: form.id,
+      customerName: form.form_name,
+      phone: "-", // Not available in API response
+      serialNumber: form.serials.current,
+      lastOfferDate: form.entry_date ? formatDate(form.entry_date) : "-",
+      lastOfferPrice: form.quotation && form.quotation.total_value != null
+        ? Number(form.quotation.total_value).toLocaleString()
+        : "-",
+      receivedOffer: "-", // Not available in API response
+      response: "مرفوض",
+      followUp: {
+        origin: form.serials.parent ? ("green" as const) : ("blue" as const),
+        branch: form.serials.parent ? "مكرر" : "أصل",
+      },
+      formData: form, // Store full form data for use in handlers
+    }));
+  }, [rejectedFormsData, formatDate]);
+
   const handleApplyFilters = (filters: Record<string, string>) => {
     setAppliedFilters(filters);
     console.log("Applied Filters:", filters);
+    // Reset to first page when filters are applied
+    setCurrentPage(1);
   };
 
   const handleView = (index: number) => {
@@ -221,57 +197,6 @@ export default function RejectedFormsPage() {
         </div>
       ),
     },
-    {
-      key: "actions",
-      header: "",
-      render: (row: TableRowData, index: number) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              size="icon"
-              className=""
-            >
-              <MoreVerticalIcon className="size-4 text-[#3675AF] dark:text-white" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger>
-                تعديل
-              </DropdownMenuSubTrigger>
-              <DropdownMenuSubContent>
-                <DropdownMenuItem onClick={() => handleEdit("basic", index)}>
-                  المعلومات الأساسية
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleEdit("followup", index)}>
-                  برنامج المتابعة
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => handleEdit("measurements", index)}
-                >
-                  القياسات
-                </DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuSub>
-            <DropdownMenuItem
-              onClick={() => handleReject(index)}
-              variant="destructive"
-            >
-              رفض
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleCreatePriceOffer(index)}>
-              إنشاء عرض سعر
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => handleContractSigned(index)}>
-              <CheckCircle2 className="size-4 ml-2" />
-              تم توقيع العقد
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ),
-    },
   ];
 
   const filterFields: FilterField[] = [
@@ -296,22 +221,44 @@ export default function RejectedFormsPage() {
 
   return (
     <>
-      <DataTable
-        data={tableData}
-        columns={rejectedFormsColumns}
-        emptyMessage="لا توجد بيانات للعرض"
-        enableFilter
-        filterFields={filterFields}
-        initialFilters={appliedFilters}
-        onApplyFilters={handleApplyFilters}
-      />
-      <TablePagination
-        currentPage={1}
-        totalPages={1}
-        pageSize={10}
-        totalItems={2}
-        onPageChange={() => {}}
-      />
+      {/* Loading State */}
+      {isLoading && (
+        <div className="text-center py-12 text-muted-foreground">
+          جاري التحميل...
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <div className="text-center py-12 text-muted-foreground">
+          حدث خطأ أثناء تحميل البيانات
+        </div>
+      )}
+
+      {/* Table Section */}
+      {!isLoading && !error && (
+        <>
+          <DataTable
+            data={tableData}
+            columns={rejectedFormsColumns}
+            emptyMessage="لا توجد بيانات للعرض"
+            enableFilter
+            filterFields={filterFields}
+            initialFilters={appliedFilters}
+            onApplyFilters={handleApplyFilters}
+          />
+          {rejectedFormsData?.meta && (
+            <TablePagination
+              currentPage={rejectedFormsData.meta.current_page}
+              totalPages={rejectedFormsData.meta.last_page}
+              pageSize={rejectedFormsData.meta.per_page}
+              totalItems={rejectedFormsData.meta.total}
+              onPageChange={setCurrentPage}
+              onPageSizeChange={setPageSize}
+            />
+          )}
+        </>
+      )}
     </>
   );
 }

@@ -3,7 +3,13 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FileText, CheckCircle2, MoreVerticalIcon, Copy } from "lucide-react";
+import {
+  FileText,
+  CheckCircle2,
+  MoreVerticalIcon,
+  Copy,
+  Eye,
+} from "lucide-react";
 import { FaFileAlt, FaCopy } from "react-icons/fa";
 import {
   Popover,
@@ -51,10 +57,14 @@ export interface FormCardProps {
   hoveredPopoverIndex: number | null;
   setHoveredPopoverIndex: (index: number | null) => void;
   onCopySerial: (serialNumber: string) => void;
-  onEdit: (section: "basic" | "followup" | "measurements", index: number) => void;
+  onEdit: (
+    section: "basic" | "followup" | "measurements",
+    index: number
+  ) => void;
   onReject: (index: number) => void;
   onCreatePriceOffer: (index: number) => void;
   onContractSigned: (index: number) => void;
+  onShow: (index: number) => void;
 }
 
 export function FormCard({
@@ -68,6 +78,7 @@ export function FormCard({
   onReject,
   onCreatePriceOffer,
   onContractSigned,
+  onShow,
 }: FormCardProps) {
   return (
     <Card className="w-full">
@@ -76,9 +87,7 @@ export function FormCard({
           {/* Customer Name */}
           <div className="flex items-center justify-between border-b pb-2">
             <div className="flex items-center gap-2">
-              <h3 className="text-xs font-semibold">
-                {item.customerName}
-              </h3>
+              <h3 className="text-xs font-semibold">{item.customerName}</h3>
               <div className="flex items-center gap-1">
                 <span className="text-xs text-muted-foreground">
                   ({item.serialNumber})
@@ -99,22 +108,19 @@ export function FormCard({
                     <MoreVerticalIcon className="size-4 text-[#3675AF] dark:text-white" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuContent align="end" className="w-40">
+                  <DropdownMenuSeparator />
                   <DropdownMenuSub>
-                    <DropdownMenuSubTrigger>
-                      تعديل
-                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubTrigger>تعديل</DropdownMenuSubTrigger>
                     <DropdownMenuSubContent>
-                      <DropdownMenuItem
-                        onClick={() => onEdit("basic", index)}
-                      >
+                      <DropdownMenuItem onClick={() => onEdit("basic", index)}>
                         المعلومات الأساسية
                       </DropdownMenuItem>
-                      <DropdownMenuItem
+                      {/* <DropdownMenuItem
                         onClick={() => onEdit("followup", index)}
                       >
                         برنامج المتابعة
-                      </DropdownMenuItem>
+                      </DropdownMenuItem> */}
                       <DropdownMenuItem
                         onClick={() => onEdit("measurements", index)}
                       >
@@ -122,21 +128,20 @@ export function FormCard({
                       </DropdownMenuItem>
                     </DropdownMenuSubContent>
                   </DropdownMenuSub>
+                  <DropdownMenuItem onClick={() => onShow(index)}>
+                    عرض التفاصيل
+                  </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => onReject(index)}
                     variant="destructive"
                   >
                     رفض
                   </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => onCreatePriceOffer(index)}
-                  >
+                  <DropdownMenuItem onClick={() => onCreatePriceOffer(index)}>
                     إنشاء عرض سعر
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={() => onContractSigned(index)}
-                  >
+                  <DropdownMenuItem onClick={() => onContractSigned(index)}>
                     <CheckCircle2 className="size-4 ml-2" />
                     تم توقيع العقد
                   </DropdownMenuItem>
@@ -149,17 +154,13 @@ export function FormCard({
           <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-3">
             {/* التاريخ */}
             <div>
-              <p className="text-xs text-muted-foreground mb-2">
-                التاريخ
-              </p>
+              <p className="text-xs text-muted-foreground mb-2">التاريخ</p>
               <p className="text-sm font-medium">{item.entry_date}</p>
             </div>
 
             {/* الحالة */}
             <div>
-              <p className="text-xs text-muted-foreground mb-2">
-                الحالة
-              </p>
+              <p className="text-xs text-muted-foreground mb-2">الحالة</p>
               {item.formData?.status === "new" ? (
                 <Badge variant="default" className="px-3 py-1">
                   جديد
@@ -183,15 +184,11 @@ export function FormCard({
 
             {/* أصل / فرع */}
             <div>
-              <p className="text-xs text-muted-foreground mb-2">
-                أصل / فرع
-              </p>
+              <p className="text-xs text-muted-foreground mb-2">أصل / فرع</p>
               <div
                 className="flex items-center gap-1"
                 title={
-                  item.followUp.origin === "blue"
-                    ? "نسخة أصلية"
-                    : "نسخة مكررة"
+                  item.followUp.origin === "blue" ? "نسخة أصلية" : "نسخة مكررة"
                 }
               >
                 {item.followUp.origin === "blue" ? (
@@ -207,9 +204,7 @@ export function FormCard({
 
             {/* المتابعة */}
             <div>
-              <p className="text-xs text-muted-foreground mb-2">
-                المتابعة
-              </p>
+              <p className="text-xs text-muted-foreground mb-2">المتابعة</p>
               <Popover
                 open={hoveredPopoverIndex === index}
                 onOpenChange={(open) =>
@@ -232,9 +227,7 @@ export function FormCard({
                   onMouseLeave={() => setHoveredPopoverIndex(null)}
                 >
                   <div className="space-y-3">
-                    <h4 className="font-semibold text-sm">
-                      ملاحظات المتابعة
-                    </h4>
+                    <h4 className="font-semibold text-sm">ملاحظات المتابعة</h4>
                     <div className="space-y-2 max-h-60 overflow-y-auto">
                       {item.formData?.follow_ups &&
                       item.formData.follow_ups.length > 0 ? (
@@ -244,9 +237,7 @@ export function FormCard({
                               key={noteIndex}
                               className="border-b pb-2 last:border-0"
                             >
-                              <p className="text-sm mb-3">
-                                {note.note}
-                              </p>
+                              <p className="text-sm mb-3">{note.note}</p>
                               <div className="flex items-center justify-between text-xs text-muted-foreground">
                                 <span>{note.user}</span>
                                 <span>{formatDate(note.date)}</span>
@@ -270,4 +261,3 @@ export function FormCard({
     </Card>
   );
 }
-

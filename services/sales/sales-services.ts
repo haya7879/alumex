@@ -125,6 +125,53 @@ export interface CreateMeasurementsResponse {
   message: string;
 }
 
+// Types for Update Form Basic Info
+export interface UpdateFormBasicInfoRequest {
+  authorized_company_id: number;
+  sales_agent_id: number;
+  engineer_name: string;
+  form_name: string;
+  phone1: string;
+  phone2?: string;
+  project_type: string;
+  project_stage: string;
+  address: string;
+}
+
+export interface UpdateFormBasicInfoResponse {
+  message?: string;
+  data?: FormDetailsData;
+}
+
+// Types for Update Form Measurements
+export interface UpdateMeasurementItem {
+  id?: number; // Optional for existing measurements
+  section_id: number;
+  width: number;
+  height: number;
+  qty: number;
+  price_per_meter: number;
+}
+
+export interface UpdateFormMeasurementsRequest {
+  measurements: UpdateMeasurementItem[];
+}
+
+export interface UpdateFormMeasurementsResponse {
+  message?: string;
+  data?: any;
+}
+
+// Types for Reject Form
+export interface RejectFormRequest {
+  reason: string;
+}
+
+export interface RejectFormResponse {
+  message?: string;
+  data?: any;
+}
+
 // Types for Forms List
 export interface FollowUpNote {
   note: string;
@@ -173,6 +220,80 @@ export interface FormsListResponse {
     to: number;
     total: number;
   };
+}
+
+// Types for Single Form Details
+export interface FormDetailsUser {
+  id: number;
+  name: string;
+}
+
+export interface FormDetailsFollowUp {
+  id: number;
+  note: string;
+  date: string;
+  user: FormDetailsUser;
+}
+
+export interface FormDetailsQuotation {
+  id: number;
+  offer_number: string;
+  offer_date: string;
+  total_value: number;
+}
+
+export interface FormDetailsContract {
+  id: number;
+  contract_date: string;
+}
+
+export interface FormDetailsParent {
+  id: number;
+  serial_number: string;
+}
+
+export interface FormMeasurement {
+  id: number;
+  section_id: number;
+  width: number;
+  height: number;
+  qty: number;
+  price_per_meter: number;
+}
+
+export interface FormDetailsData {
+  id: number;
+  serial_number: string;
+  form_name: string;
+  engineer_name: string;
+  phones: {
+    phone1: string;
+    phone2: string | null;
+  };
+  project: {
+    type: string;
+    stage: string;
+  };
+  entry_date: string;
+  address: string;
+  status: string;
+  authorized_company: {
+    id: number;
+    name: string;
+  };
+  sales_agent: {
+    id: number;
+    name: string;
+  };
+  follow_ups: FormDetailsFollowUp[];
+  quotation: FormDetailsQuotation | null;
+  contract: FormDetailsContract | null;
+  parent: FormDetailsParent | null;
+  measurements?: FormMeasurement[];
+}
+
+export interface FormDetailsResponse {
+  data: FormDetailsData;
 }
 
 // Types for Daily Movements
@@ -336,6 +457,49 @@ export interface CreateQuotationRequest {
 export interface CreateQuotationResponse {
   message?: string;
   data?: any;
+}
+
+// Types for Rejected Forms
+export interface RejectedFormData {
+  id: number;
+  form_name: string;
+  serials: {
+    current: string;
+    parent: string | null;
+  };
+  status: string;
+  entry_date: string;
+  quotation: {
+    id: number;
+    offer_number: string;
+    offer_date: string;
+    total_value: number;
+  } | null;
+}
+
+export interface RejectedFormsListResponse {
+  data: RejectedFormData[];
+  links: {
+    first: string;
+    last: string;
+    prev: string | null;
+    next: string | null;
+  };
+  meta: {
+    current_page: number;
+    from: number;
+    last_page: number;
+    links: Array<{
+      url: string | null;
+      label: string;
+      page: number | null;
+      active: boolean;
+    }>;
+    path: string;
+    per_page: number;
+    to: number;
+    total: number;
+  };
 }
 
 // Sales Services
@@ -530,6 +694,78 @@ export const salesServices = {
   },
 
   /**
+   * Get form details by ID
+   */
+  getForm: async (id: number): Promise<FormDetailsResponse> => {
+    try {
+      const response = await apiClient.get<FormDetailsResponse>(
+        `/sales/forms/${id}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch form details:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Update form basic info
+   */
+  updateFormBasicInfo: async (
+    id: number,
+    data: UpdateFormBasicInfoRequest
+  ): Promise<UpdateFormBasicInfoResponse> => {
+    try {
+      const response = await apiClient.put<UpdateFormBasicInfoResponse>(
+        `/sales/forms/${id}/basic-info`,
+        data
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Failed to update form basic info:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Update form measurements
+   */
+  updateFormMeasurements: async (
+    id: number,
+    data: UpdateFormMeasurementsRequest
+  ): Promise<UpdateFormMeasurementsResponse> => {
+    try {
+      const response = await apiClient.put<UpdateFormMeasurementsResponse>(
+        `/sales/forms/${id}/measurements`,
+        data
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Failed to update form measurements:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Reject form
+   */
+  rejectForm: async (
+    id: number,
+    data: RejectFormRequest
+  ): Promise<RejectFormResponse> => {
+    try {
+      const response = await apiClient.post<RejectFormResponse>(
+        `/sales/forms/${id}/reject`,
+        data
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Failed to reject form:", error);
+      throw error;
+    }
+  },
+
+  /**
    * Get daily movements list
    */
   getDailyMovements: async (params?: {
@@ -673,6 +909,25 @@ export const salesServices = {
       return response.data;
     } catch (error) {
       console.error("Failed to create quotation:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get rejected forms list
+   */
+  getRejectedForms: async (params?: {
+    page?: number;
+    per_page?: number;
+  }): Promise<RejectedFormsListResponse> => {
+    try {
+      const response = await apiClient.get<RejectedFormsListResponse>(
+        "/sales/forms/rejected",
+        { params }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch rejected forms:", error);
       throw error;
     }
   },
