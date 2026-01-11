@@ -39,6 +39,7 @@ import {
   CreateQuotationRequest,
   CreateQuotationResponse,
   RejectedFormsListResponse,
+  ContractsListResponse,
 } from "./sales-services";
 
 
@@ -254,6 +255,16 @@ export const useRejectedForms = (params?: { page?: number; per_page?: number }) 
   return useQuery<RejectedFormsListResponse>({
     queryKey: ["rejected-forms", params],
     queryFn: () => salesServices.getRejectedForms(params),
+  });
+};
+
+/**
+ * Hook for fetching contracts list
+ */
+export const useContracts = (params?: { page?: number; per_page?: number }) => {
+  return useQuery<ContractsListResponse>({
+    queryKey: ["contracts", params],
+    queryFn: () => salesServices.getContracts(params),
   });
 };
 

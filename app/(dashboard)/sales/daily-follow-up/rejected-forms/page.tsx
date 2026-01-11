@@ -29,9 +29,6 @@ const sampleFollowUpNotes: Record<number, FollowUpNote[]> = {};
 export default function RejectedFormsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(15);
-  const [appliedFilters, setAppliedFilters] = useState<Record<string, string>>(
-    {}
-  );
   const [hoveredPopoverIndex, setHoveredPopoverIndex] = useState<number | null>(
     null
   );
@@ -67,41 +64,6 @@ export default function RejectedFormsPage() {
       formData: form, // Store full form data for use in handlers
     }));
   }, [rejectedFormsData, formatDate]);
-
-  const handleApplyFilters = (filters: Record<string, string>) => {
-    setAppliedFilters(filters);
-    console.log("Applied Filters:", filters);
-    // Reset to first page when filters are applied
-    setCurrentPage(1);
-  };
-
-  const handleView = (index: number) => {
-    // TODO: Navigate to view page
-    console.log("View item:", index);
-  };
-
-  const handleEdit = (
-    section: "basic" | "followup" | "measurements",
-    index: number
-  ) => {
-    // TODO: Navigate to edit page with section
-    console.log("Edit", section, "for item:", index);
-  };
-
-  const handleReject = (index: number) => {
-    // TODO: Handle reject action
-    console.log("Reject item:", index);
-  };
-
-  const handleCreatePriceOffer = (index: number) => {
-    // TODO: Create price offer PDF
-    console.log("Create price offer for item:", index);
-  };
-
-  const handleContractSigned = (index: number) => {
-    // TODO: Handle contract signed action
-    console.log("Contract signed for item:", index);
-  };
 
   // Custom columns for rejected forms with follow-up and origin/branch
   const rejectedFormsColumns: Column<TableRowData>[] = [
@@ -198,27 +160,6 @@ export default function RejectedFormsPage() {
       ),
     },
   ];
-
-  const filterFields: FilterField[] = [
-    {
-      key: "customerName",
-      label: "اسم الزبون",
-      type: "input",
-      placeholder: "ابحث باسم الزبون",
-    },
-    {
-      key: "rejectionReason",
-      label: "سبب الرفض",
-      type: "select",
-      placeholder: "اختار اجابة من القائمة",
-      options: [
-        { value: "price", label: "السعر" },
-        { value: "quality", label: "الجودة" },
-        { value: "other", label: "أخرى" },
-      ],
-    },
-  ];
-
   return (
     <>
       {/* Loading State */}
@@ -242,10 +183,6 @@ export default function RejectedFormsPage() {
             data={tableData}
             columns={rejectedFormsColumns}
             emptyMessage="لا توجد بيانات للعرض"
-            enableFilter
-            filterFields={filterFields}
-            initialFilters={appliedFilters}
-            onApplyFilters={handleApplyFilters}
           />
           {rejectedFormsData?.meta && (
             <TablePagination

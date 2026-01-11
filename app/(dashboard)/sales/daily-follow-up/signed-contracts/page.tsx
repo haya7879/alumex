@@ -1,196 +1,91 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { DataTable } from "@/components/table/data-table";
 import { TablePagination } from "@/components/table";
-import { FilterField } from "../../../../../components/shared/filter-sheet";
-import { Calendar, MoreVertical } from "lucide-react";
-import {
-  SignedContractRowData,
-  signedContractsColumns,
-} from "@/app/(dashboard)/sales/_components/columns/columns";
-
-// Sample data based on the image
-const tableData: SignedContractRowData[] = [
-  {
-    customerName: "شركة اليد البناء م. عباس المحترم",
-    location: "حي النجار",
-    representativeName: "م. سجاد حسن",
-    contractSigningDate: "23/8/2525",
-    totalContractValue: "6,034,124 د.ع",
-    totalProjectArea: "25",
-  },
-  {
-    customerName: "شركة اليد البناء م. عباس المحترم",
-    location: "حي النجار",
-    representativeName: "م. سجاد حسن",
-    contractSigningDate: "23/8/2525",
-    totalContractValue: "6,034,124 د.ع",
-    totalProjectArea: "30",
-  },
-  {
-    customerName: "شركة اليد البناء م. عباس المحترم",
-    location: "حي النجار",
-    representativeName: "م. سجاد حسن",
-    contractSigningDate: "23/8/2525",
-    totalContractValue: "6,034,124 د.ع",
-    totalProjectArea: "80",
-  },
-  {
-    customerName: "شركة اليد البناء م. عباس المحترم",
-    location: "حي النجار",
-    representativeName: "م. سجاد حسن",
-    contractSigningDate: "23/8/2525",
-    totalContractValue: "6,034,124 د.ع",
-    totalProjectArea: "45",
-  },
-  {
-    customerName: "شركة اليد البناء م. عباس المحترم",
-    location: "حي النجار",
-    representativeName: "م. سجاد حسن",
-    contractSigningDate: "23/8/2525",
-    totalContractValue: "6,034,124 د.ع",
-    totalProjectArea: "70",
-  },
-  {
-    customerName: "شركة اليد البناء م. عباس المحترم",
-    location: "حي النجار",
-    representativeName: "م. سجاد حسن",
-    contractSigningDate: "23/8/2525",
-    totalContractValue: "6,034,124 د.ع",
-    totalProjectArea: "25",
-  },
-  {
-    customerName: "شركة اليد البناء م. عباس المحترم",
-    location: "حي النجار",
-    representativeName: "م. سجاد حسن",
-    contractSigningDate: "23/8/2525",
-    totalContractValue: "6,034,124 د.ع",
-    totalProjectArea: "45",
-  },
-  {
-    customerName: "شركة اليد البناء م. عباس المحترم",
-    location: "حي النجار",
-    representativeName: "م. سجاد حسن",
-    contractSigningDate: "23/8/2525",
-    totalContractValue: "6,034,124 د.ع",
-    totalProjectArea: "25",
-  },
-  {
-    customerName: "شركة اليد البناء م. عباس المحترم",
-    location: "حي النجار",
-    representativeName: "م. سجاد حسن",
-    contractSigningDate: "23/8/2525",
-    totalContractValue: "6,034,124 د.ع",
-    totalProjectArea: "45",
-  },
-  {
-    customerName: "شركة اليد البناء م. عباس المحترم",
-    location: "حي النجار",
-    representativeName: "م. سجاد حسن",
-    contractSigningDate: "23/8/2525",
-    totalContractValue: "6,034,124 د.ع",
-    totalProjectArea: "25",
-  },
-  {
-    customerName: "شركة اليد البناء م. عباس المحترم",
-    location: "حي النجار",
-    representativeName: "م. سجاد حسن",
-    contractSigningDate: "23/8/2525",
-    totalContractValue: "6,034,124 د.ع",
-    totalProjectArea: "30",
-  },
-  {
-    customerName: "شركة اليد البناء م. عباس المحترم",
-    location: "حي النجار",
-    representativeName: "م. سجاد حسن",
-    contractSigningDate: "23/8/2525",
-    totalContractValue: "6,034,124 د.ع",
-    totalProjectArea: "25",
-  },
-  {
-    customerName: "شركة اليد البناء م. عباس المحترم",
-    location: "حي النجار",
-    representativeName: "م. سجاد حسن",
-    contractSigningDate: "23/8/2525",
-    totalContractValue: "6,034,124 د.ع",
-    totalProjectArea: "25",
-  },
-];
+import { signedContractsColumns } from "@/app/(dashboard)/sales/_components/columns/columns";
+import { useContracts } from "@/services/sales/sales-hooks";
+import { ContractData } from "@/services/sales/sales-services";
+import { useDateConverter } from "@/hooks/use-date-converter";
 
 export default function SignedContractsPage() {
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const totalItems = tableData.length;
-  const totalPages = Math.ceil(totalItems / pageSize);
-  const [appliedFilters, setAppliedFilters] = useState<Record<string, string>>(
-    {}
-  );
+  const [pageSize, setPageSize] = useState(15);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const handleApplyFilters = (filters: Record<string, string>) => {
-    setAppliedFilters(filters);
-    console.log("Applied Filters:", filters);
-  };
+  // Date converter hook
+  const { formatDate } = useDateConverter();
 
-  // Define filter fields for signed contracts
-  const filterFields: FilterField[] = [
-    {
-      key: "customerName",
-      label: "اسم الزبون",
-      type: "input",
-      placeholder: "ابحث باسم الزبون",
-    },
-    {
-      key: "location",
-      label: "الموقع",
-      type: "select",
-      placeholder: "اختار اجابة من القائمة",
-      options: [
-        { value: "location1", label: "حي النجار" },
-        { value: "location2", label: "موقع 2" },
-        { value: "location3", label: "موقع 3" },
-      ],
-    },
-    {
-      key: "date",
-      label: "التاريخ",
-      type: "date",
-      placeholder: "---- / -- / --",
-      icon: Calendar,
-    },
-  ];
+  // Fetch contracts from API
+  const { data: contractsData, isLoading, error } = useContracts({
+    page: currentPage,
+    per_page: pageSize,
+  });
 
+  // Convert API data to SignedContractRowData format
+  const tableData = useMemo(() => {
+    if (!contractsData?.data) return [];
+
+    return contractsData.data.map((contract: ContractData) => ({
+      customerName: contract.form_name || "-",
+      location: contract.address || "-",
+      representativeName: contract.sales_agent || "-",
+      contractSigningDate: contract.contract_date ? formatDate(contract.contract_date) : "-",
+      totalContractValue: contract.total_amount != null
+        ? `${Number(contract.total_amount).toLocaleString()} د.ع`
+        : "-",
+      totalProjectArea: contract.total_area_m2 != null
+        ? String(contract.total_area_m2)
+        : "-",
+    }));
+  }, [contractsData, formatDate]);
 
   return (
     <>
-      <DataTable
-        data={tableData}
-        columns={signedContractsColumns}
-        emptyMessage="لا توجد بيانات للعرض"
-        enableExport
-        exportFilename="signed-contracts"
-        enableFilter
-        filterFields={filterFields}
-        initialFilters={appliedFilters}
-        onApplyFilters={handleApplyFilters}
-        enableSearch
-        searchValue={searchQuery}
-        onSearchChange={(value) => {
-          setSearchQuery(value);
-          console.log("Search Query:", value);
-        }}
-        searchPlaceholder="Search"
-        searchWidth="250px"
-      />
-      <TablePagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        pageSize={pageSize}
-        totalItems={totalItems}
-        onPageChange={setCurrentPage}
-        onPageSizeChange={setPageSize}
-      />
+      {/* Loading State */}
+      {isLoading && (
+        <div className="text-center py-12 text-muted-foreground">
+          جاري التحميل...
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <div className="text-center py-12 text-muted-foreground">
+          حدث خطأ أثناء تحميل البيانات
+        </div>
+      )}
+
+      {/* Table Section */}
+      {!isLoading && !error && (
+        <>
+          <DataTable
+            data={tableData}
+            columns={signedContractsColumns}
+            emptyMessage="لا توجد بيانات للعرض"
+            enableExport
+            exportFilename="signed-contracts"
+            enableSearch
+            searchValue={searchQuery}
+            onSearchChange={(value) => {
+              setSearchQuery(value);
+              console.log("Search Query:", value);
+            }}
+            searchPlaceholder="Search"
+            searchWidth="250px"
+          />
+          {contractsData?.meta && (
+            <TablePagination
+              currentPage={contractsData.meta.current_page}
+              totalPages={contractsData.meta.last_page}
+              pageSize={contractsData.meta.per_page}
+              totalItems={contractsData.meta.total}
+              onPageChange={setCurrentPage}
+              onPageSizeChange={setPageSize}
+            />
+          )}
+        </>
+      )}
     </>
   );
 }

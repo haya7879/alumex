@@ -502,6 +502,42 @@ export interface RejectedFormsListResponse {
   };
 }
 
+// Types for Contracts
+export interface ContractData {
+  id: number;
+  form_name: string;
+  address: string;
+  sales_agent: string;
+  contract_date: string;
+  total_amount: number | null;
+  total_area_m2: number | null;
+}
+
+export interface ContractsListResponse {
+  data: ContractData[];
+  links: {
+    first: string;
+    last: string;
+    prev: string | null;
+    next: string | null;
+  };
+  meta: {
+    current_page: number;
+    from: number;
+    last_page: number;
+    links: Array<{
+      url: string | null;
+      label: string;
+      page: number | null;
+      active: boolean;
+    }>;
+    path: string;
+    per_page: number;
+    to: number;
+    total: number;
+  };
+}
+
 // Sales Services
 export const salesServices = {
   /**
@@ -928,6 +964,25 @@ export const salesServices = {
       return response.data;
     } catch (error) {
       console.error("Failed to fetch rejected forms:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get contracts list
+   */
+  getContracts: async (params?: {
+    page?: number;
+    per_page?: number;
+  }): Promise<ContractsListResponse> => {
+    try {
+      const response = await apiClient.get<ContractsListResponse>(
+        "/sales/contracts",
+        { params }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch contracts:", error);
       throw error;
     }
   },

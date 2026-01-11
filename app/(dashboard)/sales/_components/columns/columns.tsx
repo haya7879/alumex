@@ -92,13 +92,13 @@ export const signedContractsColumns: Column<SignedContractRowData>[] = [
     key: "totalProjectArea",
     header: "مساحة المشروع",
   },
-  {
-    key: "actions",
-    header: "",
-    render: () => (
-      <Button variant="outline" size="icon" className="">
-        <MoreVerticalIcon className="size-4 text-[#3675AF] dark:text-white" />
-      </Button>
-    ),
-  },
+  // {
+  //   key: "actions",
+  //   header: "",
+  //   render: () => (
+  //     <Button variant="outline" size="icon" className="">
+  //       <MoreVerticalIcon className="size-4 text-[#3675AF] dark:text-white" />
+  //     </Button>
+  //   ),
+  // },
 ];
