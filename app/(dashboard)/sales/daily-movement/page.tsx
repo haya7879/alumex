@@ -15,9 +15,6 @@ export type { DailyMovementRowData } from "@/app/(dashboard)/sales/hooks/use-dai
 export default function DailyMovementPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(15);
-  const [appliedFilters, setAppliedFilters] = useState<Record<string, string>>(
-    {}
-  );
   const [searchQuery, setSearchQuery] = useState("");
 
   // Hooks
@@ -31,12 +28,6 @@ export default function DailyMovementPage() {
     (movementId, status) => statusHook.openDialog(movementId)
   );
 
-  const handleApplyFilters = (filters: Record<string, string>) => {
-    setAppliedFilters(filters);
-    console.log("Applied Filters:", filters);
-    // Apply filters logic here
-  };
-
   const handleStatusSelect = (status: string) => {
     statusHook.setSelectedStatus(status as "measured" | "not_measured" | "postponed");
     if (status !== "postponed") {
@@ -48,45 +39,6 @@ export default function DailyMovementPage() {
     { value: "measured", label: "تم أخذ القياس" },
     { value: "not_measured", label: "لم يتم أخذ القياس" },
     { value: "postponed", label: "مؤجل" },
-  ];
-
-
-  // Define filter fields for daily movement
-  const filterFields: FilterField[] = [
-    {
-      key: "customerName",
-      label: "اسم الزبون",
-      type: "input",
-      placeholder: "اسم الزبون",
-    },
-    {
-      key: "status",
-      label: "الحالة",
-      type: "select",
-      placeholder: "أختر المندوب من القائمة",
-      options: [
-        { value: "measured", label: "تم أخذ القياس" },
-        { value: "not_measured", label: "لم يتم أخذ القياس" },
-        { value: "postponed", label: "مؤجل" },
-      ],
-    },
-    {
-      key: "representative",
-      label: "المندوب",
-      type: "select",
-      placeholder: "أختر المندوب من القائمة",
-      options: [
-        { value: "rep1", label: "مندوب 1" },
-        { value: "rep2", label: "مندوب 2" },
-      ],
-    },
-    {
-      key: "date",
-      label: "التاريخ",
-      type: "date",
-      placeholder: "__/__/____",
-      icon: Calendar,
-    },
   ];
 
   return (
@@ -114,10 +66,6 @@ export default function DailyMovementPage() {
             emptyMessage="لا توجد بيانات للعرض"
             enableExport
             exportFilename="daily-movement"
-            enableFilter
-            filterFields={filterFields}
-            initialFilters={appliedFilters}
-            onApplyFilters={handleApplyFilters}
             enableSearch
             searchValue={searchQuery}
             onSearchChange={(value) => {

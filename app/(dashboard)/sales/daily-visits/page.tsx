@@ -3,11 +3,7 @@
 import { useState, useMemo, useCallback } from "react";
 import { DataTable, Column } from "@/components/table/data-table";
 import { TablePagination } from "@/components/table";
-import { MoreVertical, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import {
-  FilterField,
-} from "../../../../components/shared/filter-sheet";
 import { useShowroomVisits, useUpdateShowroomVisitStatus } from "@/services/sales/sales-hooks";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
@@ -31,7 +27,6 @@ export interface DailyVisitRowData {
 export default function DailyVisitsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(15);
-  const [appliedFilters, setAppliedFilters] = useState<Record<string, string>>({});
   const [statusDialogOpen, setStatusDialogOpen] = useState(false);
   const [selectedVisitId, setSelectedVisitId] = useState<number | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string>("");
@@ -136,12 +131,6 @@ export default function DailyVisitsPage() {
     },
   ], [handleStatusClick]);
 
-  const handleApplyFilters = (filters: Record<string, string>) => {
-    setAppliedFilters(filters);
-    console.log("Applied Filters:", filters);
-    // Apply filters logic here
-  };
-
   // Handle status update submit
   const handleStatusUpdate = async () => {
     if (!selectedVisitId || !selectedStatus) return;
@@ -187,44 +176,6 @@ export default function DailyVisitsPage() {
     setNotes("");
   };
 
-  // Define filter fields for daily visits
-  const filterFields: FilterField[] = [
-    {
-      key: "customerName",
-      label: "اسم الزبون",
-      type: "input",
-      placeholder: "اسم الزبون",
-    },
-    {
-      key: "status",
-      label: "الحالة",
-      type: "select",
-      placeholder: "أختر المندوب من القائمة",
-      options: [
-        { value: "measured", label: "تم أخذ القياس" },
-        { value: "not_measured", label: "لم يتم أخذ القياس" },
-        { value: "postponed", label: "مؤجل" },
-      ],
-    },
-    {
-      key: "delegate",
-      label: "المندوب",
-      type: "select",
-      placeholder: "أختر المندوب من القائمة",
-      options: [
-        { value: "rep1", label: "مندوب 1" },
-        { value: "rep2", label: "مندوب 2" },
-      ],
-    },
-    {
-      key: "date",
-      label: "التاريخ",
-      type: "date",
-      placeholder: "__/__/____",
-      icon: Calendar,
-    },
-  ];
-
   return (
     <div className="space-y-4">
       {/* Loading State */}
@@ -248,10 +199,6 @@ export default function DailyVisitsPage() {
             data={tableData}
             columns={columns}
             emptyMessage="لا توجد بيانات للعرض"
-            enableFilter
-            filterFields={filterFields}
-            initialFilters={appliedFilters}
-            onApplyFilters={handleApplyFilters}
           />
 
           {/* Pagination */}
