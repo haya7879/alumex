@@ -1,3 +1,5 @@
+import { useCallback } from "react";
+
 /**
  * Custom hook for converting date formats
  * Converts dates from DD/MM/YYYY to YYYY-MM-DD format for API usage
@@ -9,7 +11,7 @@ export function useDateConverter() {
    * @param dateString - Date string in DD/MM/YYYY or YYYY-MM-DD format
    * @returns Date string in YYYY-MM-DD format
    */
-  const convertDateToAPIFormat = (dateString: string): string => {
+  const convertDateToAPIFormat = useCallback((dateString: string): string => {
     if (!dateString) return "";
     
     // If already in YYYY-MM-DD format, validate and return
@@ -29,41 +31,41 @@ export function useDateConverter() {
     }
     
     return dateString;
-  };
+  }, []);
 
   /**
    * Formats date from API format (YYYY-MM-DD) to display format (DD/MM/YYYY)
    * @param dateString - Date string in YYYY-MM-DD format (can be null)
    * @returns Date string in DD/MM/YYYY format
    */
-  const formatDate = (dateString: string | null): string => {
+  const formatDate = useCallback((dateString: string | null): string => {
     if (!dateString) return "";
     const date = new Date(dateString);
     const day = date.getDate();
     const month = date.getMonth() + 1;
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
-  };
+  }, []);
 
   /**
    * Formats date from Date object to DD/MM/YYYY format
    * @param date - Date object
    * @returns Date string in DD/MM/YYYY format
    */
-  const formatDateToDisplay = (date: Date | undefined): string => {
+  const formatDateToDisplay = useCallback((date: Date | undefined): string => {
     if (!date) return "";
     const day = date.getDate();
     const month = date.getMonth() + 1;
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
-  };
+  }, []);
 
   /**
    * Parses date from DD/MM/YYYY or YYYY-MM-DD string to Date object
    * @param dateString - Date string in DD/MM/YYYY or YYYY-MM-DD format
    * @returns Date object or undefined if invalid
    */
-  const parseDateFromString = (dateString: string): Date | undefined => {
+  const parseDateFromString = useCallback((dateString: string): Date | undefined => {
     if (!dateString) return undefined;
     // Try DD/MM/YYYY format first
     const parts = dateString.split("/");
@@ -84,7 +86,7 @@ export function useDateConverter() {
       }
     }
     return undefined;
-  };
+  }, []);
 
   return {
     convertDateToAPIFormat,

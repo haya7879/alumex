@@ -13,6 +13,8 @@ export function useDateSync(dateString: string) {
     if (dateString) {
       const parsedDate = parseDateFromString(dateString);
       setSelectedDate(parsedDate);
+    } else {
+      setSelectedDate(undefined);
     }
   }, [dateString, parseDateFromString]);
 
